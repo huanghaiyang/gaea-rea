@@ -91,6 +91,7 @@ node tests/i18n-test.mjs    # localisation lookups, fallbacks and DOM applicatio
 node tests/graph-coords-test.mjs  # graph canvas coordinate plumbing at devicePixelRatio=2 — 20 assertions
 node tests/camera-controls-test.mjs  # 3D preview orbit/pan/zoom sign conventions — 22 assertions
 node tests/mesh-parity-test.mjs   # worker vs module mesh build, bit-for-bit — 68 assertions
+node tests/shader-src-test.mjs    # static GLSL ES 3.0 invariants — 120 assertions
 python ../tools/validate_web.py   # static: every import/asset resolves
 ```
 
@@ -126,6 +127,36 @@ Two constraints shape this, and both are worth knowing because they silently cos
 
 Orbiting and panning never rebuild the mesh — only a new height field, a new field size or a change
 of vertical exaggeration does — so interaction cost is independent of field resolution.
+
+### How the 3D relief is shaded
+
+Shading detail comes from the **height field, not from the mesh**. The field is uploaded as a
+single-channel `R32F` texture and the fragment shader derives everything per pixel:
+
+| Term | Source |
+| --- | --- |
+| normal | central differences on the height texture, plus 2-texel and 4-texel slope octaves |
+| ambient occlusion | four taps 9 texels out, weighted by how much higher the neighbours sit |
+| diffuse | one directional light, near-overhead |
+| specular | Blinn-Phong, so ridge crests read as rock rather than flat paint |
+
+This replaced a shader that lit each pixel with the **interpolated vertex normal**. That is what made
+the first renders look like soft blobs: a normal is only correct at a vertex, so the surface between
+vertices was shaded as a smooth blend and every ridge finer than one triangle vanished. The
+difference is largest exactly where terrain matters — gullies and crest lines.
+
+The height field is normalized to 0..1 before upload, so the shader never has to read a negative
+value out of a float texture, and the colour ramp is driven by the interpolated vertex height alone.
+Occlusion multiplies the lighting rather than the height, so a colour always means the same
+elevation.
+
+If the texture cannot be created, `uNormalRes` is 0 and the shader falls back to the interpolated
+normal, so the view still renders rather than going black.
+
+`tests/shader-src-test.mjs` checks the GLSL statically — `#version` placement, balanced delimiters,
+every called function exists in GLSL ES 3.00, every uniform is declared *and* located *and* assigned,
+the two stages' varyings agree, and no non-existent built-in is referenced. A real driver is still the
+only true compiler, but these are the mistakes that would otherwise show up as a black viewport.
 
 ---
 

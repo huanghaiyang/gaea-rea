@@ -28,9 +28,15 @@ uniform mat4 uProj;
 uniform mat4 uView;
 out vec3 vNormal;
 out float vHeight;
+out vec2 vGrid;
+out vec3 vWorld;
 void main() {
   vNormal = aNormal;
   vHeight = aHeight;
+  // Grid position in 0..1. The mesh spans exactly one texture width, so this is also
+  // the height-texture coordinate used for per-pixel normals.
+  vGrid = aPos.xz + 0.5;
+  vWorld = aPos;
   gl_Position = uProj * uView * vec4(aPos, 1.0);
 }`;
 
@@ -38,11 +44,22 @@ const FRAG = `#version 300 es
 precision highp float;
 in vec3 vNormal;
 in float vHeight;
+in vec2 vGrid;
+in vec3 vWorld;
 out vec4 outColor;
 uniform int uRamp;
 uniform vec3 uLightDir;
 uniform float uAmbient;
 uniform float uExposure;
+uniform sampler2D uHeight;
+uniform float uNormalRes;    // 0 disables texture normals (texture unavailable)
+uniform vec2 uNormalScale;   // height units -> world slope
+uniform vec2 uTexel;         // 1 / field size
+uniform vec2 uDetail;        // fine detail normal strength
+uniform vec3 uSky;
+uniform vec3 uAOI;           // x: strength, y: reach in texels, z: floor
+uniform vec3 uSpec;          // x: strength, y: shininess
+uniform vec3 uEye;           // camera position in world space
 
 vec3 toSrgb(vec3 c) {
   vec3 lo = c * 12.92;
@@ -100,6 +117,53 @@ vec3 rampHeat(float x) {
 }
 
 void main() {
+  vec3 n;
+  // Ambient occlusion: 1 means fully lit, lower means sheltered by nearby terrain.
+  float ao = 1.0;
+
+  if (uNormalRes > 0.0) {
+    // Per-pixel normal from the height texture, so shading detail is limited by the
+    // FIELD resolution rather than by how many vertices the mesh has. The old path
+    // interpolated vertex normals across each triangle, which is what flattened
+    // ridges into soft blobs.
+    float h = vHeight;
+    float hl = texture(uHeight, vGrid - vec2(uTexel.x, 0.0)).r;
+    float hr = texture(uHeight, vGrid + vec2(uTexel.x, 0.0)).r;
+    float hd = texture(uHeight, vGrid - vec2(0.0, uTexel.y)).r;
+    float hu = texture(uHeight, vGrid + vec2(0.0, uTexel.y)).r;
+    n = normalize(vec3((hl - hr) * uNormalScale.x, 1.0, (hd - hu) * uNormalScale.y));
+
+    // Two extra octaves of slope detail give the crisp drainage texture that a
+    // single-texel difference cannot express.
+    float h2l = texture(uHeight, vGrid - vec2(uTexel.x * 2.0, 0.0)).r;
+    float h2r = texture(uHeight, vGrid + vec2(uTexel.x * 2.0, 0.0)).r;
+    float h2d = texture(uHeight, vGrid - vec2(0.0, uTexel.y * 2.0)).r;
+    float h2u = texture(uHeight, vGrid + vec2(0.0, uTexel.y * 2.0)).r;
+    n = normalize(n + vec3((h2l - h2r) * uDetail.x, 0.0, (h2d - h2u) * uDetail.y));
+
+    float h4l = texture(uHeight, vGrid - vec2(uTexel.x * 4.0, 0.0)).r;
+    float h4r = texture(uHeight, vGrid + vec2(uTexel.x * 4.0, 0.0)).r;
+    float h4d = texture(uHeight, vGrid - vec2(0.0, uTexel.y * 4.0)).r;
+    float h4u = texture(uHeight, vGrid + vec2(0.0, uTexel.y * 4.0)).r;
+    n = normalize(n + vec3((h4l - h4r) * uDetail.x * 0.5, 0.0, (h4d - h4u) * uDetail.y * 0.5));
+
+    // Sky occlusion: how much higher the surrounding terrain sits. This is what puts
+    // dark creases in valleys and under cliffs, which flat diffuse lighting misses.
+    float m = uAOI.y;
+    float occ = 0.0;
+    occ += clamp((texture(uHeight, vGrid + vec2( uTexel.x * m, 0.0)).r - h) * uAOI.x, 0.0, 1.0);
+    occ += clamp((texture(uHeight, vGrid + vec2(-uTexel.x * m, 0.0)).r - h) * uAOI.x, 0.0, 1.0);
+    occ += clamp((texture(uHeight, vGrid + vec2(0.0,  uTexel.y * m)).r - h) * uAOI.x, 0.0, 1.0);
+    occ += clamp((texture(uHeight, vGrid + vec2(0.0, -uTexel.y * m)).r - h) * uAOI.x, 0.0, 1.0);
+    occ *= 0.25;
+    // Weight by facing-up-ness: a vertical wall is not sheltered from the sky above.
+    ao = mix(1.0, uAOI.z, occ * clamp(n.y, 0.0, 1.0));
+  } else {
+    n = normalize(vNormal);
+  }
+
+  // The ramp is driven by the interpolated height only, so a colour always means the
+  // same elevation. Occlusion is kept out of it and applied to the lighting instead.
   float t = clamp(vHeight, 0.0, 1.0);
   vec3 base;
   if (uRamp == 1) base = vec3(t);
@@ -107,12 +171,21 @@ void main() {
   else if (uRamp == 3) base = rampHeat(t);
   else base = rampTerrain(t);
 
-  vec3 n = normalize(vNormal);
   vec3 l = normalize(uLightDir);
   float diff = max(dot(n, l), 0.0);
-  float fill = max(dot(n, normalize(vec3(-0.55, 0.5, 0.35))), 0.0) * 0.20;
-  float rim = pow(1.0 - max(n.z, 0.0), 2.0) * 0.05;
-  vec3 lit = base * (diff * 0.98 + fill + rim + uAmbient);
+  // Sky/ground hemisphere ambient: upward faces catch sky, downward faces go dark.
+  float hemi = mix(uAmbient * 0.35, uAmbient * 1.15, clamp(n.y * 0.5 + 0.5, 0.0, 1.0));
+  float fill = max(dot(n, normalize(vec3(-0.55, 0.5, 0.35))), 0.0) * 0.18;
+  vec3 lit = base * (diff * 1.02 + hemi + fill) * ao;
+  lit += uSky * diff * 0.10 * ao;
+
+  // Blinn-Phong highlight, which is what makes ridge crests read as rock rather than
+  // as flat paint. vWorld is the interpolated vertex position; GLSL ES 3.0 has no
+  // built-in cameraPosition in the fragment stage.
+  vec3 v = normalize(uEye - vWorld);
+  float spec = pow(max(dot(n, normalize(l + v)), 0.0), uSpec.y) * uSpec.x;
+  lit += vec3(spec) * ao;
+
   outColor = vec4(toSrgb(lit * uExposure), 1.0);
 }`;
 
@@ -147,6 +220,14 @@ function lookAt(out, ex, ey, ez, cx, cy, cz, ux, uy, uz) {
 }
 
 /* ------------------------------------------------------------------ viewport */
+
+/**
+ * Shader sources, exported so the static GLSL checks in tests/shader-src-test.mjs can
+ * inspect them. A browser is the only real compiler, but most mistakes that make a
+ * shader fail to compile are structural and catchable without one.
+ */
+export const SHADER_VERT = VERT;
+export const SHADER_FRAG = FRAG;
 
 export class Viewport {
   constructor(canvas2d, canvas3d, opts = {}) {
@@ -219,10 +300,34 @@ export class Viewport {
         light: gl.getUniformLocation(prog, 'uLightDir'),
         ambient: gl.getUniformLocation(prog, 'uAmbient'),
         exposure: gl.getUniformLocation(prog, 'uExposure'),
+        // Per-pixel shading state. `height` may stay -1 when the texture cannot be
+        // created, in which case `normalRes` is 0 and the fragment shader falls back
+        // to the interpolated vertex normal.
+        height: gl.getUniformLocation(prog, 'uHeight'),
+        normalRes: gl.getUniformLocation(prog, 'uNormalRes'),
+        normalScale: gl.getUniformLocation(prog, 'uNormalScale'),
+        texel: gl.getUniformLocation(prog, 'uTexel'),
+        detail: gl.getUniformLocation(prog, 'uDetail'),
+        sky: gl.getUniformLocation(prog, 'uSky'),
+        aoi: gl.getUniformLocation(prog, 'uAOI'),
+        spec: gl.getUniformLocation(prog, 'uSpec'),
+        eye: gl.getUniformLocation(prog, 'uEye'),
       };
       this.vao = gl.createVertexArray();
       this.vbo = gl.createBuffer();
       this.ibo = gl.createBuffer();
+
+      // Height texture: the full field goes in as normalized single-channel float, so
+      // normals are derived per pixel at field resolution instead of being
+      // interpolated between mesh vertices.
+      this.heightTex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, this.heightTex);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      // 1x1 transparent placeholder keeps the sampler complete before the first field.
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.R32F, 1, 1, 0, gl.RED, gl.FLOAT, new Float32Array([0]));
       gl.bindVertexArray(this.vao);
       gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
       // 7 floats per vertex: px py pz nx ny nz height
@@ -487,9 +592,40 @@ export class Viewport {
     gl.uniformMatrix4fv(this.loc.proj, false, this.proj);
     gl.uniformMatrix4fv(this.loc.view, false, this.view);
     gl.uniform1i(this.loc.ramp, ({ terrain: 0, gray: 1, flow: 2, heat: 3 })[this.ramp] ?? 0);
-    gl.uniform3f(this.loc.light, 0.52, 0.80, 0.40);
-    gl.uniform1f(this.loc.ambient, 0.15);
+    gl.uniform3f(this.loc.light, 0.45, 0.82, 0.34);
+    gl.uniform1f(this.loc.ambient, 0.155);
     gl.uniform1f(this.loc.exposure, 1.03);
+    gl.uniform3f(this.loc.eye, ex, ey, ez);
+    gl.uniform3f(this.loc.sky, 0.36, 0.52, 0.78);
+    gl.uniform3f(this.loc.spec, 0.055, 42.0, 0.0);
+    // AOI: strength, reach in texels, floor. Calibrated so a 9-texel drop of 0.05
+    // normalized height occludes about 20%, which darkens ravines without greying
+    // gentle slopes.
+    gl.uniform3f(this.loc.aoi, 4.0, 9.0, 0.42);
+
+    // Per-pixel shading needs the field as a texture. `_heightTexSize` is only set
+    // once a field has been uploaded, so before that the shader falls back to the
+    // interpolated vertex normal rather than sampling a placeholder.
+    const field = this.field;
+    const haveTex = !!(field && field.data && this._heightTexSize);
+    if (haveTex) {
+      const size = field.size;
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.heightTex);
+      gl.uniform1i(this.loc.height, 0);
+      gl.uniform2f(this.loc.texel, 1 / size, 1 / size);
+      // Slope sensitivity, calibrated against the geometry rather than guessed. The
+      // value k maps a normalized height difference between neighbouring texels to a
+      // surface angle of atan(k * dh / 2). At k = 4.5 a typical 0.10 step read as 13
+      // degrees, which visibly flattened the relief; k = 11 puts it near 29 degrees,
+      // in the range real terrain uses. The wider taps use a larger k because a
+      // 2-texel and 4-texel difference is proportionally smaller.
+      gl.uniform2f(this.loc.normalScale, this._meshWidth * 11.0, this._meshWidth * 11.0);
+      gl.uniform2f(this.loc.detail, this._meshWidth * 20.0, this._meshWidth * 20.0);
+      gl.uniform1f(this.loc.normalRes, 1);
+    } else {
+      gl.uniform1f(this.loc.normalRes, 0);
+    }
 
     // Nothing to draw until the first mesh arrives. The request is already in
     // flight, and the cleared frame is preferable to blocking the UI thread.
@@ -573,6 +709,52 @@ export class Viewport {
       mode: res.mode,
       buildMs: res.buildMs,
     };
+    this._uploadHeightTexture(res.n, res.stride);
+  }
+
+  /**
+   * Upload the height field as a single-channel float texture so the fragment shader
+   * can derive normals, ambient occlusion and specular per pixel.
+   *
+   * The field is normalized to 0..1 (and widened if it is flat) to avoid relying on
+   * `texture()` being able to return negative values. `this._heightScale` maps that
+   * back to the band the geometry uses.
+   */
+  _uploadHeightTexture(n, stride) {
+    const gl = this.gl;
+    const s = this.field;
+    if (!gl || !this.heightTex || !s || !s.data) return;
+
+    const size = s.size;
+    const channels = s.channels || 1;
+    const gridStep = n > 1 ? 1 / (n - 1) : 1;
+    const width = (n - 1) * (stride * gridStep);
+    const exag = Math.max(0.02, Math.min(0.55, 0.34 * this.exaggeration));
+    // Geometry: y = (t - 0.5) * exag, with t the normalized height.
+    this._heightScale = exag;
+    this._heightBias = -0.5 * exag;
+    this._meshWidth = width;
+
+    const range = s.max - s.min;
+    const wide = range > 1e-9;
+    const inv = wide ? 1 / range : 1;
+
+    const tex = new Float32Array(size * size);
+    const data = s.data;
+    if (wide) {
+      for (let i = 0, p = 0; i < tex.length; i++, p += channels) {
+        tex[i] = (data[p] - s.min) * inv;
+      }
+    } else {
+      tex.fill(0.5);
+    }
+
+    gl.bindTexture(gl.TEXTURE_2D, this.heightTex);
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R32F, size, size, 0, gl.RED, gl.FLOAT, tex);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    this._heightTexSize = size;
+    this._heightTexRange = wide ? range : 1;
   }
 
   /**
