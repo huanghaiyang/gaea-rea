@@ -70,8 +70,12 @@ export class GraphEditor {
   resize() {
     const rect = this.canvas.getBoundingClientRect();
     const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const w = Math.max(1, Math.round(rect.width * dpr));
-    const h = Math.max(1, Math.round(rect.height * dpr));
+    // CSS-pixel size of the drawing surface. view.x/view.y, pointer offsetX/Y and
+    // all drawing share this space; the backing store is this multiplied by dpr.
+    this.cssWidth = Math.max(1, rect.width);
+    this.cssHeight = Math.max(1, rect.height);
+    const w = Math.max(1, Math.round(this.cssWidth * dpr));
+    const h = Math.max(1, Math.round(this.cssHeight * dpr));
     if (this.canvas.width !== w || this.canvas.height !== h) {
       this.canvas.width = w;
       this.canvas.height = h;
@@ -310,13 +314,20 @@ export class GraphEditor {
     const ctx = this.ctx;
     if (!ctx) return;
     const dpr = this.dpr || 1;
-    const w = this.canvas.width, h = this.canvas.height;
     ctx.save();
-    ctx.scale(1, 1);
+    // The backing store is sized `CSS px * dpr`, so the context must be scaled by
+    // the same factor. Everything drawn after this — and every pointer coordinate
+    // read from offsetX/offsetY — is then in CSS pixels, which is also the space
+    // view.x/view.y live in. Without this scale the drawing occupies the top-left
+    // 1/dpr of the bitmap while hit-testing still assumes CSS pixels, so clicks
+    // land off by that factor on any display with devicePixelRatio > 1.
+    ctx.scale(dpr, dpr);
+    const w = this.cssWidth || this.canvas.width / dpr;
+    const h = this.cssHeight || this.canvas.height / dpr;
     ctx.fillStyle = '#0f151c';
     ctx.fillRect(0, 0, w, h);
 
-    this._drawGrid(ctx, w, h, dpr);
+    this._drawGrid(ctx, w, h);
 
     ctx.save();
     ctx.translate(this.view.x, this.view.y);
@@ -336,7 +347,8 @@ export class GraphEditor {
     if (delBtn) delBtn.disabled = !state.selected;
   }
 
-  _drawGrid(ctx, w, h, dpr) {
+  _drawGrid(ctx, w, h) {
+    // w/h are CSS pixels: the caller has already applied the DPR scale.
     const k = this.view.k;
     const step = GRID * k;
     if (step < 7) return;

@@ -263,6 +263,15 @@ const registry = {
     if (el.id) this.byId.set(el.id, el);
     for (const c of el.children) this.register(c);
   },
+  /**
+   * Drop everything. The registry is module-level, so a second install in the same
+   * process would otherwise leave the previous run's elements addressable by id and
+   * let two tests silently share state.
+   */
+  reset() {
+    this.byId.clear();
+    this.all.clear();
+  },
 };
 
 /**
@@ -348,8 +357,16 @@ function query(root, sel, first) {
 
 function make2DContext(canvas) {
   const noop = () => {};
+  // Transform calls are recorded rather than discarded: canvas code that sizes a
+  // backing store by devicePixelRatio must pair that with ctx.scale(dpr, dpr), and
+  // a no-op scale() would hide a missing or wrong one.
+  const transforms = [];
+  let scaleX = 1;
+  let scaleY = 1;
   return {
     canvas,
+    transforms,
+    get currentScale() { return [scaleX, scaleY]; },
     imageSmoothingEnabled: true,
     imageSmoothingQuality: 'high',
     globalAlpha: 1,
@@ -359,7 +376,14 @@ function make2DContext(canvas) {
     font: '10px monospace',
     textBaseline: 'alphabetic',
     textAlign: 'start',
-    save: noop, restore: noop, scale: noop, translate: noop, rotate: noop,
+    save: noop, restore: noop, rotate: noop,
+    scale(x, y) { scaleX *= x; scaleY *= y; transforms.push(['scale', x, y]); },
+    translate(x, y) { transforms.push(['translate', x, y]); },
+    setTransform(a, b, c, d, e, f) {
+      scaleX = a; scaleY = d;
+      transforms.push(['setTransform', a, b, c, d, e, f]);
+    },
+    resetTransform() { scaleX = 1; scaleY = 1; transforms.push(['resetTransform']); },
     beginPath: noop, closePath: noop, moveTo: noop, lineTo: noop, arc: noop, arcTo: noop,
     bezierCurveTo: noop, quadraticCurveTo: noop, rect: noop, stroke: noop, fill: noop,
     fillRect: noop, strokeRect: noop, clearRect: noop, clip: noop,
@@ -375,8 +399,10 @@ function make2DContext(canvas) {
 
 /* --------------------------------------------------------------- globals */
 
-export function installDomShim({ url = 'http://127.0.0.1:8080/', catalog } = {}) {
+export function installDomShim({ url = 'http://127.0.0.1:8080/', catalog, devicePixelRatio = 1 } = {}) {
   const doc = new Document2();
+  // Start clean so a second install in the same process cannot see stale elements.
+  registry.reset();
 
   // Pre-create every element the app looks up by id, plus the canvases.
   const ids = [
@@ -437,7 +463,7 @@ export function installDomShim({ url = 'http://127.0.0.1:8080/', catalog } = {})
   const listeners = new Map();
   const win = {
     document: doc,
-    devicePixelRatio: 1,
+    devicePixelRatio: Number(devicePixelRatio) > 0 ? Number(devicePixelRatio) : 1,
     addEventListener(type, fn) {
       if (!listeners.has(type)) listeners.set(type, new Set());
       listeners.get(type).add(fn);

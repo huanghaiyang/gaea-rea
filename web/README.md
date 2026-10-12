@@ -87,7 +87,8 @@ editing, undo, export, and every implemented algorithm) and writes a JSON report
 cd D:\sgames\gaea-rea\web
 node tests/smoke.mjs        # engine, numerics and physics — 86 assertions
 node tests/app-test.mjs     # the whole application under a DOM shim — 63 assertions
-node tests/i18n-test.mjs    # localisation lookups and fallbacks — 36 assertions
+node tests/i18n-test.mjs    # localisation lookups, fallbacks and DOM application — 46 assertions
+node tests/graph-coords-test.mjs  # graph canvas coordinate plumbing at devicePixelRatio=2 — 20 assertions
 python ../tools/validate_web.py   # static: every import/asset resolves
 ```
 
@@ -267,10 +268,16 @@ Both suites were run to completion in this environment:
   at three resolutions for all 56 registered nodes, and bit-identical determinism.
 * `tests/app-test.mjs` — **63/63 pass, 0 console errors, 0 console warnings.** Drives the real
   application.
-* `tests/i18n-test.mjs` — **36/36 pass.** Loads the real dictionaries from disk by stubbing
+* `tests/i18n-test.mjs` — **46/46 pass.** Loads the real dictionaries from disk by stubbing
   `fetch`, then drives the real `js/i18n.js`: language detection, chrome lookup, node/group vs
   parameter lookups, the four role-divergent names, English fallback for unknown terms, switching
-  back and forth, and full-vocabulary coverage with no blank values.
+  back and forth, and full-vocabulary coverage with no blank values. It also applies the dictionary
+  to real elements and asserts `textContent`, `aria-label`, `title` and `placeholder` are rewritten
+  and that English restores the authored text.
+* `tests/graph-coords-test.mjs` — **20/20 pass at `devicePixelRatio=2`.** Guards the graph canvas:
+  the backing store must be `CSS size × DPR`, `draw()` must apply `ctx.scale(dpr, dpr)`, and
+  `toWorld`/`toScreen`/`hitTest`/`viewCenter` must agree in CSS pixels. DPR 1 hides this class of
+  bug entirely, which is why the test forces DPR 2.
 * **The browser could not be started here.** Chromium's mojo IPC needs named pipes, which this
   sandbox denies; Chrome and Edge were tried with `--headless`, `--headless=new`, `--dump-dom`
   and `--remote-debugging-port`, and every launch self-terminates. Therefore the GLSL shaders
