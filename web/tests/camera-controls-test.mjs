@@ -91,19 +91,45 @@ const { Viewport } = await import('../js/viewport.js');
 
 /* -------------------------------------------------------------- horizontal */
 
-// Same direct-manipulation sense horizontally: dragging right moves the terrain right.
+// Horizontal uses the OPPOSITE operator to vertical. Screen-right is
+// `normalize(fwd x world_up)`, and at the default camera
+// dot(world +X, screen_right) = +0.8139, so raising target[0] moves the terrain
+// LEFT on screen. Following the cursor therefore needs `target[0] -= dx * s`.
+// Derivation: `python tools/derive_pan_horizontal.py`.
 {
   const cam = freshCam();
   const before = cam.target[0];
-  Viewport.pan(cam, 30, 0);
-  ok(cam.target[0] > before, 'drag right moves the target right (terrain moves right)', cam.target[0]);
+  Viewport.pan(cam, 30, 0);   // drag right
+  ok(
+    cam.target[0] < before,
+    'drag right lowers target[0], so the terrain moves right (follows cursor)',
+    cam.target[0],
+  );
   ok(near(cam.target[1], 0.18), 'horizontal pan does not touch the vertical axis', cam.target[1]);
 }
 
 {
   const cam = freshCam();
-  Viewport.pan(cam, -30, 0);
-  ok(cam.target[0] < 0, 'drag left moves the target left', cam.target[0]);
+  Viewport.pan(cam, -30, 0);   // drag left
+  ok(cam.target[0] > 0, 'drag left raises target[0], so the terrain moves left', cam.target[0]);
+}
+
+// Guard the exact operator, and that the two axes are not accidentally unified.
+{
+  const cam = freshCam();
+  const dx = 30;
+  const s = cam.dist * 0.0022;
+  Viewport.pan(cam, dx, 0);
+  ok(
+    near(cam.target[0], 0 - dx * s),
+    'horizontal pan uses -= dx (opposite sign to the vertical axis)',
+    cam.target[0],
+  );
+  ok(
+    !near(cam.target[0], 0 + dx * s),
+    'horizontal pan is NOT += dx',
+    cam.target[0],
+  );
 }
 
 /* ------------------------------------------------------------- axis coupling */

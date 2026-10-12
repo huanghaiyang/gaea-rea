@@ -89,7 +89,7 @@ node tests/smoke.mjs        # engine, numerics and physics — 86 assertions
 node tests/app-test.mjs     # the whole application under a DOM shim — 63 assertions
 node tests/i18n-test.mjs    # localisation lookups, fallbacks and DOM application — 46 assertions
 node tests/graph-coords-test.mjs  # graph canvas coordinate plumbing at devicePixelRatio=2 — 20 assertions
-node tests/camera-controls-test.mjs  # 3D preview orbit/pan/zoom sign conventions — 20 assertions
+node tests/camera-controls-test.mjs  # 3D preview orbit/pan/zoom sign conventions — 22 assertions
 python ../tools/validate_web.py   # static: every import/asset resolves
 ```
 
@@ -279,20 +279,24 @@ Both suites were run to completion in this environment:
   the backing store must be `CSS size × DPR`, `draw()` must apply `ctx.scale(dpr, dpr)`, and
   `toWorld`/`toScreen`/`hitTest`/`viewCenter` must agree in CSS pixels. DPR 1 hides this class of
   bug entirely, which is why the test forces DPR 2.
-* `tests/camera-controls-test.mjs` — **20/20 pass.** Guards the 3D preview camera against sign
-  regressions. Panning uses the **inverse-drag convention**: the terrain moves opposite to the
-  cursor (drag up slides the terrain down), like map navigation. The sign is derived from the
-  projection rather than by hand — `python tools/derive_pan_sign.py` shows that raising
-  `target[1]` moves the terrain down the screen, which fixes the operator as `-= dy`. The vertical
-  drag deliberately does **not** touch the depth axis: `tools/derive_pan_screen_vector.py` measured
-  that coupling to inject sideways drift up to 2.09× the vertical motion at some yaw angles. Also
-  covers pitch clamping, pan scale tracking zoom distance, and that panning never rotates the camera.
-* **The browser could not be started here.** Chromium's mojo IPC needs named pipes, which this
-  sandbox denies; Chrome and Edge were tried with `--headless`, `--headless=new`, `--dump-dom`
-  and `--remote-debugging-port`, and every launch self-terminates. Therefore the GLSL shaders
-  have never been compiled by a real driver, the 3D terrain has never been rendered, and no
-  screenshot exists. `?selftest=1` is provided to close exactly that gap on a machine with a
-  working browser.
+* `tests/camera-controls-test.mjs` — **22/22 pass.** Guards the 3D preview camera against sign
+  regressions. Panning is **direct manipulation** — the terrain follows the cursor — and the two
+  axes deliberately use **opposite operators**, because the world axes project onto the screen
+  basis with different signs. Screen-right is `normalize(fwd × world_up)` and at the default camera
+  `dot(world +X, screen_right) = +0.8139`, so raising `target[0]` moves the terrain *left*, while
+  raising `target[1]` moves it *down*. Hence `target[0] -= dx` and `target[1] += dy`. Derive both
+  with `tools/derive_pan_sign.py` and `tools/derive_pan_horizontal.py` rather than by hand: the
+  horizontal axis was asserted by hand once and shipped inverted. The vertical drag deliberately
+  does **not** touch the depth axis — `tools/derive_pan_screen_vector.py` measured that coupling to
+  inject sideways drift up to 2.09× the vertical motion at some yaw angles. Also covers pitch
+  clamping, pan scale tracking zoom distance, and that panning never rotates the camera.
+* **The 3D view has never been verified against a real driver in this session.** Earlier notes here
+  claimed Chromium could not start at all; that was wrong. Chrome 155 *does* launch headless on this
+  host and its DevTools endpoint answers, so the browser is reachable. What remains unverified is
+  the rendering itself: whether the GLSL compiles on a real GPU, what the shaded relief actually
+  looks like, and whether the terrain reads correctly. Consequence: the pan/orbit sign conventions
+  above are settled by projection mathematics and unit tests, **not** by looking at the picture.
+  `?selftest=1` exists to close that gap on a machine where the view can be seen.
 
 Full statement of what is and is not verified: [IMPLEMENTATION-NOTES.md §9](IMPLEMENTATION-NOTES.md).
 

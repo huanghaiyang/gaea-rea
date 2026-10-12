@@ -246,18 +246,25 @@ export class Viewport {
    * follows the cursor in both axes. Drag up (dy < 0) moves the terrain up the
    * screen; drag right (dx > 0) moves it right.
    *
-   * Sign derivation (reproduce with `python tools/derive_pan_sign.py`): projecting a
-   * fixed terrain point with the real look-at matrix shows that RAISING target[1]
-   * moves the terrain DOWN the screen (ndc_y goes from -0.127 to -0.193 for
-   * target[1] += 0.10). Therefore:
+   * The two axes need OPPOSITE operators, because the camera orbits the target and
+   * the world axes project onto the screen basis with different signs. Derive both
+   * with `python tools/derive_pan_sign.py` (vertical) and
+   * `python tools/derive_pan_horizontal.py` (horizontal) rather than by hand.
    *
+   * Vertical: raising target[1] moves the terrain DOWN the screen, so
    *   operator            drag up (dy<0)      drag down (dy>0)
-   *   target[1] += dy*s   terrain up          terrain down     <- wanted (follows cursor)
-   *   target[1] -= dy*s   terrain down        terrain up       <- inverse convention
+   *   target[1] += dy*s   terrain up          terrain down     <- wanted
+   *   target[1] -= dy*s   terrain down        terrain up
+   * hence `+= dy * s`.
    *
-   * so the vertical operator is `+= dy * s`. The horizontal axis uses the same
-   * direct-manipulation sense: dragging right (dx > 0) RAISES target[0], moving the
-   * terrain right.
+   * Horizontal: screen-right is `normalize(fwd x world_up)`, and at the default
+   * camera `dot(world +X, screen_right) = +0.8139`. Raising target[0] therefore
+   * moves the terrain LEFT on screen, so following the cursor needs the opposite
+   * sign:
+   *   operator            drag right (dx>0)   drag left (dx<0)
+   *   target[0] += dx*s   terrain left        terrain right
+   *   target[0] -= dx*s   terrain right       terrain left      <- wanted
+   * hence `-= dx * s`. (The earlier `+=` was asserted by hand and was wrong.)
    *
    * The depth axis (target[2]) is deliberately NOT touched. Coupling it to dy was
    * measured to inject sideways drift (`python tools/derive_pan_screen_vector.py`:
@@ -271,7 +278,7 @@ export class Viewport {
    */
   static pan(cam, dx, dy) {
     const s = cam.dist * 0.0022;
-    cam.target[0] += dx * s;
+    cam.target[0] -= dx * s;
     cam.target[1] += dy * s;
     return cam;
   }

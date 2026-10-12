@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """Prove the camera-controls test fails when the pan convention is broken.
 
-The fixed behaviour is direct manipulation: the terrain follows the cursor. Three
-mutations are guarded:
+The fixed behaviour is direct manipulation (the terrain follows the cursor), and the
+two axes deliberately use OPPOSITE operators because the world axes project onto the
+screen basis with different signs. Mutations guarded:
 
-  A. inverse-drag vertical sign (`target[1] -= dy * s`) — the bug the user reported
-  B. inverse-drag horizontal sign (`target[0] -= dx * s`)
-  C. re-adding the depth-axis coupling, which injects sideways drift
+  A. both axes inverted (the originally shipped state, which was wrong both ways)
+  B. horizontal inverted (left/right reversed, as reported once vertical was fixed)
+  C. both axes unified to `+=` (a tempting "simplify" that breaks the horizontal axis)
+  D. re-adding the depth-axis coupling, which injects sideways drift
 
-The fix is `target[0] += dx * s` and `target[1] += dy * s` with no target[2] term.
+The fix is `target[0] -= dx * s` and `target[1] += dy * s` with no target[2] term.
 If the test still passes while a mutation is present, the guard is worthless.
 
 Usage:
@@ -24,20 +26,24 @@ WS = Path(__file__).resolve().parent.parent
 VP = WS / "web" / "js" / "viewport.js"
 TEST = WS / "web" / "tests" / "camera-controls-test.mjs"
 
-GOOD = "    cam.target[0] += dx * s;\n    cam.target[1] += dy * s;\n    return cam;"
+GOOD = "    cam.target[0] -= dx * s;\n    cam.target[1] += dy * s;\n    return cam;"
 
 MUTATIONS = [
     (
-        "A: inverse-drag vertical sign (the reported bug)",
+        "A: both axes inverted (the originally shipped state)",
         "    cam.target[0] += dx * s;\n    cam.target[1] -= dy * s;\n    return cam;",
     ),
     (
-        "B: inverse-drag horizontal sign",
-        "    cam.target[0] -= dx * s;\n    cam.target[1] += dy * s;\n    return cam;",
+        "B: horizontal inverted only (left/right reversed)",
+        "    cam.target[0] += dx * s;\n    cam.target[1] += dy * s;\n    return cam;",
     ),
     (
-        "C: depth-axis coupling re-added",
-        "    cam.target[0] += dx * s;\n    cam.target[1] += dy * s;\n"
+        "C: both axes unified to -= (asymmetric projection ignored)",
+        "    cam.target[0] -= dx * s;\n    cam.target[1] -= dy * s;\n    return cam;",
+    ),
+    (
+        "D: depth-axis coupling re-added",
+        "    cam.target[0] -= dx * s;\n    cam.target[1] += dy * s;\n"
         "    cam.target[2] += dy * s;\n    return cam;",
     ),
 ]
@@ -68,7 +74,7 @@ def main() -> int:
         print("could not locate the fixed pan block; aborting")
         return 2
 
-    print("1. baseline (target[1] -= dy * s, no depth coupling)")
+    print("1. baseline (target[0] -= dx * s, target[1] += dy * s, no depth coupling)")
     rc, out = run_test()
     m = re.search(r"PASS (\d+)\s+FAIL (\d+)", out)
     print(f"   exit={rc}  {m.group(0) if m else out.strip()[:100]}")
