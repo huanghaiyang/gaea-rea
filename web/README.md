@@ -280,9 +280,13 @@ Both suites were run to completion in this environment:
   `toWorld`/`toScreen`/`hitTest`/`viewCenter` must agree in CSS pixels. DPR 1 hides this class of
   bug entirely, which is why the test forces DPR 2.
 * `tests/camera-controls-test.mjs` — **20/20 pass.** Guards the 3D preview camera against sign
-  regressions. Panning is direct manipulation, so the terrain follows the cursor in both axes;
-  the vertical axis was inverted. Also covers pitch clamping, the pan scale tracking zoom distance,
-  and that panning never rotates the camera.
+  regressions. Panning uses the **inverse-drag convention**: the terrain moves opposite to the
+  cursor (drag up slides the terrain down), like map navigation. The sign is derived from the
+  projection rather than by hand — `python tools/derive_pan_sign.py` shows that raising
+  `target[1]` moves the terrain down the screen, which fixes the operator as `-= dy`. The vertical
+  drag deliberately does **not** touch the depth axis: `tools/derive_pan_screen_vector.py` measured
+  that coupling to inject sideways drift up to 2.09× the vertical motion at some yaw angles. Also
+  covers pitch clamping, pan scale tracking zoom distance, and that panning never rotates the camera.
 * **The browser could not be started here.** Chromium's mojo IPC needs named pipes, which this
   sandbox denies; Chrome and Edge were tried with `--headless`, `--headless=new`, `--dump-dom`
   and `--remote-debugging-port`, and every launch self-terminates. Therefore the GLSL shaders

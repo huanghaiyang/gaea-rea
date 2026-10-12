@@ -40,57 +40,63 @@ const { Viewport } = await import('../js/viewport.js');
 
 /* ---------------------------------------------------------------- vertical */
 
-// Drag DOWN (cursor moves down the screen, dy > 0) -> terrain follows the cursor
-// down -> the target must move down, i.e. target[1] decreases.
+// Convention (confirmed with the user): the terrain moves OPPOSITE to the cursor,
+// as in map navigation. Drag up (dy < 0) must move the terrain DOWN the screen.
+//
+// The sign is derived from the projection, not by hand (tools/derive_pan_sign.py):
+//   operator            drag up (dy<0)      drag down (dy>0)
+//   target[1] += dy*s   terrain up          terrain down     <- follows cursor
+//   target[1] -= dy*s   terrain down        terrain up       <- inverse (wanted)
+// so the implementation is `target[1] -= dy * s`.
+{
+  const cam = freshCam();
+  const before = cam.target[1];
+  Viewport.pan(cam, 0, -40);   // drag up
+  ok(
+    cam.target[1] > before,
+    'drag up raises the target, so the terrain slides down the screen',
+    { before, after: cam.target[1] },
+  );
+}
+
+// Drag down -> terrain slides up the screen -> target[1] decreases.
 {
   const cam = freshCam();
   const before = cam.target[1];
   Viewport.pan(cam, 0, 40);
   ok(
     cam.target[1] < before,
-    'drag down lowers the target (terrain follows the cursor)',
+    'drag down lowers the target, so the terrain slides up the screen',
     { before, after: cam.target[1] },
   );
 }
 
-// Drag UP -> target[1] increases.
-{
-  const cam = freshCam();
-  const before = cam.target[1];
-  Viewport.pan(cam, 0, -40);
-  ok(
-    cam.target[1] > before,
-    'drag up raises the target',
-    { before, after: cam.target[1] },
-  );
-}
-
-// The defect in one assertion: vertical pan must be the OPPOSITE sign to the old
-// `+= dy` behaviour. Guard against a silent regression to it.
+// Guard the exact operator so a regression to cursor-following is caught.
 {
   const cam = freshCam();
   const dy = 25;
   const s = cam.dist * 0.0022;
   Viewport.pan(cam, 0, dy);
   ok(
-    !near(cam.target[1], 0.18 + dy * s),
-    'vertical pan is NOT the old inverted `+= dy` behaviour',
+    near(cam.target[1], 0.18 - dy * s),
+    'vertical pan uses -= dy (inverse-drag convention)',
     cam.target[1],
   );
   ok(
-    near(cam.target[1], 0.18 - dy * s),
-    'vertical pan magnitude is unchanged, only the sign',
+    !near(cam.target[1], 0.18 + dy * s),
+    'vertical pan is NOT the cursor-following sign',
     cam.target[1],
   );
 }
 
 /* -------------------------------------------------------------- horizontal */
 
+// Same inverse convention horizontally: dragging right moves the terrain left.
 {
   const cam = freshCam();
   const before = cam.target[0];
   Viewport.pan(cam, 30, 0);
-  ok(cam.target[0] < before, 'drag right moves the target left (terrain follows)', cam.target[0]);
+  ok(cam.target[0] < before, 'drag right moves the target left (terrain moves left)', cam.target[0]);
   ok(near(cam.target[1], 0.18), 'horizontal pan does not touch the vertical axis', cam.target[1]);
 }
 
@@ -102,12 +108,18 @@ const { Viewport } = await import('../js/viewport.js');
 
 /* ------------------------------------------------------------- axis coupling */
 
-// target[2] previously received the vertical delta and keeps that role.
+// The vertical drag must NOT touch the depth axis. Coupling target[2] to dy was
+// measured to inject sideways drift (projected: 0.28x sideways at yaw 0.62, and
+// 2.09x at yaw 2.40), turning an up/down drag into near-horizontal sliding.
 {
   const cam = freshCam();
   const before = cam.target[2];
   Viewport.pan(cam, 0, 40);
-  ok(cam.target[2] !== before, 'vertical pan still advances the depth axis', cam.target[2]);
+  ok(
+    near(cam.target[2], before),
+    'vertical pan leaves the depth axis untouched (no sideways drift)',
+    { before, after: cam.target[2] },
+  );
 }
 
 // Pan scale follows zoom distance, so panning stays proportional when zoomed out.
