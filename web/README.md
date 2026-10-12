@@ -89,6 +89,7 @@ node tests/smoke.mjs        # engine, numerics and physics — 86 assertions
 node tests/app-test.mjs     # the whole application under a DOM shim — 63 assertions
 node tests/i18n-test.mjs    # localisation lookups, fallbacks and DOM application — 46 assertions
 node tests/graph-coords-test.mjs  # graph canvas coordinate plumbing at devicePixelRatio=2 — 20 assertions
+node tests/camera-controls-test.mjs  # 3D preview orbit/pan/zoom sign conventions — 20 assertions
 python ../tools/validate_web.py   # static: every import/asset resolves
 ```
 
@@ -278,6 +279,10 @@ Both suites were run to completion in this environment:
   the backing store must be `CSS size × DPR`, `draw()` must apply `ctx.scale(dpr, dpr)`, and
   `toWorld`/`toScreen`/`hitTest`/`viewCenter` must agree in CSS pixels. DPR 1 hides this class of
   bug entirely, which is why the test forces DPR 2.
+* `tests/camera-controls-test.mjs` — **20/20 pass.** Guards the 3D preview camera against sign
+  regressions. Panning is direct manipulation, so the terrain follows the cursor in both axes;
+  the vertical axis was inverted. Also covers pitch clamping, the pan scale tracking zoom distance,
+  and that panning never rotates the camera.
 * **The browser could not be started here.** Chromium's mojo IPC needs named pipes, which this
   sandbox denies; Chrome and Edge were tried with `--headless`, `--headless=new`, `--dump-dom`
   and `--remote-debugging-port`, and every launch self-terminates. Therefore the GLSL shaders

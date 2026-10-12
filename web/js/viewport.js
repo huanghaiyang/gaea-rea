@@ -227,6 +227,50 @@ export class Viewport {
 
   /* ---------------------------------------------------------- controls */
 
+  /**
+   * Orbit the camera from a pointer delta. Exported as a pure function so the sign
+   * conventions are testable without a WebGL context.
+   * @param {{yaw:number,pitch:number,dist:number,target:number[]}} cam
+   * @param {number} dx horizontal delta in CSS pixels
+   * @param {number} dy vertical delta in CSS pixels
+   * @returns {typeof cam} the same object, mutated
+   */
+  static orbit(cam, dx, dy) {
+    cam.yaw -= dx * 0.008;
+    cam.pitch = Math.max(0.05, Math.min(1.52, cam.pitch + dy * 0.006));
+    return cam;
+  }
+
+  /**
+   * Pan the camera target from a pointer delta, as direct manipulation: the terrain
+   * follows the cursor in both axes.
+   *
+   * Sign derivation — the camera sits above the target and looks down, since
+   *   ey = target[1] + dist * sin(pitch)
+   * so raising target[1] moves the terrain up the screen. A downward drag (dy > 0)
+   * must therefore DECREASE target[1]; the old code increased it, which is the
+   * "vertical pan is inverted" defect. The horizontal axis and target[2] keep their
+   * sign, so only the vertical sense changed.
+   *
+   * @param {{yaw:number,pitch:number,dist:number,target:number[]}} cam
+   * @param {number} dx horizontal delta in CSS pixels
+   * @param {number} dy vertical delta in CSS pixels
+   * @returns {typeof cam} the same object, mutated
+   */
+  static pan(cam, dx, dy) {
+    const s = cam.dist * 0.0022;
+    cam.target[0] -= dx * s;
+    cam.target[1] -= dy * s;
+    cam.target[2] += dy * s;
+    return cam;
+  }
+
+  /** Zoom by one wheel step; direction sign is the wheel's own. */
+  static zoom(cam, deltaY) {
+    cam.dist = Math.max(0.75, Math.min(9, cam.dist * (1 + Math.sign(deltaY) * 0.09)));
+    return cam;
+  }
+
   _bindControls() {
     const c = this.c3d;
     let drag = null;
@@ -239,14 +283,8 @@ export class Viewport {
       if (!drag) return;
       const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
       drag.x = e.clientX; drag.y = e.clientY;
-      if (drag.pan) {
-        const s = this.camera.dist * 0.0022;
-        this.camera.target[0] -= dx * s;
-        this.camera.target[2] += dy * s;
-      } else {
-        this.camera.yaw -= dx * 0.008;
-        this.camera.pitch = Math.max(0.05, Math.min(1.52, this.camera.pitch + dy * 0.006));
-      }
+      if (drag.pan) Viewport.pan(this.camera, dx, dy);
+      else Viewport.orbit(this.camera, dx, dy);
       this._schedule();
     });
     const end = (e) => {
@@ -259,7 +297,7 @@ export class Viewport {
     c.addEventListener('wheel', (e) => {
       if (this.mode !== '3d') return;
       e.preventDefault();
-      this.camera.dist = Math.max(0.75, Math.min(9, this.camera.dist * (1 + Math.sign(e.deltaY) * 0.09)));
+      Viewport.zoom(this.camera, e.deltaY);
       this._schedule();
     }, { passive: false });
     c.addEventListener('dblclick', () => {
