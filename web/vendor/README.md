@@ -15,11 +15,18 @@ may also be opened from `file://`, so every dependency is committed as-is.
 | --- | --- | --- |
 | `three.core.js` | 1,458,113 | `9edde002b066a9a0` |
 | `three.module.js` | 662,772 | `9052042d676cb0fd` |
-| `OrbitControls.js` | 40,755 | `3d79d07ecb686b4e` |
 
-Files are byte-identical to the published package; nothing was patched. Bare specifiers
-(`import ... from 'three'` inside `OrbitControls.js`) are resolved by the import map in
-`index.html`, which is why the vendored files can stay pristine and verifiable.
+Both files are byte-identical to the published package; nothing was patched.
+
+`js/render3d.js` imports `three.module.js` by **relative path**, not by the bare
+`'three'` specifier, because the Node test suite imports the same module and Node has
+no import map. `three.module.js` itself imports `three.core.js` relatively, so the pair
+resolves identically in the browser and in Node.
+
+`OrbitControls.js` was vendored and then removed: the camera maths in `viewport.js` was
+derived from the projection, confirmed by the user against the running app, and is
+pinned by `tests/camera-controls-test.mjs`, so handing camera control to OrbitControls
+would silently change behaviour that had already been signed off. It is not needed.
 
 To re-download and confirm the digests:
 
@@ -29,6 +36,5 @@ New-Item -ItemType Directory -Force .build\three-dl | Out-Null
 Set-Location .build\three-dl
 npm pack three@0.186.1 --registry=https://registry.npmmirror.com
 tar -xzf three-0.186.1.tgz
-Get-FileHash package\build\three.core.js, package\build\three.module.js,
-             package\examples\jsm\controls\OrbitControls.js -Algorithm SHA256
+Get-FileHash package\build\three.core.js, package\build\three.module.js -Algorithm SHA256
 ```

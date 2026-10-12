@@ -91,7 +91,9 @@ node tests/i18n-test.mjs    # localisation lookups, fallbacks and DOM applicatio
 node tests/graph-coords-test.mjs  # graph canvas coordinate plumbing at devicePixelRatio=2 — 20 assertions
 node tests/camera-controls-test.mjs  # 3D preview orbit/pan/zoom sign conventions — 22 assertions
 node tests/mesh-parity-test.mjs   # worker vs module mesh build, bit-for-bit — 68 assertions
-node tests/shader-src-test.mjs    # static GLSL ES 3.0 invariants — 120 assertions
+node tests/shader-src-test.mjs    # static GLSL invariants (three.js ES 1.00 dialect) — 80 assertions
+node tests/multiscale-erosion-test.mjs  # Laplacian pyramid + drainage connectivity — 31 assertions
+node ../tools/verify-browser.mjs --chrome "<path to chrome>"  # real browser: 3D renders, worker engages
 python ../tools/validate_web.py   # static: every import/asset resolves
 ```
 
@@ -130,6 +132,11 @@ of vertical exaggeration does — so interaction cost is independent of field re
 
 ### How the 3D relief is shaded
 
+The 3D view renders through **three.js** (vendored, see `vendor/README.md`): three.js owns the
+scene, the render target, the depth state and the geometry buffers, while the camera **maths** stays
+in `viewport.js` because those sign conventions were derived from the projection and are pinned by
+`tests/camera-controls-test.mjs`.
+
 Shading detail comes from the **height field, not from the mesh**. The field is uploaded as a
 single-channel `R32F` texture and the fragment shader derives everything per pixel:
 
@@ -145,18 +152,43 @@ the first renders look like soft blobs: a normal is only correct at a vertex, so
 vertices was shaded as a smooth blend and every ridge finer than one triangle vanished. The
 difference is largest exactly where terrain matters — gullies and crest lines.
 
+The shaders are written in GLSL ES 1.00 (`attribute`/`varying`/`gl_FragColor`/`texture2D`) because
+three.js injects `#version`, `precision` and the built-in matrices itself; declaring those would be a
+redefinition. `tests/shader-src-test.mjs` therefore asserts they are **absent**, which is the kind of
+assumption worth pinning after changing renderer.
+
 The height field is normalized to 0..1 before upload, so the shader never has to read a negative
 value out of a float texture, and the colour ramp is driven by the interpolated vertex height alone.
 Occlusion multiplies the lighting rather than the height, so a colour always means the same
 elevation.
 
 If the texture cannot be created, `uNormalRes` is 0 and the shader falls back to the interpolated
-normal, so the view still renders rather than going black.
+normal, so the view still renders rather than going black. The WebGL2 context is also probed before
+three.js is constructed, because `WebGLRenderer` logs to `console.error` on context failure before it
+throws — a supported degradation should not look like a crash.
 
-`tests/shader-src-test.mjs` checks the GLSL statically — `#version` placement, balanced delimiters,
-every called function exists in GLSL ES 3.00, every uniform is declared *and* located *and* assigned,
-the two stages' varyings agree, and no non-existent built-in is referenced. A real driver is still the
-only true compiler, but these are the mistakes that would otherwise show up as a black viewport.
+### Verifying the parts Node cannot reach
+
+`node tools/verify-browser.mjs --chrome "<path to chrome>"` serves the app, drives a real browser and
+reports whether three.js initialised, whether the GLSL compiled, and whether the Worker offload
+engaged. Headless Chrome has no GPU, so the script enables SwiftShader; without it WebGL is
+unavailable and the run would report a false negative.
+
+It launches Chrome with an isolated `--user-data-dir`, records the exact PID, and on exit signals
+**only that PID and its children** — never by process name, because a name match would kill the
+user's own browser.
+
+Last recorded run (Chrome 155, headless, SwiftShader):
+
+```
+isSecureContext = true        typeof Worker = function
+three           = OK REVISION 186
+available3D     = true        renderer3d.info = three.js ready
+mesh = 65536 verts, 130050 tris, stride 1, built in worker in 2.8ms
+meshWorker = worker (worker active)
+drawingBuffer = 720x221, distinct colours = 4096
+RENDERED = YES                console.error = 0   console.warn = 0
+```
 
 ---
 
