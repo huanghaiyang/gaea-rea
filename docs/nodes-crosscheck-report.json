@@ -1,0 +1,847 @@
+{
+  "catalog_count": 182,
+  "il_node_class_count": 195,
+  "matched": 179,
+  "matched_catalog_parameter_total": 1327,
+  "matched_catalog_enum_member_total": 741,
+  "matched_il_parameter_total": 1196,
+  "only_in_catalog": [
+    "FlowMap",
+    "FlowMapClassic",
+    "MathX"
+  ],
+  "only_in_il": [
+    "Construction",
+    "CutNoise",
+    "FileSequence",
+    "Flow",
+    "FlowClassic",
+    "HoudiniOut",
+    "Invert",
+    "Macro",
+    "Math",
+    "MeshWarp",
+    "Pond",
+    "River2",
+    "SBomber",
+    "TriplanarDisplacement",
+    "VFX"
+  ],
+  "parameter_mismatches": [
+    {
+      "node": "Blur",
+      "catalog_only": [
+        "Blur"
+      ],
+      "il_only": [],
+      "catalog_count": 2,
+      "il_count": 1
+    },
+    {
+      "node": "Bomber",
+      "catalog_only": [
+        "Proportional"
+      ],
+      "il_only": [
+        "MaintainProportions"
+      ],
+      "catalog_count": 15,
+      "il_count": 15
+    },
+    {
+      "node": "Canyon",
+      "catalog_only": [
+        "Formation",
+        "Structure"
+      ],
+      "il_only": [],
+      "catalog_count": 12,
+      "il_count": 10
+    },
+    {
+      "node": "Cartography",
+      "catalog_only": [
+        "Land",
+        "Line Art",
+        "Map Style"
+      ],
+      "il_only": [],
+      "catalog_count": 23,
+      "il_count": 20
+    },
+    {
+      "node": "Clip",
+      "catalog_only": [
+        "Clip"
+      ],
+      "il_only": [],
+      "catalog_count": 4,
+      "il_count": 3
+    },
+    {
+      "node": "ColorErosion",
+      "catalog_only": [
+        "Q 0",
+        "Q 1",
+        "Version"
+      ],
+      "il_only": [],
+      "catalog_count": 11,
+      "il_count": 8
+    },
+    {
+      "node": "Combine",
+      "catalog_only": [
+        "Output",
+        "Swap Inputs"
+      ],
+      "il_only": [
+        "Clamp",
+        "SwitchInputs"
+      ],
+      "catalog_count": 6,
+      "il_count": 6
+    },
+    {
+      "node": "Compare",
+      "catalog_only": [
+        "A/B"
+      ],
+      "il_only": [
+        "Comparison",
+        "Mode"
+      ],
+      "catalog_count": 4,
+      "il_count": 5
+    },
+    {
+      "node": "Constant",
+      "catalog_only": [
+        "Constant"
+      ],
+      "il_only": [],
+      "catalog_count": 4,
+      "il_count": 3
+    },
+    {
+      "node": "Contours",
+      "catalog_only": [
+        "Lines"
+      ],
+      "il_only": [],
+      "catalog_count": 7,
+      "il_count": 6
+    },
+    {
+      "node": "Cracks",
+      "catalog_only": [
+        "Advanced settings",
+        "Cracks"
+      ],
+      "il_only": [],
+      "catalog_count": 12,
+      "il_count": 10
+    },
+    {
+      "node": "CraterField",
+      "catalog_only": [
+        "Craterfield",
+        "Position"
+      ],
+      "il_only": [],
+      "catalog_count": 8,
+      "il_count": 6
+    },
+    {
+      "node": "Distance",
+      "catalog_only": [
+        "Options"
+      ],
+      "il_only": [],
+      "catalog_count": 14,
+      "il_count": 13
+    },
+    {
+      "node": "Dusting",
+      "catalog_only": [
+        "Distribution",
+        "Effects",
+        "Snowfall"
+      ],
+      "il_only": [],
+      "catalog_count": 17,
+      "il_count": 14
+    },
+    {
+      "node": "EasyErosion",
+      "catalog_only": [
+        "Erosion",
+        "Style Editor"
+      ],
+      "il_only": [],
+      "catalog_count": 7,
+      "il_count": 5
+    },
+    {
+      "node": "Erosion",
+      "catalog_only": [
+        "Erosion",
+        "Flow",
+        "Other Settings",
+        "Scale",
+        "Selective Processing"
+      ],
+      "il_only": [],
+      "catalog_count": 28,
+      "il_count": 21
+    },
+    {
+      "node": "Erosion2",
+      "catalog_only": [
+        "Bed Load",
+        "Coarse Sediments",
+        "Discharge Angle",
+        "ExtraDepositionBoost",
+        "General",
+        "Orographic Influence",
+        "Sediment Discharge",
+        "Suspended Load"
+      ],
+      "il_only": [
+        "BedLoadDischargeAmount",
+        "BedLoadDischargeAngle",
+        "CoarseSedimentsDischargeAmount",
+        "CoarseSedimentsDischargeAngle",
+        "SuspendedLoadDischargeAmount",
+        "SuspendedLoadDischargeAngle"
+      ],
+      "catalog_count": 27,
+      "il_count": 22
+    },
+    {
+      "node": "Export",
+      "catalog_only": [
+        "Prepare for Bridge"
+      ],
+      "il_only": [
+        "HoudiniOut"
+      ],
+      "catalog_count": 7,
+      "il_count": 7
+    },
+    {
+      "node": "Extend",
+      "catalog_only": [
+        "Extend"
+      ],
+      "il_only": [],
+      "catalog_count": 2,
+      "il_count": 1
+    },
+    {
+      "node": "File",
+      "catalog_only": [
+        "Caching",
+        "File",
+        "Prepare for Bridge"
+      ],
+      "il_only": [
+        "FileName",
+        "HoudiniIn"
+      ],
+      "catalog_count": 11,
+      "il_count": 10
+    },
+    {
+      "node": "FractalTerraces",
+      "catalog_only": [
+        "Advanced",
+        "Tilt"
+      ],
+      "il_only": [],
+      "catalog_count": 22,
+      "il_count": 20
+    },
+    {
+      "node": "Gabor",
+      "catalog_only": [
+        "Azimuth",
+        "Gabor"
+      ],
+      "il_only": [
+        "AnisotropyAzimuth"
+      ],
+      "catalog_count": 7,
+      "il_count": 6
+    },
+    {
+      "node": "Gamma",
+      "catalog_only": [
+        "Gamma"
+      ],
+      "il_only": [
+        "GammaValue"
+      ],
+      "catalog_count": 2,
+      "il_count": 2
+    },
+    {
+      "node": "Glacier",
+      "catalog_only": [
+        "Glacier",
+        "Smooth",
+        "Surface"
+      ],
+      "il_only": [
+        "Chipped"
+      ],
+      "catalog_count": 21,
+      "il_count": 19
+    },
+    {
+      "node": "HydroFix",
+      "catalog_only": [
+        "HydroFix"
+      ],
+      "il_only": [],
+      "catalog_count": 2,
+      "il_count": 1
+    },
+    {
+      "node": "Lake",
+      "catalog_only": [
+        "Accuracy",
+        "Advanced Mode",
+        "Lake Formation",
+        "Shore Formation",
+        "Simple Mode"
+      ],
+      "il_only": [],
+      "catalog_count": 17,
+      "il_count": 12
+    },
+    {
+      "node": "Layers",
+      "catalog_only": [
+        "Blend Layer 1",
+        "Blend Layer 2",
+        "Blend Layer 3",
+        "Blend Layer 4",
+        "Blend Layer 5",
+        "Blend Layer 6",
+        "Blend Layer 7"
+      ],
+      "il_only": [
+        "Blend2",
+        "Blend3",
+        "Blend4",
+        "Blend5",
+        "Blend6",
+        "Blend7",
+        "Blend8"
+      ],
+      "catalog_count": 7,
+      "il_count": 7
+    },
+    {
+      "node": "LightX",
+      "catalog_only": [
+        "Colors",
+        "Light"
+      ],
+      "il_only": [],
+      "catalog_count": 25,
+      "il_count": 23
+    },
+    {
+      "node": "LinearGradient",
+      "catalog_only": [
+        "Edge Behavior"
+      ],
+      "il_only": [
+        "Edge"
+      ],
+      "catalog_count": 3,
+      "il_count": 3
+    },
+    {
+      "node": "LoopEnd",
+      "catalog_only": [
+        "Build Time",
+        "Design Time",
+        "Loop"
+      ],
+      "il_only": [
+        "PrimedBuild"
+      ],
+      "catalog_count": 8,
+      "il_count": 6
+    },
+    {
+      "node": "Meshify",
+      "catalog_only": [
+        "Meshify"
+      ],
+      "il_only": [],
+      "catalog_count": 4,
+      "il_count": 3
+    },
+    {
+      "node": "MultiFractal",
+      "catalog_only": [
+        "Attenuation",
+        "Complexity",
+        "Contrast",
+        "Fractal",
+        "Iterations",
+        "Position",
+        "Relative Anisotropy",
+        "Relative Feature Scale",
+        "Relative Size",
+        "Roughness",
+        "Scale",
+        "Strength",
+        "Type",
+        "Warp"
+      ],
+      "il_only": [
+        "FeatureSize",
+        "FractalGain",
+        "RelativeWarpAnisotropy",
+        "RelativeWarpSize",
+        "Size",
+        "VariationContrast",
+        "VariationType",
+        "WarpAttenuation",
+        "WarpComplexity",
+        "WarpIterations",
+        "WarpRoughness",
+        "WarpStrength"
+      ],
+      "catalog_count": 30,
+      "il_count": 26
+    },
+    {
+      "node": "Object",
+      "catalog_only": [
+        "Mesh",
+        "Position",
+        "Quality",
+        "Rotation"
+      ],
+      "il_only": [
+        "FileName"
+      ],
+      "catalog_count": 15,
+      "il_count": 11
+    },
+    {
+      "node": "Outcrops",
+      "catalog_only": [
+        "Outcrops",
+        "Variation Range"
+      ],
+      "il_only": [],
+      "catalog_count": 11,
+      "il_count": 9
+    },
+    {
+      "node": "Perlin",
+      "catalog_only": [
+        "Height",
+        "Noise",
+        "Transform",
+        "Warp"
+      ],
+      "il_only": [
+        "Clamp",
+        "WarpOctaves",
+        "WarpType"
+      ],
+      "catalog_count": 17,
+      "il_count": 14
+    },
+    {
+      "node": "Pockmarks",
+      "catalog_only": [
+        "Depth",
+        "Pockmarks"
+      ],
+      "il_only": [
+        "Height"
+      ],
+      "catalog_count": 8,
+      "il_count": 7
+    },
+    {
+      "node": "Ridge",
+      "catalog_only": [
+        "Advanced"
+      ],
+      "il_only": [],
+      "catalog_count": 7,
+      "il_count": 6
+    },
+    {
+      "node": "SatMap",
+      "catalog_only": [
+        "Processing"
+      ],
+      "il_only": [],
+      "catalog_count": 12,
+      "il_count": 11
+    },
+    {
+      "node": "Scree",
+      "catalog_only": [
+        "Stones"
+      ],
+      "il_only": [],
+      "catalog_count": 7,
+      "il_count": 6
+    },
+    {
+      "node": "Sea",
+      "catalog_only": [
+        "Sea"
+      ],
+      "il_only": [
+        "SeaArrangement"
+      ],
+      "catalog_count": 9,
+      "il_count": 9
+    },
+    {
+      "node": "Seamless",
+      "catalog_only": [
+        "Preview Tiling"
+      ],
+      "il_only": [
+        "ToggleTiling"
+      ],
+      "catalog_count": 4,
+      "il_count": 4
+    },
+    {
+      "node": "Shrubs",
+      "catalog_only": [
+        "Artistic Control",
+        "Aspect Inhibition",
+        "Count in Thousands",
+        "Custom Inhibitors",
+        "Growth",
+        "Seek Water",
+        "Shrubs",
+        "Snow Inhibition"
+      ],
+      "il_only": [
+        "ShrubCount",
+        "WaterAffinity"
+      ],
+      "catalog_count": 27,
+      "il_count": 21
+    },
+    {
+      "node": "Snow",
+      "catalog_only": [
+        "Advanced",
+        "Settle Duration",
+        "Snow"
+      ],
+      "il_only": [
+        "SettleThaw"
+      ],
+      "catalog_count": 18,
+      "il_count": 15
+    },
+    {
+      "node": "Snowfield",
+      "catalog_only": [
+        "Advanced",
+        "Settle Duration",
+        "Snow"
+      ],
+      "il_only": [
+        "SettleThaw"
+      ],
+      "catalog_count": 19,
+      "il_count": 17
+    },
+    {
+      "node": "Steps",
+      "catalog_only": [
+        "Steps"
+      ],
+      "il_only": [],
+      "catalog_count": 4,
+      "il_count": 3
+    },
+    {
+      "node": "Stones",
+      "catalog_only": [
+        "Stones"
+      ],
+      "il_only": [],
+      "catalog_count": 5,
+      "il_count": 4
+    },
+    {
+      "node": "SuperColor",
+      "catalog_only": [
+        "Color"
+      ],
+      "il_only": [],
+      "catalog_count": 15,
+      "il_count": 12
+    },
+    {
+      "node": "Switch",
+      "catalog_only": [
+        "Discard Alt in Final Build"
+      ],
+      "il_only": [
+        "DiscardAlternate"
+      ],
+      "catalog_count": 2,
+      "il_count": 2
+    },
+    {
+      "node": "Synth",
+      "catalog_only": [
+        "Sampling",
+        "Synthesize Colors"
+      ],
+      "il_only": [
+        "SynthColors"
+      ],
+      "catalog_count": 8,
+      "il_count": 7
+    },
+    {
+      "node": "Terraces",
+      "catalog_only": [
+        "Terraces"
+      ],
+      "il_only": [
+        "NumTerraces"
+      ],
+      "catalog_count": 5,
+      "il_count": 5
+    },
+    {
+      "node": "TextureBase",
+      "catalog_only": [
+        "Accentuate",
+        "Flows",
+        "Processing",
+        "Structure"
+      ],
+      "il_only": [
+        "Accentuation",
+        "Scale"
+      ],
+      "catalog_count": 12,
+      "il_count": 10
+    },
+    {
+      "node": "Texturizer",
+      "catalog_only": [
+        "Components"
+      ],
+      "il_only": [],
+      "catalog_count": 8,
+      "il_count": 7
+    },
+    {
+      "node": "Thermal",
+      "catalog_only": [
+        "Erosion",
+        "Scale",
+        "Talus"
+      ],
+      "il_only": [],
+      "catalog_count": 14,
+      "il_count": 11
+    },
+    {
+      "node": "Thermal2",
+      "catalog_only": [
+        "Erosion",
+        "Scale",
+        "Talus"
+      ],
+      "il_only": [],
+      "catalog_count": 9,
+      "il_count": 6
+    },
+    {
+      "node": "TileInput",
+      "catalog_only": [
+        "File"
+      ],
+      "il_only": [
+        "FileName"
+      ],
+      "catalog_count": 6,
+      "il_count": 6
+    },
+    {
+      "node": "Tint",
+      "catalog_only": [
+        "Processing"
+      ],
+      "il_only": [],
+      "catalog_count": 8,
+      "il_count": 7
+    },
+    {
+      "node": "Transform",
+      "catalog_only": [
+        "Angle",
+        "Position",
+        "Rotation",
+        "Settings"
+      ],
+      "il_only": [
+        "Rotate"
+      ],
+      "catalog_count": 15,
+      "il_count": 11
+    },
+    {
+      "node": "Transform3D",
+      "catalog_only": [
+        "Position",
+        "Quality",
+        "Rotation"
+      ],
+      "il_only": [],
+      "catalog_count": 13,
+      "il_count": 9
+    },
+    {
+      "node": "Trees",
+      "catalog_only": [
+        "Artistic Control",
+        "Aspect Inhibition",
+        "Count in Thousands",
+        "Custom Inhibitors",
+        "Growth",
+        "Seek Water",
+        "Snow Inhibition",
+        "Trees"
+      ],
+      "il_only": [
+        "TreeCount",
+        "WaterAffinity"
+      ],
+      "catalog_count": 35,
+      "il_count": 29
+    },
+    {
+      "node": "Unreal",
+      "catalog_only": [
+        "Information",
+        "Naming"
+      ],
+      "il_only": [],
+      "catalog_count": 21,
+      "il_count": 19
+    },
+    {
+      "node": "VariableBlur",
+      "catalog_only": [
+        "Blur"
+      ],
+      "il_only": [],
+      "catalog_count": 2,
+      "il_count": 1
+    },
+    {
+      "node": "Voronoi",
+      "catalog_only": [
+        "Noise",
+        "Octaves",
+        "Transform",
+        "Type",
+        "Warp"
+      ],
+      "il_only": [
+        "WarpOctaves",
+        "WarpType"
+      ],
+      "catalog_count": 18,
+      "il_count": 15
+    },
+    {
+      "node": "Warp",
+      "catalog_only": [
+        "Iterative",
+        "Warp",
+        "Warp Source"
+      ],
+      "il_only": [
+        "NoiseType"
+      ],
+      "catalog_count": 16,
+      "il_count": 14
+    },
+    {
+      "node": "WaterColor",
+      "catalog_only": [
+        "Contributions",
+        "Post Processing"
+      ],
+      "il_only": [],
+      "catalog_count": 17,
+      "il_count": 15
+    },
+    {
+      "node": "WaveShine",
+      "catalog_only": [
+        "Global",
+        "Intensity",
+        "Lighting",
+        "Ripples",
+        "Wind Patch"
+      ],
+      "il_only": [
+        "WindPatchAnimationSpeed",
+        "WindPatchIntensity",
+        "WindPatchSize"
+      ],
+      "catalog_count": 19,
+      "il_count": 15
+    },
+    {
+      "node": "Weathering",
+      "catalog_only": [
+        "Post Processing",
+        "Primary"
+      ],
+      "il_only": [],
+      "catalog_count": 12,
+      "il_count": 10
+    },
+    {
+      "node": "Wizard",
+      "catalog_only": [
+        "Erosion"
+      ],
+      "il_only": [],
+      "catalog_count": 10,
+      "il_count": 9
+    },
+    {
+      "node": "Wizard2",
+      "catalog_only": [
+        "Advanced",
+        "Convert",
+        "Erosion"
+      ],
+      "il_only": [],
+      "catalog_count": 11,
+      "il_count": 8
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+# Line endings are stored exactly as written on disk.
+#
+# The global git config on this machine sets core.autocrlf=true, which would
+# rewrite every text file on commit. Several artifacts here have intentional
+# line endings (UTF-16 evidence dumps, generated Markdown/JSON), and the analysis
+# toolchain is line-ending agnostic, so normalisation would only add noise to the
+# history. The repository therefore pins text=auto off.
+* -text
+
+# Explicit binary markers, so no tool ever attempts a text diff on them.
+*.dll binary
+*.exe binary
+*.pdb binary
+*.bin binary
+*.unity3d binary
+*.clut binary
+*.terrain binary
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.zip binary
+
+# Generated artifacts that are committed anyway: keep diffs readable.
+*.md text
+*.py text
+*.js text
+*.mjs text
+*.json text
+*.html text
+*.css text
+*.cs text
+*.ps1 text
+*.yml text
+*.yaml text
+*.tsv text

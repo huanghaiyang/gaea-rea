@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    GaeaPools - offline decoder for Eazfuscator.NET's encrypted constant pools.
+    Gaea.Engine.dll (and siblings) keep every int/long/float/double/string literal
+    in embedded manifest resources wrapped by an XOR + SymmetricAlgorithm + raw
+    Deflate envelope implemented in obfuscated classes. This tool reproduces that
+    envelope from the recovered algorithm so the pools can be read without
+    executing the target assembly.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>GaeaPools</AssemblyName>
+    <RootNamespace>GaeaPools</RootNamespace>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RestorePackages>false</RestorePackages>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
+    <NoWarn>$(NoWarn);CS0618;NU1701;MSB3277</NoWarn>
+    <RoslynDir>C:\Users\huanh\.trae-cn\extensions\muhammad-sammy.csharp-2.145.21-g154a82fd27-win32-x64\.roslyn</RoslynDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="ICSharpCode.Decompiler">
+      <HintPath>$(RoslynDir)\ICSharpCode.Decompiler.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="CopyDecompilerDependencies" AfterTargets="Build">
+    <ItemGroup>
+      <_DecompilerDep Include="$(RoslynDir)\Microsoft.Extensions.Logging.Abstractions.dll" />
+      <_DecompilerDep Include="$(RoslynDir)\Microsoft.Bcl.AsyncInterfaces.dll" />
+      <_DecompilerDep Include="$(RoslynDir)\System.Reflection.Metadata.dll" />
+      <_DecompilerDep Include="$(RoslynDir)\System.Collections.Immutable.dll" />
+      <_DecompilerDep Include="$(RoslynDir)\Humanizer.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_DecompilerDep)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"
+          Condition="Exists('%(FullPath)')" />
+  </Target>
+
+</Project>

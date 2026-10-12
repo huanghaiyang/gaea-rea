@@ -1,0 +1,11 @@
+- insert:
+    - id: rea-mcp
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: rea
+        transport: stdio
+        command: 'C:\Program Files\nodejs\node.exe'
+        args:
+          - 'D:\sgames\gaea-rea\tools\node_modules\rea-agents\scripts\rea.mjs'
+          - 'mcp'
+        failOnStartupError: true

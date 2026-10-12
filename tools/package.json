@@ -1,0 +1,12 @@
+{
+  "name": "gaea-rea-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Analysis toolchain for the Gaea 2.0 reverse-engineering effort. Rea-agents provides the REA MCP server that the rea-mcp bundle launches.",
+  "dependencies": {
+    "rea-agents": "6.4.0"
+  },
+  "scripts": {
+    "install-rea": "npm install --no-audit --no-fund"
+  }
+}

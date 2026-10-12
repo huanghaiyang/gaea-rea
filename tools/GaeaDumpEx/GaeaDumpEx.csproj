@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Index-aware sibling of GaeaDump. Gaea.Engine.dll contains same-FullName type
+    pairs (e.g. QuadSpinner.Gaea.Engine.Fx.Map appears twice because one is the
+    non-generic Single map and the other is the generic Map<DataType>). GaeaDump's
+    name-keyed `dump` cannot select between them, so this tool selects the Nth
+    match by ordinal and prints ReflectionName (with generic arity) for identity.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>GaeaDumpEx</AssemblyName>
+    <RootNamespace>GaeaDumpEx</RootNamespace>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RestorePackages>false</RestorePackages>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
+    <NoWarn>$(NoWarn);CS0618;NU1701;MSB3277</NoWarn>
+    <RoslynDir>C:\Users\huanh\.trae-cn\extensions\muhammad-sammy.csharp-2.145.21-g154a82fd27-win32-x64\.roslyn</RoslynDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="ICSharpCode.Decompiler">
+      <HintPath>$(RoslynDir)\ICSharpCode.Decompiler.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="CopyDecompilerDependencies" AfterTargets="Build">
+    <ItemGroup>
+      <_DecompilerDep Include="$(RoslynDir)\Microsoft.Extensions.Logging.Abstractions.dll" />
+      <_DecompilerDep Include="$(RoslynDir)\Microsoft.Bcl.AsyncInterfaces.dll" />
+      <_DecompilerDep Include="$(RoslynDir)\System.Reflection.Metadata.dll" />
+      <_DecompilerDep Include="$(RoslynDir)\System.Collections.Immutable.dll" />
+      <_DecompilerDep Include="$(RoslynDir)\Humanizer.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_DecompilerDep)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"
+          Condition="Exists('%(FullPath)')" />
+  </Target>
+
+</Project>

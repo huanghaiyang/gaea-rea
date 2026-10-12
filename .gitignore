@@ -1,0 +1,67 @@
+# ---------------------------------------------------------------------------
+# Build outputs and caches. All of these are regenerable; none are source.
+# ---------------------------------------------------------------------------
+.build/
+.dotnet/
+.npm-cache/
+.nuget-packages/
+obj/
+bin/
+__pycache__/
+*.pyc
+*.pyo
+
+# ---------------------------------------------------------------------------
+# Node dependencies. Install with: npm install --prefix tools
+# The lockfile (tools/package-lock.json) is committed so the REA MCP server
+# version is pinned; node_modules itself is not.
+# ---------------------------------------------------------------------------
+node_modules/
+.npm/
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+
+# ---------------------------------------------------------------------------
+# Reverse-engineering evidence.
+#
+# evidence/ holds decompiled proprietary Gaea source (Gaea.Nodes.dll,
+# Gaea.Engine.dll) and raw native binary dumps. It is deliberately not tracked:
+# it is regenerable, large (~22 MB), and contains third-party proprietary code
+# that should not be redistributed through this repository.
+#
+# Recreate it from an installed Gaea with:
+#     pwsh -File tools/run-analysis.ps1
+# ---------------------------------------------------------------------------
+evidence/
+
+# Stray error/stdout capture files produced by the analysis scripts.
+_err.txt
+_stdout.txt
+_stderr.txt
+
+# ---------------------------------------------------------------------------
+# Editor / OS noise
+# ---------------------------------------------------------------------------
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+Thumbs.db
+desktop.ini
+
+# ---------------------------------------------------------------------------
+# Secrets. No credentials are used by this project, but these patterns are
+# ignored defensively so a future local config cannot be committed by accident.
+# ---------------------------------------------------------------------------
+.env
+.env.*
+*.pem
+*.pfx
+*.p12
+*.key
+id_rsa*
+.npmrc.local
+.credentials*
+secrets.*

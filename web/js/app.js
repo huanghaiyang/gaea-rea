@@ -1,0 +1,446 @@
+﻿/**
+ * app.js — application bootstrap and wiring.
+ *
+ * Responsibilities: load the catalog, build the panels, own the single EvalController and
+ * Viewport instance, and translate toolbar/keyboard intent into graph + evaluation work.
+ * Every panel is a small class that subscribes to the shared bus; nothing here reaches into
+ * another panel's DOM.
+ */
+
+import { state, bus, loadCatalog, selectNode, undo, redo, clearHistory, activeRoot, rootsToEvaluate } from './state.js';
+import { GraphEditor } from './graph-editor.js';
+import { ParamsPanel } from './params-panel.js';
+import { LibraryPanel } from './library-panel.js';
+import { InfoPanel } from './info-panel.js';
+import { EvalController } from './eval-controller.js';
+import { Viewport } from './viewport.js';
+import { buildDemoGraph, buildStarterGraph } from './demo-graph.js';
+import { IMPLEMENTED, BY_NAME, NODES } from './registry.js';
+import { findTerminal, getNode } from './graph.js';
+import { fieldToPNG, download } from './export.js';
+import { $, $$, toast, fmtMs, fmt, esc } from './util.js';
+
+/* ------------------------------------------------------------------ module singletons */
+
+let editor = null;
+let params = null;
+let library = null;
+let info = null;
+let viewport = null;
+const evaluator = new EvalController();
+
+/* ------------------------------------------------------------------ status helpers */
+
+function setStatus(text, kind = '') {
+  const el = $('#eval-status');
+  if (!el) return;
+  el.textContent = text;
+  el.className = `status${kind ? ' ' + kind : ''}`;
+}
+
+function setGraphHint(text) { const el = $('#graph-hint'); if (el) el.textContent = text; }
+
+/* ------------------------------------------------------------------ init */
+
+async function init() {
+  try {
+    const catalog = await loadCatalogFromDisk();
+    loadCatalog(catalog);
+    // Coverage bookkeeping, all derived rather than hard-coded:
+    //   implementedCount – registry entries that carry a kernel (the "shipped algorithms" count)
+    //   catalogCovered   – catalogued node NAMES whose own registry entry carries a kernel
+    // The registry also ships nodes that are not in Nodes.json (Output, Group, the Select
+    // family), which is why the two numbers differ.
+    state.implementedCount = NODES.filter((n) => n.algorithm).length;
+    state.catalogCovered = (catalog.nodes || []).filter((n) => {
+      const e = BY_NAME.get(n.name);
+      return !!(e && e.algorithm);
+    }).length;
+
+    // --- panels
+    const graphCanvas = $('#graph-canvas');
+    editor = new GraphEditor(graphCanvas, { onStatus: (m) => { setGraphHint(m); setStatus('graph', ''); } });
+    params = new ParamsPanel({ onChange: (name, value, node) => onParamChange(name, value, node) });
+    library = new LibraryPanel({ onAdd: (name) => addNodeByName(name) });
+    library.build(catalog);
+    info = new InfoPanel();
+
+    viewport = new Viewport($('#view-canvas-2d'), $('#view-canvas-3d'), {
+      onStatus: (m) => { toast(m, 'error', 4200); $('#vp-fallback').hidden = false; $('#vp-fallback').textContent = m; },
+    });
+    state.glAvailable = viewport.available3D;
+    if (!viewport.available3D) {
+      $('#vp-fallback').hidden = false;
+      $('#vp-fallback').textContent = `WebGL2 unavailable (${viewport.status}) — using the 2D heightmap view.`;
+    }
+
+    // --- worker
+    const usingWorker = await evaluator.init(catalog);
+    if (!usingWorker) {
+      toast('Worker unavailable — evaluating on the main thread (UI will pause during a build).', 'error', 5200);
+    }
+
+    wireToolbar();
+    wireBus();
+    wireKeyboard();
+
+    // --- first graph
+    loadGraph(buildDemoGraph(), { announce: 'demo pipeline loaded' });
+    setStatus('idle');
+  } catch (err) {
+    showFatal(err);
+  }
+}
+
+/**
+ * The catalog is the only file loaded over the network. Opening index.html straight from disk
+ * (file://) makes fetch illegal, so we fail with an actionable message instead of a blank page.
+ */
+async function loadCatalogFromDisk() {
+  if (location.protocol === 'file:') {
+    throw new Error(
+      'This page was opened as a file:// document, so the browser refuses to load data/nodes.json.\n' +
+      'Start a static server in the web/ folder and open the http:// URL instead:\n' +
+      '    python -m http.server 8080\n' +
+      '    then open http://localhost:8080/'
+    );
+  }
+  const res = await fetch('data/nodes.json', { cache: 'no-cache' });
+  if (!res.ok) throw new Error(`could not load data/nodes.json (HTTP ${res.status})`);
+  const catalog = await res.json();
+  if (!catalog || !Array.isArray(catalog.nodes)) throw new Error('data/nodes.json has an unexpected shape');
+  return catalog;
+}
+
+function showFatal(err) {
+  const msg = (err && err.message) || String(err);
+  const box = document.createElement('div');
+  box.style.cssText = 'position:fixed;inset:0;background:#0d1117;color:#e6edf3;padding:40px;font:13px/1.6 ui-monospace,monospace;white-space:pre-wrap;z-index:999;overflow:auto';
+  box.textContent = `Gaea Web failed to start.\n\n${msg}`;
+  document.body.appendChild(box);
+  setStatus('failed', 'error');
+  console.error(err);
+}
+
+/* ------------------------------------------------------------------ graph loading */
+
+function loadGraph(built, opts = {}) {
+  state.graph = built.graph;
+  state.fields.clear();
+  state.lastStats = [];
+  state.lastErrors = [];
+  state.previewRoot = null;
+  selectNode(built.terminal || findTerminal(state.graph));
+  clearHistory();
+  bus.emit('graph:replaced', { reason: opts.reason || 'load' });
+  bus.emit('node:changed', { id: state.selected });
+  syncToolbarFromGraph();
+  if (editor) editor.fit();
+  evaluator.requestNow('load');
+  if (opts.announce) toast(opts.announce);
+}
+
+function syncToolbarFromGraph() {
+  const res = $('#sel-res');
+  if (res) res.value = String(state.graph.build.size);
+  const seed = $('#inp-seed');
+  if (seed) seed.value = String(state.graph.build.seed);
+}
+
+function addNodeByName(name) {
+  if (!editor) return;
+  editor.addNodeCenter(name);
+  const entry = BY_NAME.get(name);
+  if (!entry || !entry.algorithm) {
+    toast(`${name} is catalogued but not implemented — it will pass its first input through.`, 'error', 3600);
+  }
+}
+
+/* ------------------------------------------------------------------ toolbar */
+
+function wireToolbar() {
+  $('#btn-new').addEventListener('click', () => loadGraph(buildStarterGraph(), { announce: 'new graph' }));
+  $('#btn-demo').addEventListener('click', () => loadGraph(buildDemoGraph(), { announce: 'demo pipeline loaded' }));
+  $('#btn-undo').addEventListener('click', () => { if (!undo()) toast('nothing to undo'); });
+  $('#btn-redo').addEventListener('click', () => { if (!redo()) toast('nothing to redo'); });
+  $('#btn-fit').addEventListener('click', () => editor && editor.fit());
+
+  $('#btn-add-node').addEventListener('click', () => {
+    const name = libraryDefaultPick();
+    if (name) addNodeByName(name);
+  });
+  $('#btn-delete-node').addEventListener('click', () => editor && editor.deleteSelected());
+
+  $('#sel-res').addEventListener('change', (e) => {
+    const size = Number(e.target.value) | 0;
+    state.graph.build.size = size;
+    if (size >= 512 && graphHasErosion()) {
+      toast(`Erosion at ${size}px can take several seconds — the worker keeps the UI responsive.`, 'error', 4200);
+    }
+    evaluator.requestNow('resolution');
+  });
+  $('#inp-seed').addEventListener('change', (e) => {
+    state.graph.build.seed = Number(e.target.value) | 0;
+    evaluator.requestNow('seed');
+  });
+  $('#btn-dice').addEventListener('click', () => {
+    const s = Math.floor(Math.random() * 100000);
+    state.graph.build.seed = s;
+    $('#inp-seed').value = String(s);
+    evaluator.requestNow('seed');
+  });
+
+  $('#btn-view2d').addEventListener('click', () => setViewMode('2d'));
+  $('#btn-view3d').addEventListener('click', () => setViewMode('3d'));
+  $('#sel-ramp').addEventListener('change', (e) => {
+    state.ramp = e.target.value;
+    if (viewport) viewport.setRamp(state.ramp);
+  });
+  $('#inp-exag').addEventListener('input', (e) => {
+    state.exaggeration = Number(e.target.value) || 1;
+    if (viewport) viewport.setExaggeration(state.exaggeration);
+  });
+
+  $('#btn-export').addEventListener('click', exportPNG);
+
+  // inspector tabs
+  const tabs = $$('#inspector .tab');
+  for (const t of tabs) {
+    t.addEventListener('click', () => {
+      for (const o of tabs) o.classList.toggle('active', o === t);
+      $('#page-params').hidden = t.dataset.tab !== 'params';
+      $('#page-info').hidden = t.dataset.tab !== 'info';
+    });
+  }
+}
+
+function setViewMode(mode) {
+  if (!viewport) return;
+  if (mode === '3d' && !viewport.available3D) {
+    toast(`3D is unavailable: ${viewport.status}`, 'error', 4200);
+    return;
+  }
+  state.viewMode = mode;
+  viewport.setMode(mode);
+  $('#btn-view2d').classList.toggle('active', mode === '2d');
+  $('#btn-view3d').classList.toggle('active', mode === '3d');
+  $('#vp-mode').textContent = mode === '3d' ? '3D' : '2D';
+  updateOverlay();
+}
+
+function graphHasErosion() {
+  return state.graph.nodes.some((n) => n.name === 'Erosion' || n.name === 'Erosion2' || n.name === 'Thermal');
+}
+
+function libraryDefaultPick() {
+  const used = new Set(state.graph.nodes.map((n) => n.name));
+  const pools = ['MultiFractal', 'Warp', 'Erosion2', 'Combine', 'Blur', 'Adjust'];
+  return pools.find((p) => !used.has(p)) || 'MultiFractal';
+}
+
+/* ------------------------------------------------------------------ events */
+
+function onParamChange(name, value, node) {
+  if (params && node && node.id === params.currentId) {
+    // keep readouts in sync when several controls show the same parameter
+    params.syncValues();
+  }
+  if (name === 'Seed') {
+    // per-node seed changes do not need a full schema rebuild
+  }
+  void value;
+  setStatus('queued');
+  evaluator.request('param');
+  bus.emit('node:changed', { id: node.id });
+}
+
+function wireBus() {
+  bus.on('history:changed', ({ undo: u, redo: r }) => {
+    const bu = $('#btn-undo'), br = $('#btn-redo');
+    if (bu) { bu.disabled = u === 0; bu.title = `Undo (${u} step${u === 1 ? '' : 's'}) — Ctrl+Z`; }
+    if (br) { br.disabled = r === 0; br.title = `Redo (${r} step${r === 1 ? '' : 's'}) — Ctrl+Y`; }
+  });
+
+  bus.on('graph:changed', ({ reason }) => {
+    if (reason !== 'move') setStatus('queued');
+    evaluator.request(reason);
+    updateSources();
+  });
+  bus.on('graph:replaced', () => { evaluator.requestNow('graph'); updateSources(); });
+  bus.on('preview:changed', () => { evaluator.requestNow('preview'); updateSources(); });
+  bus.on('selection:changed', () => { updateSources(); updateOverlay(); });
+
+  bus.on('eval:start', ({ reason }) => {
+    setStatus(`building… (${reason})`, 'busy');
+  });
+
+  bus.on('eval:done', (result) => {
+    state.lastResult = result;
+    const errs = (result.errors || []).length;
+    setStatus(errs ? `${fmtMs(result.ms)} · ${errs} error${errs === 1 ? '' : 's'}` : fmtMs(result.ms), errs ? 'error' : '');
+    state.fps = result.ms;
+    pickAndShowField();
+    updateSources();
+    updateOverlay();
+    const seen = new Set();
+    for (const e of result.errors || []) {
+      if (seen.has(e.message)) continue;
+      seen.add(e.message);
+      toast(e.message, 'error', 4000);
+    }
+  });
+}
+
+/** Choose which evaluated field the viewport shows and hand it to the renderer. */
+function pickAndShowField() {
+  const fields = state.fields;
+  if (!fields.size) return;
+  let chosen = null;
+  let chosenName = '';
+  const rootId = activeRoot();
+  if (rootId && fields.has(rootId)) {
+    chosen = fields.get(rootId);
+    const n = getNode(state.graph, rootId);
+    chosenName = n ? n.name : '';
+  } else {
+    // fall back to the terminal output, else the first available field
+    const t = findTerminal(state.graph);
+    if (t && fields.has(t)) {
+      chosen = fields.get(t);
+      const n = getNode(state.graph, t);
+      chosenName = n ? n.name : '';
+    } else {
+      const [id, f] = fields.entries().next().value;
+      chosen = f;
+      const n = getNode(state.graph, id);
+      chosenName = n ? n.name : '';
+    }
+  }
+  if (!chosen) return;
+  state.displayedRoot = chosen.root;
+  if (viewport) viewport.setField(chosen);
+  const sub = $('#vp-subject');
+  if (sub) sub.textContent = chosenName ? `— ${chosenName}` : '';
+  updateOverlay();
+}
+
+function updateOverlay() {
+  const el = $('#vp-overlay');
+  if (!el) return;
+  const f = state.fields.get(state.displayedRoot);
+  const lines = [];
+  if (f) {
+    lines.push(`${f.size} x ${f.size}  min ${fmt(f.min, 3)}  max ${fmt(f.max, 3)}  mean ${fmt(f.mean, 3)}  sd ${fmt(f.std, 3)}`);
+  }
+  if (state.viewMode === '3d' && viewport && viewport.meshInfo) {
+    const m = viewport.meshInfo;
+    lines.push(`${m.vertices.toLocaleString()} verts · ${m.triangles.toLocaleString()} tris · stride ${m.stride} · drag orbit, wheel zoom, dbl-click reset`);
+  } else if (state.viewMode === '2d') {
+    lines.push('1:1 pixel view — switch to 3D for shaded relief');
+  }
+  el.textContent = lines.join('\n');
+  const pill = $('#vp-stats');
+  if (pill && f) pill.textContent = `${f.size}² · ${state.lastMs ? fmtMs(state.lastMs) : '—'}`;
+}
+
+/* ------------------------------------------------------------------ source chips */
+
+function updateSources() {
+  const box = $('#sources');
+  if (!box) return;
+  const roots = rootsToEvaluate();
+  box.innerHTML = '';
+  if (!roots.length) return;
+  for (const id of roots) {
+    const node = getNode(state.graph, id);
+    if (!node) continue;
+    const chip = document.createElement('button');
+    chip.className = `source-chip${state.displayedRoot === id ? ' active' : ''}`;
+    const isTerm = node.name === 'Output' || node.name === 'Export';
+    chip.innerHTML = `${esc(node.name)} <span class="tag">${isTerm ? 'FINAL' : (state.previewRoot === id ? 'PINNED' : 'SELECTED')}</span>`;
+    chip.title = `Show ${node.name} in the viewport`;
+    chip.addEventListener('click', () => {
+      state.previewRoot = isTerm ? null : id;
+      selectNode(id);
+      bus.emit('preview:changed', { id: state.previewRoot });
+    });
+    box.appendChild(chip);
+  }
+}
+
+/* ------------------------------------------------------------------ export */
+
+async function exportPNG() {
+  if (!viewport || !state.displayedRoot || !state.fields.get(state.displayedRoot)) {
+    toast('nothing to export yet', 'error');
+    return;
+  }
+  const field = state.fields.get(state.displayedRoot);
+  const node = getNode(state.graph, field.root);
+  const base = `gaeaweb_${(node ? node.name : 'field').toLowerCase()}_${field.size}_s${state.graph.build.seed}`;
+  try {
+    // 16-bit: the precision-preserving deliverable
+    const png16 = fieldToPNG(field, { bitDepth: 16, min: 0, max: 1 });
+    download(png16, `${base}_16bit.png`);
+    // 8-bit: universally viewable companion
+    const png8 = fieldToPNG(field, { bitDepth: 8, min: 0, max: 1 });
+    download(png8, `${base}_8bit.png`);
+    toast(`exported ${base}_16bit.png (${(png16.length / 1024).toFixed(0)} KB) and 8-bit preview`);
+  } catch (err) {
+    toast(`export failed: ${err.message}`, 'error', 4000);
+  }
+}
+
+/* ------------------------------------------------------------------ keyboard */
+
+function wireKeyboard() {
+  window.addEventListener('keydown', (e) => {
+    const tag = (e.target && e.target.tagName) || '';
+    const typing = tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA';
+    if (typing && !(e.key === 'Escape')) return;
+
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); if (!undo()) toast('nothing to undo'); return; }
+    if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+      e.preventDefault(); if (!redo()) toast('nothing to redo'); return;
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') { e.preventDefault(); loadGraph(buildStarterGraph(), { announce: 'new graph' }); return; }
+    if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); editor && editor.deleteSelected(); return; }
+    if (e.key === 'f' || e.key === 'F') { editor && editor.fit(); return; }
+    if (e.key === '1') { setViewMode('2d'); return; }
+    if (e.key === '2') { setViewMode('3d'); return; }
+    if (e.key === 'e' || e.key === 'E') { exportPNG(); return; }
+    if (e.key === '/' ) { e.preventDefault(); const s = $('#lib-search'); if (s) s.focus(); return; }
+    if (e.key === 'Escape') { editor && editor.hidePortPicker(); return; }
+  });
+}
+
+/* ------------------------------------------------------------------ boot */
+
+window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('error', (e) => {
+  setStatus('error', 'error');
+  console.error('[gaea-web]', e.error || e.message);
+});
+window.addEventListener('unhandledrejection', (e) => {
+  setStatus('error', 'error');
+  console.error('[gaea-web] unhandled rejection', e.reason);
+});
+
+// Expose a tiny debug surface for the verification harness and for manual poking in devtools.
+window.GAEAWEB = {
+  get state() { return state; },
+  get editor() { return editor; },
+  get viewport() { return viewport; },
+  get evaluator() { return evaluator; },
+  IMPLEMENTED,
+  exportPNG,
+  selectNode,
+  toast,
+};
+
+// Named exports as well, so the Node verification harness can drive the exact same module
+// instance the page uses without going through a global.
+export { state, selectNode, exportPNG, undo, redo, loadGraph, addNodeByName };
+export const getEditor = () => editor;
+export const getViewport = () => viewport;
+export const getEvaluator = () => evaluator;

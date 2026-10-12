@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    GaeaPoolReflect - dump Eazfuscator constant pools by driving the target's own
+    pool loaders through reflection in a throwaway process. GaeaPools (the offline
+    reimplementation) could not reproduce Eazfuscator's Deflate variant exactly, so
+    this tool asks Gaea.Engine.dll to decode its own embedded resources and then
+    only *reads* the resulting private fields/arrays. Nothing is written back and
+    no application entry point is invoked.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>GaeaPoolReflect</AssemblyName>
+    <RootNamespace>GaeaPoolReflect</RootNamespace>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RestorePackages>false</RestorePackages>
+  </PropertyGroup>
+
+</Project>
