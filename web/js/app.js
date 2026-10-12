@@ -91,9 +91,18 @@ async function init() {
     }
 
     // --- worker
+    // Both the graph evaluation and the 3D mesh building need the Worker API. In a
+    // non-secure context (plain http on a LAN IP) Chromium does not expose it at
+    // all, so say which case this is instead of leaving the user to notice the
+    // stutter.
+    const secure = typeof isSecureContext === 'undefined' ? null : isSecureContext;
     const usingWorker = await evaluator.init(catalog);
     if (!usingWorker) {
-      toast('Worker unavailable — evaluating on the main thread (UI will pause during a build).', 'error', 5200);
+      const why = secure === false
+        ? 'This page is not a secure context, so browsers do not expose Worker for a LAN '
+          + 'http address. Serve it from http://localhost or over https to enable background evaluation.'
+        : 'Worker could not be started.';
+      toast(`Worker unavailable — evaluating on the main thread (UI will pause during a build). ${why}`, 'error', 7000);
     }
 
     wireToolbar();
@@ -350,7 +359,14 @@ function updateOverlay() {
   }
   if (state.viewMode === '3d' && viewport && viewport.meshInfo) {
     const m = viewport.meshInfo;
-    lines.push(`${m.vertices.toLocaleString()} verts · ${m.triangles.toLocaleString()} tris · stride ${m.stride} · drag orbit, wheel zoom, dbl-click reset`);
+    // Surface where the mesh was built. When a Worker is unavailable the geometry
+    // is rebuilt on the UI thread, which is the difference between smooth orbiting
+    // and visible stutter — so it is stated rather than left to be felt.
+    const diag = viewport.meshWorker ? viewport.meshWorker.diagnostics() : null;
+    const where = diag && diag.mode === 'worker'
+      ? `mesh in worker${Number.isFinite(diag.lastMs) ? ` ${fmtMs(diag.lastMs)}` : ''}`
+      : 'mesh on UI thread';
+    lines.push(`${m.vertices.toLocaleString()} verts · ${m.triangles.toLocaleString()} tris · stride ${m.stride} · ${where} · drag orbit, wheel zoom, dbl-click reset`);
   } else if (state.viewMode === '2d') {
     lines.push('1:1 pixel view — switch to 3D for shaded relief');
   }

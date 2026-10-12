@@ -90,12 +90,41 @@ node tests/app-test.mjs     # the whole application under a DOM shim — 63 asse
 node tests/i18n-test.mjs    # localisation lookups, fallbacks and DOM application — 46 assertions
 node tests/graph-coords-test.mjs  # graph canvas coordinate plumbing at devicePixelRatio=2 — 20 assertions
 node tests/camera-controls-test.mjs  # 3D preview orbit/pan/zoom sign conventions — 22 assertions
+node tests/mesh-parity-test.mjs   # worker vs module mesh build, bit-for-bit — 68 assertions
 python ../tools/validate_web.py   # static: every import/asset resolves
 ```
 
 `tests/app-test.mjs` installs `tests/dom-shim.mjs` and then imports `js/app.js` exactly as
 `index.html` does, so it exercises the real import graph, event wiring, parameter panel and
 export path — not a mock.
+
+### Background work (Workers)
+
+The two CPU-heavy steps — graph evaluation and turning a height field into a render mesh — run in
+Workers when the browser allows it:
+
+| Module | Role |
+| --- | --- |
+| `js/eval-worker.js` | evaluates the node graph off the UI thread |
+| `js/eval-controller.js` | starts it, and falls back to inline evaluation |
+| `js/mesh-build.js` | the mesh algorithm, as a pure function |
+| `js/mesh-worker.js` | the same algorithm as a **classic** worker script |
+| `js/mesh-worker-controller.js` | starts it, serialises requests, reports the mode |
+
+Two constraints shape this, and both are worth knowing because they silently cost performance:
+
+1. **Workers are unavailable over plain HTTP to a LAN address.** Chromium only exposes `Worker` in a
+   secure context, so `http://192.168.x.x/` cannot create one at all and everything runs on the UI
+   thread. Use `http://localhost/` or HTTPS to get background evaluation and meshing. The app states
+   this in a toast and tags the 3D overlay with `mesh in worker` or `mesh on UI thread`.
+2. **A classic worker cannot `import`.** The mesh algorithm therefore exists twice — once as an ES
+   module and once inside the worker. That duplication is only safe because
+   `tests/mesh-parity-test.mjs` runs both over twelve field shapes and asserts the vertex and index
+   buffers are bit-for-bit identical. The worker is bootstrapped from a Blob URL for the same
+   reason `{type:'module'}` is avoided: the classic form is the only portable one.
+
+Orbiting and panning never rebuild the mesh — only a new height field, a new field size or a change
+of vertical exaggeration does — so interaction cost is independent of field resolution.
 
 ---
 

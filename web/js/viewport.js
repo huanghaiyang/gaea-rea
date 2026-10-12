@@ -14,6 +14,8 @@
 
 import { paintField, rampCSS } from './colormap.js';
 import { rafThrottle } from './util.js';
+import { MeshWorkerController } from './mesh-worker-controller.js';
+import { buildMesh } from './mesh-build.js';
 
 /* ------------------------------------------------------------------ GLSL */
 
@@ -167,6 +169,18 @@ export class Viewport {
     this.ctx = this.c2d.getContext('2d', { alpha: false });
     this._initGL();
     this._bindControls();
+
+    /**
+     * Mesh building (the one CPU-heavy step per field change) is offloaded when a
+     * Worker can be created. `meshWorker.diagnostics()` explains the mode, because in
+     * a non-secure context the Worker API does not exist at all and the difference is
+     * otherwise invisible.
+     */
+    this.meshWorker = new MeshWorkerController();
+    this.meshWorker.init().then((res) => {
+      if (!res.ok) this.onStatus(`3D mesh building runs on the UI thread — ${res.reason}`);
+      else this._schedule();
+    }).catch(() => { /* inline fallback already in place */ });
   }
 
   /* ---------------------------------------------------------- GL setup */
@@ -338,13 +352,15 @@ export class Viewport {
     this.draw();
   }
 
-  setRamp(ramp) { this.ramp = ramp; this.pendingFull = null; this.mesh = null; this._schedule(); }
-  setExaggeration(x) { this.exaggeration = x; this.mesh = null; this._schedule(); }
+  // Invalidation is decided centrally by `_meshStale`, which compares the height
+  // array, its shape and the exaggeration. Setting `mesh = null` here would discard
+  // a usable mesh every time a ramp changed, so these only schedule a redraw.
+  setRamp(ramp) { this.ramp = ramp; this.pendingFull = null; this._schedule(); }
+  setExaggeration(x) { this.exaggeration = x; this._schedule(); }
 
   setField(field) {
     this.field = field;
     this.pendingFull = null;
-    this.mesh = null;
     this.resize();
     this.draw();
   }
@@ -445,9 +461,8 @@ export class Viewport {
   _draw3D() {
     const gl = this.gl;
     const s = this.field;
-    if (!this.mesh || this.mesh.token !== s || this.mesh.exag !== this.exaggeration) {
-      this._buildMesh(s, s);
-    }
+    if (this._meshStale(s)) this._requestMesh(s);
+
     gl.viewport(0, 0, this.c3d.width, this.c3d.height);
     gl.clearColor(0.043, 0.058, 0.078, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -468,71 +483,109 @@ export class Viewport {
     gl.uniform1f(this.loc.ambient, 0.15);
     gl.uniform1f(this.loc.exposure, 1.03);
 
+    // Nothing to draw until the first mesh arrives. The request is already in
+    // flight, and the cleared frame is preferable to blocking the UI thread.
+    if (!this.mesh) return;
+
     gl.bindVertexArray(this.vao);
     gl.drawElements(gl.TRIANGLES, this.ibCount, gl.UNSIGNED_INT, 0);
     gl.bindVertexArray(null);
   }
 
+  /* --------------------------------------------------- mesh cache + worker */
+
   /**
-   * Build the height mesh. Sampling is capped so even a 1024px field produces a bounded
-   * triangle count; normals are central differences on the sample grid.
+   * A mesh is reusable while the height data, its shape and the vertical stretch are
+   * unchanged. Camera moves change none of these, so orbiting and panning never
+   * rebuild — which is what keeps interaction smooth.
    */
-  _buildMesh(s, token) {
+  _meshStale(s) {
+    const m = this.mesh;
+    if (!m) return true;
+    if (!s || !s.data) return false;
+    return m.src !== s.data || m.size !== s.size || m.exag !== this.exaggeration;
+  }
+
+  /**
+   * Ask for a mesh, either from the worker or inline. At most one request is in
+   * flight; `_meshRequest` holds the token so a late reply for superseded data is
+   * discarded.
+   */
+  _requestMesh(s) {
+    if (this._meshPending) return;
+    if (!s || !s.data) return;
+    this._meshPending = true;
+    const token = s;
+    this.meshWorker.request({
+      data: s.data,
+      size: s.size,
+      channels: s.channels || 1,
+      min: s.min,
+      max: s.max,
+      exaggeration: this.exaggeration,
+      token,
+    }).then((res) => {
+      this._meshPending = false;
+      // Superseded, or the field moved on while this was building.
+      if (!res) { this._schedule(); return; }
+      if (res.token !== this.field) { this._schedule(); return; }
+      this._uploadMesh(res);
+      this._schedule();
+    }).catch((err) => {
+      this._meshPending = false;
+      this.onStatus(`3D mesh build failed: ${err.message}`);
+    });
+  }
+
+  /**
+   * Upload a built mesh to the GPU. The vertex buffer is rewritten every time; the
+   * index buffer only when the topology changed, since it depends solely on `n`.
+   */
+  _uploadMesh(res) {
     const gl = this.gl;
-    const size = s.size;
-    const stride = Math.max(1, Math.ceil(size / 384));
-    const n = Math.floor((size - 1) / stride) + 1;
-    const channels = s.channels || 1;
-    const vrange = s.max - s.min > 1e-9 ? s.max - s.min : 1;
-    const stretch = Math.max(0.02, Math.min(0.55, 0.34 * this.exaggeration));
-    const get = (i, j) => {
-      const xi = Math.min(size - 1, Math.max(0, i * stride));
-      const yi = Math.min(size - 1, Math.max(0, j * stride));
-      return s.data[(yi * size + xi) * channels];
-    };
-
-    const verts = new Float32Array(n * n * 7);
-    for (let j = 0; j < n; j++) {
-      for (let i = 0; i < n; i++) {
-        const h = get(i, j);
-        const t = (h - s.min) / vrange;
-        const hl = get(Math.max(0, i - 1), j);
-        const hr = get(Math.min(n - 1, i + 1), j);
-        const hd = get(i, Math.max(0, j - 1));
-        const hu = get(i, Math.min(n - 1, j + 1));
-        const dx = ((hr - hl) / vrange) * stretch * n * 0.5;
-        const dz = ((hu - hd) / vrange) * stretch * n * 0.5;
-        let nx = -dx, ny = 1, nz = -dz;
-        const len = Math.hypot(nx, ny, nz) || 1;
-        nx /= len; ny /= len; nz /= len;
-        const o = (j * n + i) * 7;
-        verts[o] = i / (n - 1) - 0.5;
-        verts[o + 1] = t * stretch - stretch * 0.5;
-        verts[o + 2] = j / (n - 1) - 0.5;
-        verts[o + 3] = nx; verts[o + 4] = ny; verts[o + 5] = nz;
-        verts[o + 6] = t;
-      }
-    }
-
-    const quads = (n - 1) * (n - 1);
-    const idx = new Uint32Array(quads * 6);
-    let k = 0;
-    for (let j = 0; j < n - 1; j++) {
-      for (let i = 0; i < n - 1; i++) {
-        const a = j * n + i, b = a + 1, c = a + n, d = c + 1;
-        idx[k++] = a; idx[k++] = c; idx[k++] = b;
-        idx[k++] = b; idx[k++] = c; idx[k++] = d;
-      }
-    }
-
+    if (!gl) return;
     gl.bindVertexArray(this.vao);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
-    gl.bufferData(gl.ARRAY_BUFFER, verts, gl.DYNAMIC_DRAW);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idx, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, res.verts, gl.DYNAMIC_DRAW);
+    if (this._iboN !== res.n) {
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, res.idx, gl.STATIC_DRAW);
+      this._iboN = res.n;
+    }
     gl.bindVertexArray(null);
-    this.ibCount = idx.length;
-    this.mesh = { token, exag: this.exaggeration, vertices: n * n, triangles: quads * 2, stride };
+    this.ibCount = res.idx.length;
+    this.mesh = {
+      src: res.token,
+      size: res.token && res.token.size,
+      exag: this.exaggeration,
+      n: res.n,
+      stride: res.stride,
+      vertices: res.vertices,
+      triangles: res.triangles,
+      mode: res.mode,
+      buildMs: res.buildMs,
+    };
+  }
+
+  /**
+   * Build the height mesh on the calling thread.
+   *
+   * Retained for the inline path and for tests. The shared implementation lives in
+   * mesh-build.js so the worker copy and this one can be compared directly; see
+   * web/tests/mesh-worker-parity-test.mjs.
+   */
+  _buildMesh(s, token) {
+    const res = buildMesh({
+      data: s.data,
+      size: s.size,
+      channels: s.channels || 1,
+      min: s.min,
+      max: s.max,
+      exaggeration: this.exaggeration,
+      token,
+    });
+    this._uploadMesh(res);
+    return this.mesh;
   }
 
   get meshInfo() { return this.mesh; }
