@@ -66,6 +66,8 @@ async function init() {
     info = new InfoPanel();
 
     viewport = new Viewport($('#view-canvas-2d'), $('#view-canvas-3d'), {
+      // The layout box the canvases fill; measured instead of a hidden canvas.
+      host: document.querySelector('#viewport .vp-body') || $('#viewport'),
       onStatus: (m) => { toast(m, 'error', 4200); $('#vp-fallback').hidden = false; $('#vp-fallback').textContent = m; },
     });
     state.glAvailable = viewport.available3D;

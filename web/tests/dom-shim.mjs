@@ -370,6 +370,21 @@ export function installDomShim({ url = 'http://127.0.0.1:8080/', catalog } = {})
     doc.body.appendChild(el);
     registry.register(el);
   }
+  // The app looks for "#viewport .vp-body"; give the injected element that child so the shim
+  // mirrors the real layout (index.html nests both canvases inside .vp-body).
+  {
+    const vp = registry.byId.get('viewport');
+    const body = new Node2('div');
+    body.className = 'vp-body';
+    vp.appendChild(body);
+    // re-parent the canvases into it, exactly as the host page does
+    for (const id of ['view-canvas-2d', 'view-canvas-3d']) {
+      const c = registry.byId.get(id);
+      if (c && c.parentNode) c.parentNode.removeChild(c);
+      body.appendChild(c);
+      registry.register(c);
+    }
+  }
   // canvas size so the viewport's internal ImageData logic is exercised
   for (const id of ['view-canvas-2d', 'view-canvas-3d']) {
     const c = registry.byId.get(id);
