@@ -1,4 +1,4 @@
-﻿/**
+/**
  * registry.js — THE single extension point of the whole application.
  *
  * To add (or improve) the algorithm of any node you change exactly one place: the NODES
@@ -34,7 +34,7 @@ import {
   directionalWarp, blur, deflate, dilate, denoise, combine, maskApply, maskBlend,
 } from './kernels/filters.js';
 import {
-  hydraulicDroplet, streamPower, thermalTalus,
+  hydraulicDroplet, hydraulicDropletMultiscale, streamPower, thermalTalus,
 } from './kernels/erosion.js';
 import {
   levelsRange, slope, heightKey, occlusion, distanceTransform, fractalTerraces, stepsNode,
@@ -722,8 +722,8 @@ export const NODES = [
 
   /* ---------------------------------------------------------- EROSION */
   {
-    name: 'Erosion2', algorithm: hydraulicDroplet, category: CAT.EROS,
-    summary: 'Particle (droplet) hydraulic erosion — the recommended erosion node in this build.',
+    name: 'Erosion2', algorithm: hydraulicDropletMultiscale, category: CAT.EROS,
+    summary: 'Multiscale particle erosion on a Laplacian pyramid: levels are eroded coarse-to-fine, which is what produces long connected valleys instead of isolated scratches.',
     inputs: [H()], outputs: [OUT_H()],
     note: 'model',
     params: {
