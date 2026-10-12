@@ -1,4 +1,4 @@
-﻿/**
+/**
  * dom-shim.mjs — a small in-memory DOM used to run the WHOLE browser application under Node.
  *
  * Why this exists: this build sandbox cannot start a browser (Chromium's mojo IPC needs named
@@ -51,7 +51,28 @@ class Node2 {
     this.childNodes = this.children;
     this.parentNode = null;
     this.attributes = new Map();
-    this.dataset = {};
+    // Real DOMStringMap rejects keys that are not valid property names: a hyphen
+    // (or anything that is not followed by an uppercase letter) throws a
+    // SyntaxError on assignment. The shim enforces the same rule, because a plain
+    // object would silently accept invalid keys and hide exactly that class of bug.
+    this.dataset = new Proxy({}, {
+      set(target, prop, value) {
+        if (typeof prop === 'string' && !/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(prop)) {
+          throw new SyntaxError(
+            `Failed to set a named property '${prop}' on 'DOMStringMap': '${prop}' is not a valid property name.`,
+          );
+        }
+        target[prop] = value;
+        return true;
+      },
+      get(target, prop) {
+        if (typeof prop === 'string' && (prop.startsWith('to') || prop === 'valueOf')) {
+          // Let Object.prototype helpers through untouched.
+          return target[prop] ?? undefined;
+        }
+        return target[prop];
+      },
+    });
     this.style = new Style();
     this.classList = new ClassList(this);
     this._className = '';
@@ -120,6 +141,13 @@ class Node2 {
   getAttribute(k) { return this.attributes.has(k) ? this.attributes.get(k) : null; }
   removeAttribute(k) { this.attributes.delete(k); }
   hasAttribute(k) { return this.attributes.has(k); }
+
+  // `aria-label` is a reflected attribute in real browsers: assigning the IDL
+  // property updates the content attribute and vice versa. The i18n layer writes
+  // el['aria-label'], so without this the two views would disagree in the shim
+  // while agreeing in a browser.
+  get 'aria-label'() { return this.attributes.has('aria-label') ? this.attributes.get('aria-label') : null; }
+  set 'aria-label'(v) { this.attributes.set('aria-label', String(v)); }
 
   appendChild(child) {
     if (!child) return child;

@@ -166,13 +166,38 @@ export function isTranslated() {
 /* --------------------------------------------------------------- DOM plumbing */
 
 /**
+ * Original (authored, English) property values, remembered per element+property so
+ * a language switch can restore them exactly.
+ *
+ * A WeakMap is used rather than element.dataset because dataset keys may not
+ * contain hyphens: storing the memo for `aria-label` as `data-i18nSrcaria-label`
+ * is invalid and throws a SyntaxError on assignment. The map also leaves the DOM
+ * unmodified and is garbage-collected with the elements.
+ *
+ * @type {WeakMap<Element, Map<string, string>>}
+ */
+const originalText = new WeakMap();
+
+function rememberOriginal(el, prop) {
+  let snapshot = originalText.get(el);
+  if (!snapshot) {
+    snapshot = new Map();
+    originalText.set(el, snapshot);
+  }
+  if (!snapshot.has(prop)) {
+    snapshot.set(prop, el[prop] ?? '');
+  }
+  return snapshot.get(prop);
+}
+
+/**
  * Apply dictionary entries to elements carrying data-i18n attributes:
  *   data-i18n="key"            -> textContent
  *   data-i18n-title="key"      -> title
  *   data-i18n-placeholder="key"-> placeholder
  *   data-i18n-aria="key"       -> aria-label
- * The element's original text is used as the English fallback, so the markup
- * stays readable and a missing key is harmless.
+ * The element's authored text is captured on first sight and used as the English
+ * fallback, so the markup stays readable and a missing key is harmless.
  */
 export function applyDocument(root = document) {
   const attrMap = [
@@ -184,12 +209,7 @@ export function applyDocument(root = document) {
   for (const [attr, prop] of attrMap) {
     for (const el of root.querySelectorAll(`[${attr}]`)) {
       const key = el.getAttribute(attr);
-      // Remember the authored English text once, so switching back is exact.
-      const memo = `i18nSrc${prop}`;
-      if (el.dataset[memo] === undefined) {
-        el.dataset[memo] = el[prop] ?? '';
-      }
-      const fallback = el.dataset[memo];
+      const fallback = rememberOriginal(el, prop);
       el[prop] = t(key, fallback);
     }
   }
