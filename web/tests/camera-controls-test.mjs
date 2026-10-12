@@ -40,70 +40,70 @@ const { Viewport } = await import('../js/viewport.js');
 
 /* ---------------------------------------------------------------- vertical */
 
-// Convention (confirmed with the user): the terrain moves OPPOSITE to the cursor,
-// as in map navigation. Drag up (dy < 0) must move the terrain DOWN the screen.
+// Convention (reported by the user, final): DIRECT MANIPULATION — the terrain
+// follows the cursor. Drag up (dy < 0) must move the terrain UP the screen.
 //
 // The sign is derived from the projection, not by hand (tools/derive_pan_sign.py):
 //   operator            drag up (dy<0)      drag down (dy>0)
-//   target[1] += dy*s   terrain up          terrain down     <- follows cursor
-//   target[1] -= dy*s   terrain down        terrain up       <- inverse (wanted)
-// so the implementation is `target[1] -= dy * s`.
+//   target[1] += dy*s   terrain up          terrain down     <- follows cursor (wanted)
+//   target[1] -= dy*s   terrain down        terrain up       <- inverse convention
+// so the implementation is `target[1] += dy * s`.
 {
   const cam = freshCam();
   const before = cam.target[1];
   Viewport.pan(cam, 0, -40);   // drag up
   ok(
-    cam.target[1] > before,
-    'drag up raises the target, so the terrain slides down the screen',
+    cam.target[1] < before,
+    'drag up lowers the target, so the terrain moves up the screen (follows cursor)',
     { before, after: cam.target[1] },
   );
 }
 
-// Drag down -> terrain slides up the screen -> target[1] decreases.
+// Drag down -> terrain moves down the screen -> target[1] increases.
 {
   const cam = freshCam();
   const before = cam.target[1];
   Viewport.pan(cam, 0, 40);
   ok(
-    cam.target[1] < before,
-    'drag down lowers the target, so the terrain slides up the screen',
+    cam.target[1] > before,
+    'drag down raises the target, so the terrain moves down the screen',
     { before, after: cam.target[1] },
   );
 }
 
-// Guard the exact operator so a regression to cursor-following is caught.
+// Guard the exact operator so a regression to the inverse convention is caught.
 {
   const cam = freshCam();
   const dy = 25;
   const s = cam.dist * 0.0022;
   Viewport.pan(cam, 0, dy);
   ok(
-    near(cam.target[1], 0.18 - dy * s),
-    'vertical pan uses -= dy (inverse-drag convention)',
+    near(cam.target[1], 0.18 + dy * s),
+    'vertical pan uses += dy (follows the cursor)',
     cam.target[1],
   );
   ok(
-    !near(cam.target[1], 0.18 + dy * s),
-    'vertical pan is NOT the cursor-following sign',
+    !near(cam.target[1], 0.18 - dy * s),
+    'vertical pan is NOT the inverse-drag sign',
     cam.target[1],
   );
 }
 
 /* -------------------------------------------------------------- horizontal */
 
-// Same inverse convention horizontally: dragging right moves the terrain left.
+// Same direct-manipulation sense horizontally: dragging right moves the terrain right.
 {
   const cam = freshCam();
   const before = cam.target[0];
   Viewport.pan(cam, 30, 0);
-  ok(cam.target[0] < before, 'drag right moves the target left (terrain moves left)', cam.target[0]);
+  ok(cam.target[0] > before, 'drag right moves the target right (terrain moves right)', cam.target[0]);
   ok(near(cam.target[1], 0.18), 'horizontal pan does not touch the vertical axis', cam.target[1]);
 }
 
 {
   const cam = freshCam();
   Viewport.pan(cam, -30, 0);
-  ok(cam.target[0] > 0, 'drag left moves the target right', cam.target[0]);
+  ok(cam.target[0] < 0, 'drag left moves the target left', cam.target[0]);
 }
 
 /* ------------------------------------------------------------- axis coupling */

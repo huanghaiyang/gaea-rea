@@ -242,38 +242,27 @@ export class Viewport {
   }
 
   /**
-   * Pan the camera target from a pointer delta.
+   * Pan the camera target from a pointer delta, as DIRECT MANIPULATION: the terrain
+   * follows the cursor in both axes. Drag up (dy < 0) moves the terrain up the
+   * screen; drag right (dx > 0) moves it right.
    *
-   * Convention: the terrain moves OPPOSITE to the cursor, as in map navigation —
-   * dragging up (dy < 0) walks the view north across the terrain, so the terrain
-   * appears to slide DOWN the screen. This is the inverse-drag convention, not
-   * direct manipulation; it is deliberate and was confirmed by the user.
-   *
-   * Sign derivation — numerically projected, not reasoned by hand, because the
-   * sign here is easy to get backwards. The camera sits above the target and looks
-   * down:
-   *   ey = target[1] + dist * sin(pitch)
-   * Projecting a fixed terrain point with the real look-at matrix shows that
-   * RAISING target[1] moves the terrain DOWN the screen (ndc_y goes from -0.127 to
-   * -0.193 for target[1] += 0.10):
+   * Sign derivation (reproduce with `python tools/derive_pan_sign.py`): projecting a
+   * fixed terrain point with the real look-at matrix shows that RAISING target[1]
+   * moves the terrain DOWN the screen (ndc_y goes from -0.127 to -0.193 for
+   * target[1] += 0.10). Therefore:
    *
    *   operator            drag up (dy<0)      drag down (dy>0)
-   *   target[1] += dy*s   terrain up          terrain down     <- follows cursor
-   *   target[1] -= dy*s   terrain down        terrain up       <- inverse (wanted)
+   *   target[1] += dy*s   terrain up          terrain down     <- wanted (follows cursor)
+   *   target[1] -= dy*s   terrain down        terrain up       <- inverse convention
    *
-   * The required behaviour is the inverse of the cursor, so `-= dy`. Reproduce with
-   * `python tools/derive_pan_sign.py`.
+   * so the vertical operator is `+= dy * s`. The horizontal axis uses the same
+   * direct-manipulation sense: dragging right (dx > 0) RAISES target[0], moving the
+   * terrain right.
    *
-   * The horizontal axis already follows the same inverse convention and is
-   * unchanged: dragging right (dx > 0) lowers target[0], moving the terrain left.
-   * That axis maps to target[0], which is perpendicular to the view, so it needs no
-   * other component.
-   *
-   * The depth axis (target[2]) is deliberately NOT touched by the vertical drag.
-   * Coupling it to dy was tried and measured to inject sideways drift: projected at
-   * yaw 0.62 a vertical drag moved the terrain 0.28x sideways, at yaw 1.20 0.60x,
-   * and at yaw 2.40 2.09x — i.e. near-horizontal sliding instead of up/down. See
-   * `python tools/derive_pan_screen_vector.py`.
+   * The depth axis (target[2]) is deliberately NOT touched. Coupling it to dy was
+   * measured to inject sideways drift (`python tools/derive_pan_screen_vector.py`:
+   * 0.28x sideways at yaw 0.62, up to 2.09x at yaw 2.40), turning an up/down drag
+   * into near-horizontal sliding.
    *
    * @param {{yaw:number,pitch:number,dist:number,target:number[]}} cam
    * @param {number} dx horizontal delta in CSS pixels
@@ -282,8 +271,8 @@ export class Viewport {
    */
   static pan(cam, dx, dy) {
     const s = cam.dist * 0.0022;
-    cam.target[0] -= dx * s;
-    cam.target[1] -= dy * s;
+    cam.target[0] += dx * s;
+    cam.target[1] += dy * s;
     return cam;
   }
 
