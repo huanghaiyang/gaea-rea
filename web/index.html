@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Gaea Web — node graph terrain generator</title>
+<title data-i18n="app.title">Gaea Web — node graph terrain generator</title>
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -12,20 +12,20 @@
   <div class="brand">
     <span class="brand-mark"></span>
     <span class="brand-name">GAEA<span class="brand-accent">WEB</span></span>
-    <span class="brand-sub">node graph terrain generator</span>
+    <span class="brand-sub" data-i18n="app.brandSub">node graph terrain generator</span>
   </div>
 
-  <div class="tb-group" role="group" aria-label="Graph">
-    <button id="btn-new" class="tb" title="New graph (Ctrl+N)">New</button>
-    <button id="btn-demo" class="tb" title="Load the demo terrain graph">Demo</button>
-    <button id="btn-undo" class="tb" title="Undo (Ctrl+Z)" disabled>Undo</button>
-    <button id="btn-redo" class="tb" title="Redo (Ctrl+Y)" disabled>Redo</button>
-    <button id="btn-fit" class="tb" title="Fit graph to view (F)">Fit</button>
+  <div class="tb-group" role="group" data-i18n-aria="toolbar.graph" aria-label="Graph">
+    <button id="btn-new" class="tb" data-i18n="toolbar.new" data-i18n-title="toolbar.newTitle" title="New graph (Ctrl+N)">New</button>
+    <button id="btn-demo" class="tb" data-i18n="toolbar.demo" data-i18n-title="toolbar.demoTitle" title="Load the demo terrain graph">Demo</button>
+    <button id="btn-undo" class="tb" data-i18n="toolbar.undo" data-i18n-title="toolbar.undoTitle" title="Undo (Ctrl+Z)" disabled>Undo</button>
+    <button id="btn-redo" class="tb" data-i18n="toolbar.redo" data-i18n-title="toolbar.redoTitle" title="Redo (Ctrl+Y)" disabled>Redo</button>
+    <button id="btn-fit" class="tb" data-i18n="toolbar.fit" data-i18n-title="toolbar.fitTitle" title="Fit graph to view (F)">Fit</button>
   </div>
 
-  <div class="tb-group" role="group" aria-label="Build">
-    <label class="tb-field" title="Field resolution used for evaluation">
-      <span>Res</span>
+  <div class="tb-group" role="group" data-i18n-aria="toolbar.build" aria-label="Build">
+    <label class="tb-field" data-i18n-title="toolbar.resTitle" title="Field resolution used for evaluation">
+      <span data-i18n="toolbar.res">Res</span>
       <select id="sel-res">
         <option value="64">64</option>
         <option value="128">128</option>
@@ -34,34 +34,41 @@
         <option value="1024">1024</option>
       </select>
     </label>
-    <label class="tb-field" title="Global seed added to every node's own Seed">
-      <span>Seed</span>
+    <label class="tb-field" data-i18n-title="toolbar.seedTitle" title="Global seed added to every node's own Seed">
+      <span data-i18n="toolbar.seed">Seed</span>
       <input id="inp-seed" type="number" value="0" step="1" />
     </label>
-    <button id="btn-dice" class="tb" title="Randomise the global seed">&#9860;</button>
+    <button id="btn-dice" class="tb" data-i18n-title="toolbar.diceTitle" title="Randomise the global seed">&#9860;</button>
   </div>
 
-  <div class="tb-group" role="group" aria-label="Preview">
-    <button id="btn-view2d" class="tb toggle active" title="2D heightmap (1)">2D</button>
-    <button id="btn-view3d" class="tb toggle" title="3D terrain (2)">3D</button>
-    <label class="tb-field" title="Colour ramp used to visualise the height field">
-      <span>Ramp</span>
+  <div class="tb-group" role="group" data-i18n-aria="toolbar.preview" aria-label="Preview">
+    <button id="btn-view2d" class="tb toggle active" data-i18n="toolbar.view2d" data-i18n-title="toolbar.view2dTitle" title="2D heightmap (1)">2D</button>
+    <button id="btn-view3d" class="tb toggle" data-i18n="toolbar.view3d" data-i18n-title="toolbar.view3dTitle" title="3D terrain (2)">3D</button>
+    <label class="tb-field" data-i18n-title="toolbar.rampTitle" title="Colour ramp used to visualise the height field">
+      <span data-i18n="toolbar.ramp">Ramp</span>
       <select id="sel-ramp">
-        <option value="terrain">Terrain</option>
-        <option value="gray">Grayscale</option>
-        <option value="flow">Water</option>
-        <option value="heat">Heat</option>
+        <option value="terrain" data-i18n="ramp.terrain">Terrain</option>
+        <option value="gray" data-i18n="ramp.gray">Grayscale</option>
+        <option value="flow" data-i18n="ramp.flow">Water</option>
+        <option value="heat" data-i18n="ramp.heat">Heat</option>
       </select>
     </label>
-    <label class="tb-field" title="Vertical exaggeration in the 3D view">
-      <span>Exag</span>
+    <label class="tb-field" data-i18n-title="toolbar.exagTitle" title="Vertical exaggeration in the 3D view">
+      <span data-i18n="toolbar.exag">Exag</span>
       <input id="inp-exag" type="range" min="0.1" max="3" step="0.05" value="1" />
     </label>
   </div>
 
-  <div class="tb-group tb-right" role="group" aria-label="Output">
-    <span id="eval-status" class="status">idle</span>
-    <button id="btn-export" class="tb primary" title="Export the evaluated height field as PNG">Export PNG</button>
+  <div class="tb-group tb-right" role="group" data-i18n-aria="toolbar.output" aria-label="Output">
+    <span id="eval-status" class="status" data-i18n="toolbar.statusIdle">idle</span>
+    <label class="tb-field" data-i18n-title="toolbar.langTitle" title="Interface language">
+      <span data-i18n="toolbar.lang">Lang</span>
+      <select id="sel-lang">
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+      </select>
+    </label>
+    <button id="btn-export" class="tb primary" data-i18n="toolbar.export" data-i18n-title="toolbar.exportTitle" title="Export the evaluated height field as PNG">Export PNG</button>
   </div>
 </header>
 
@@ -70,36 +77,36 @@
   <!-- ---------------------------------------------------------------- library -->
   <aside id="library" class="panel">
     <div class="panel-head">
-      <h2>Node Library</h2>
+      <h2 data-i18n="library.title">Node Library</h2>
       <span id="lib-count" class="pill">—</span>
     </div>
     <div class="panel-body">
-      <input id="lib-search" class="search" type="search" placeholder="Search 182 nodes…" autocomplete="off" />
+      <input id="lib-search" class="search" type="search" data-i18n-placeholder="library.searchPlaceholder" placeholder="Search 182 nodes…" autocomplete="off" />
       <div class="lib-filters" id="lib-filters">
-        <button class="chip active" data-filter="all">All</button>
-        <button class="chip" data-filter="implemented">Implemented</button>
-        <button class="chip" data-filter="catalog">Catalog only</button>
-        <button class="chip" data-filter="used">In graph</button>
+        <button class="chip active" data-filter="all" data-i18n="library.filterAll">All</button>
+        <button class="chip" data-filter="implemented" data-i18n="library.filterImplemented">Implemented</button>
+        <button class="chip" data-filter="catalog" data-i18n="library.filterCatalog">Catalog only</button>
+        <button class="chip" data-filter="used" data-i18n="library.filterUsed">In graph</button>
       </div>
-      <div id="lib-list" class="lib-list" role="listbox" aria-label="Nodes"></div>
+      <div id="lib-list" class="lib-list" role="listbox" data-i18n-aria="library.nodesAria" aria-label="Nodes"></div>
     </div>
   </aside>
 
   <!-- ---------------------------------------------------------------- graph -->
   <section id="graphwrap">
     <div class="panel-head graph-head">
-      <h2>Node Graph</h2>
+      <h2 data-i18n="graph.title">Node Graph</h2>
       <div class="graph-tools">
-        <button id="btn-add-node" class="tb small" title="Add node at the centre of the view">+ Node</button>
-        <button id="btn-delete-node" class="tb small" title="Delete selection (Del)" disabled>Delete</button>
-        <span id="graph-hint" class="hint">drag from an output port to an input port to connect</span>
+        <button id="btn-add-node" class="tb small" data-i18n="graph.addNode" data-i18n-title="graph.addNodeTitle" title="Add node at the centre of the view">+ Node</button>
+        <button id="btn-delete-node" class="tb small" data-i18n="graph.delete" data-i18n-title="graph.deleteTitle" title="Delete selection (Del)" disabled>Delete</button>
+        <span id="graph-hint" class="hint" data-i18n="graph.hint">drag from an output port to an input port to connect</span>
       </div>
     </div>
     <div id="graphview" class="graphview">
       <canvas id="graph-canvas"></canvas>
       <div id="graph-empty" class="graph-empty">
-        <p>Empty graph.</p>
-        <p>Pick a node from the library on the left, or press <b>Demo</b> to build a full terrain pipeline.</p>
+        <p data-i18n="graph.emptyTitle">Empty graph.</p>
+        <p data-i18n="graph.emptyHint">Pick a node from the library on the left, or press <b>Demo</b> to build a full terrain pipeline.</p>
       </div>
       <div id="port-picker" class="port-picker" hidden></div>
     </div>
@@ -108,36 +115,36 @@
   <!-- ---------------------------------------------------------------- inspector -->
   <aside id="inspector" class="panel">
     <div class="panel-tabs" role="tablist">
-      <button class="tab active" data-tab="params" role="tab">Parameters</button>
-      <button class="tab" data-tab="info" role="tab">Info</button>
+      <button class="tab active" data-tab="params" role="tab" data-i18n="inspector.tabParams">Parameters</button>
+      <button class="tab" data-tab="info" role="tab" data-i18n="inspector.tabInfo">Info</button>
     </div>
 
     <div class="panel-body tab-page" id="page-params">
       <div id="node-head" class="node-head">
         <div class="node-title">
-          <span id="node-name">No selection</span>
+          <span id="node-name" data-i18n="inspector.noSelection">No selection</span>
           <span id="node-badge" class="badge" hidden></span>
         </div>
-        <p id="node-desc" class="muted">Select a node in the graph to edit its parameters.</p>
+        <p id="node-desc" class="muted" data-i18n="inspector.selectPrompt">Select a node in the graph to edit its parameters.</p>
       </div>
       <div id="param-list" class="param-list"></div>
     </div>
 
     <div class="panel-body tab-page" id="page-info" hidden>
       <div class="info-block">
-        <h3>Evaluation</h3>
+        <h3 data-i18n="info.evaluation">Evaluation</h3>
         <table class="kv" id="info-eval"><tbody></tbody></table>
       </div>
       <div class="info-block">
-        <h3>Node timings (ms)</h3>
+        <h3 data-i18n="info.timings">Node timings (ms)</h3>
         <div id="info-timings" class="timings">—</div>
       </div>
       <div class="info-block">
-        <h3>Diagnostics</h3>
-        <div id="info-errors" class="errors">no errors</div>
+        <h3 data-i18n="info.diagnostics">Diagnostics</h3>
+        <div id="info-errors" class="errors" data-i18n="info.noErrors">no errors</div>
       </div>
       <div class="info-block">
-        <h3>Coverage</h3>
+        <h3 data-i18n="info.coverage">Coverage</h3>
         <p class="muted small" id="info-coverage">—</p>
       </div>
     </div>
@@ -146,7 +153,7 @@
   <!-- ---------------------------------------------------------------- viewport -->
   <section id="viewport" class="panel">
     <div class="panel-head">
-      <h2>Preview <span id="vp-subject" class="muted"></span></h2>
+      <h2><span data-i18n="preview.title">Preview</span> <span id="vp-subject" class="muted"></span></h2>
       <div class="vp-tools">
         <span id="vp-mode" class="pill">2D</span>
         <span id="vp-stats" class="pill mono">—</span>
@@ -156,7 +163,7 @@
       <canvas id="view-canvas-2d"></canvas>
       <canvas id="view-canvas-3d" hidden></canvas>
       <div id="vp-overlay" class="vp-overlay"></div>
-      <div id="vp-fallback" class="vp-fallback" hidden>WebGL2 unavailable — using the 2D heightmap view.</div>
+      <div id="vp-fallback" class="vp-fallback" hidden data-i18n="preview.webglFallback">WebGL2 unavailable — using the 2D heightmap view.</div>
     </div>
     <div id="sources" class="sources"></div>
   </section>
@@ -170,6 +177,6 @@
   // Verification harness: only in the ?selftest=1 page, never in the normal path.
   if (new URLSearchParams(location.search).has('selftest')) import('./js/selftest.js');
 </script>
-<noscript><p style="padding:20px;color:#e6edf3">This tool requires JavaScript ES modules.</p></noscript>
+<noscript><p style="padding:20px;color:#e6edf3" data-i18n="app.requiresJs">This tool requires JavaScript ES modules.</p></noscript>
 </body>
 </html>

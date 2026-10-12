@@ -20,6 +20,44 @@ What this build does *not* do, and how close each algorithm is to Gaea, is docum
 
 ---
 
+## Language (中文 / English)
+
+The interface ships in English and Simplified Chinese. Pick one with the **Lang**
+selector in the toolbar. The choice is remembered in `localStorage`, and a first
+visit follows the browser's language preference.
+
+Translation is a **display-layer** concern. The graph, evaluator and kernel
+registry keep using the real Gaea identifiers (`MultiFractal`, `Rock Softness`),
+so changing language cannot alter a single computation — only how labels render.
+That also means an untranslated string degrades to English, never to a blank.
+
+| File | Contents |
+| --- | --- |
+| `data/i18n-ui.zh.json` | interface chrome, keyed by stable id (`toolbar.export`) |
+| `data/i18n-terms.zh.json` | `terms` = node and group names, `paramNames` = parameter names |
+| `data/i18n-vocab.json` | generated inventory of every string needing translation |
+| `js/i18n.js` | `t()` chrome, `term()` node/group, `paramLabel()` parameter, `desc()` descriptions |
+
+Coverage of the catalogue is complete: **182 node names, 99 group names and 561
+parameter names**.
+
+A few names serve both roles and legitimately translate differently, so the
+dictionary keeps two namespaces rather than one flat table:
+
+| Name | As node / group | As parameter |
+| --- | --- | --- |
+| `Steps` | 阶地 | 阶数 |
+| `Peaks` | 峰群 | 峰数 |
+| `Layers` | 图层 | 图层数 |
+| `Variation` | 变化 | 变化量 |
+
+Node and parameter **descriptions** are still served in English (the Gaea text);
+the dictionary has a `descriptions` slot for them, but it is not populated yet.
+
+The dictionary is validated by `tools/check_i18n.py` (coverage, no blank values),
+`tools/check_dup_keys.py` (no duplicate keys within a namespace) and
+`web/tests/i18n-test.mjs` (36 assertions driving the real module).
+
 ## Run it
 
 ```powershell
@@ -49,6 +87,7 @@ editing, undo, export, and every implemented algorithm) and writes a JSON report
 cd D:\sgames\gaea-rea\web
 node tests/smoke.mjs        # engine, numerics and physics — 86 assertions
 node tests/app-test.mjs     # the whole application under a DOM shim — 63 assertions
+node tests/i18n-test.mjs    # localisation lookups and fallbacks — 36 assertions
 python ../tools/validate_web.py   # static: every import/asset resolves
 ```
 
@@ -93,6 +132,7 @@ export path — not a mock.
 ```
 index.html
   └── js/app.js                     composition root: wires panels to state, owns the toolbar
+        ├── js/i18n.js              display-layer translation (t/term/paramLabel/desc) + Lang switch
         ├── js/state.js             app state, undo/redo history, schema cache, event bus
         ├── js/graph.js             node/edge model, topological order, cycle detection
         ├── js/graph-editor.js      canvas interaction, drawing, hit-testing, connections
@@ -227,6 +267,10 @@ Both suites were run to completion in this environment:
   at three resolutions for all 56 registered nodes, and bit-identical determinism.
 * `tests/app-test.mjs` — **63/63 pass, 0 console errors, 0 console warnings.** Drives the real
   application.
+* `tests/i18n-test.mjs` — **36/36 pass.** Loads the real dictionaries from disk by stubbing
+  `fetch`, then drives the real `js/i18n.js`: language detection, chrome lookup, node/group vs
+  parameter lookups, the four role-divergent names, English fallback for unknown terms, switching
+  back and forth, and full-vocabulary coverage with no blank values.
 * **The browser could not be started here.** Chromium's mojo IPC needs named pipes, which this
   sandbox denies; Chrome and Edge were tried with `--headless`, `--headless=new`, `--dump-dom`
   and `--remote-debugging-port`, and every launch self-terminates. Therefore the GLSL shaders

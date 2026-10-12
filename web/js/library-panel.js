@@ -11,6 +11,7 @@
 
 import { state, bus, schemaFor, isImplemented, nodeDescription, registryEntry, categoryOf } from './state.js';
 import { $, esc } from './util.js';
+import { t, term, desc as trDesc } from './i18n.js';
 
 export class LibraryPanel {
   constructor(opts = {}) {
@@ -100,7 +101,7 @@ export class LibraryPanel {
     for (const group of keys) {
       const head = document.createElement('div');
       head.className = 'lib-group';
-      head.textContent = `${group} · ${groups.get(group).length}`;
+      head.textContent = `${term(group)} · ${groups.get(group).length}`;
       frag.appendChild(head);
       for (const item of groups.get(group)) {
         frag.appendChild(this.makeItem(item.cat, item.impl, used.has(item.name)));
@@ -111,7 +112,7 @@ export class LibraryPanel {
     this.list.appendChild(frag);
 
     if (this.count) {
-      this.count.textContent = `${shown}/${this.catalog.length} · ${implCount} impl`;
+      this.count.textContent = `${shown}/${this.catalog.length} · ${implCount} ${t('unit.impl', 'impl')}`;
       this.count.title = `${implCount} of ${this.catalog.length} nodes have an algorithm in this build`;
     }
   }
@@ -126,14 +127,14 @@ export class LibraryPanel {
     dot.className = 'dot';
     const nm = document.createElement('span');
     nm.className = 'nm';
-    nm.textContent = cat.name;
+    nm.textContent = term(cat.name);
     const cnt = document.createElement('span');
     cnt.className = 'cnt';
     const paramCount = (cat.params || []).length;
     cnt.textContent = impl ? String(paramCount) : '—';
 
     const summary = nodeDescription(cat.name) || cat.description || '';
-    el.title = `${cat.name}${impl ? '' : '  [catalog only]'}\n${summary}\n${paramCount} parameters`;
+    el.title = `${term(cat.name)}${impl ? '' : `  [${t('library.catalogOnlyTag', 'catalog only')}]`}\n${trDesc(summary)}\n${paramCount} ${t('unit.params', 'parameters')}`;
     el.appendChild(dot); el.appendChild(nm); el.appendChild(cnt);
 
     const activate = () => this.onAdd(cat.name);

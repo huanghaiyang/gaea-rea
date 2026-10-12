@@ -5,6 +5,7 @@
 
 import { state, bus } from './state.js';
 import { $, fmtMs, fmt } from './util.js';
+import { t } from './i18n.js';
 
 /** Local HTML escape (kept here so the panel has no dependency on util's markup helpers). */
 function esc(s) {
@@ -23,7 +24,7 @@ export class InfoPanel {
   }
 
   markBusy() {
-    if (this.evalTable) this.evalTable.innerHTML = '<tr><td>status</td><td>evaluating…</td></tr>';
+    if (this.evalTable) this.evalTable.innerHTML = `<tr><td>${t('info.status', 'status')}</td><td>${t('info.evaluating', 'evaluating…')}</td></tr>`;
   }
 
   update(result) {
@@ -58,7 +59,7 @@ export class InfoPanel {
     if (this.timings) {
       const stats = (r && r.stats) || state.lastStats;
       if (!stats || !stats.length) {
-        this.timings.innerHTML = '<span class="muted small">run an evaluation</span>';
+        this.timings.innerHTML = `<span class="muted small">${t('info.runEval', 'run an evaluation')}</span>`;
       } else {
         const max = Math.max(...stats.map((s) => s.ms), 0.001);
         const sorted = stats.slice().sort((a, b) => b.ms - a.ms).slice(0, 14);
@@ -77,7 +78,7 @@ export class InfoPanel {
       const errs = (r && r.errors) || state.lastErrors;
       if (!errs || !errs.length) {
         this.errors.className = 'errors';
-        this.errors.textContent = 'no errors';
+        this.errors.textContent = t('info.noErrors', 'no errors');
       } else {
         this.errors.className = 'errors has';
         this.errors.textContent = errs.map((e) => `${e.nodeId ? e.nodeId.slice(0, 6) + ' ' : ''}${e.message}`).join('\n');

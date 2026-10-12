@@ -15,7 +15,10 @@
 
 import { state, bus, schemaFor, isImplemented, registryEntry, nodeDescription, resetNodeParams, snapshot } from './state.js';
 import { getNode } from './graph.js';
-import { fmt, $ } from './util.js';
+import { fmt, esc, $ } from './util.js';
+// Display-layer localisation. The graph keeps real Gaea identifiers; only the
+// rendered labels are translated.
+import { t, term, paramLabel, desc as trDesc, option as trOption } from './i18n.js';
 
 export class ParamsPanel {
   constructor(opts = {}) {
@@ -41,11 +44,11 @@ export class ParamsPanel {
     if (!this.list) return;
 
     if (!node) {
-      this.nameEl.textContent = 'No selection';
-      this.descEl.textContent = 'Select a node in the graph to edit its parameters.';
+      this.nameEl.textContent = t('inspector.noSelection', 'No selection');
+      this.descEl.textContent = t('inspector.selectPrompt', 'Select a node in the graph to edit its parameters.');
       this.descEl.classList.add('muted');
       this.badgeEl.hidden = true;
-      this.list.innerHTML = '<p class="muted small">Nothing selected.</p>';
+      this.list.innerHTML = `<p class="muted small">${esc(t('inspector.noSelection', 'Nothing selected.'))}</p>`;
       return;
     }
 
@@ -55,19 +58,28 @@ export class ParamsPanel {
     const schema = schemaFor(node.name);
     const groups = new Set((catalogNode && catalogNode.groups) || []);
 
-    this.nameEl.textContent = node.name;
-    this.descEl.textContent = nodeDescription(node.name) || (catalogNode && catalogNode.description) || 'No description available.';
+    this.nameEl.textContent = term(node.name);
+    this.descEl.textContent = trDesc(
+      nodeDescription(node.name) || (catalogNode && catalogNode.description) || t('inspector.noDescription', 'No description available.'),
+    );
     this.descEl.classList.remove('muted');
 
     // --- fidelity badge
     const note = entry && entry.note;
     let badgeText, badgeClass;
-    if (!impl) { badgeText = note === 'stub' ? 'stub' : 'not implemented'; badgeClass = 'stub'; }
+    if (!impl) { badgeText = note === 'stub' ? 'stub' : 'notImplemented'; badgeClass = 'stub'; }
     else if (note === 'stub') { badgeText = 'stub'; badgeClass = 'stub'; }
     else if (note === 'model') { badgeText = 'model'; badgeClass = 'model'; }
     else if (note === 'approx') { badgeText = 'approx'; badgeClass = 'approx'; }
     else { badgeText = 'implemented'; badgeClass = 'ok'; }
-    this.badgeEl.textContent = badgeText;
+    const BADGE_LABELS = {
+      stub: 'stub',
+      notImplemented: 'not implemented',
+      model: 'model',
+      approx: 'approx',
+      implemented: 'implemented',
+    };
+    this.badgeEl.textContent = t(`badge.${badgeText}`, BADGE_LABELS[badgeText]);
     this.badgeEl.className = `badge ${badgeClass}`;
     this.badgeEl.hidden = false;
 
@@ -77,7 +89,7 @@ export class ParamsPanel {
     if (!impl) {
       const warn = document.createElement('div');
       warn.className = 'param-group';
-      warn.textContent = 'not implemented — passes its first input through';
+      warn.textContent = t('inspector.warnNotImplemented', 'not implemented — passes its first input through');
       this.list.appendChild(warn);
       const p = document.createElement('p');
       p.className = 'muted small';
@@ -93,9 +105,9 @@ export class ParamsPanel {
     tree.style.display = 'flex';
     tree.style.gap = '6px';
     tree.style.margin = '0 0 8px';
-    tree.innerHTML = `<button class="tb small" id="p-reset">Reset</button>
-      <button class="tb small" id="p-preview">Pin preview</button>
-      <button class="tb small" id="p-unpin">Unpin</button>`;
+    tree.innerHTML = `<button class="tb small" id="p-reset">${esc(t('panel.reset', 'Reset'))}</button>
+      <button class="tb small" id="p-preview">${esc(t('panel.pinPreview', 'Pin preview'))}</button>
+      <button class="tb small" id="p-unpin">${esc(t('panel.unpin', 'Unpin'))}</button>`;
     this.list.appendChild(tree);
     tree.querySelector('#p-reset').addEventListener('click', () => {
       snapshot();
@@ -122,7 +134,7 @@ export class ParamsPanel {
     if (!schema.length && !(catalogNode && catalogNode.groups && catalogNode.groups.length)) {
       const p = document.createElement('p');
       p.className = 'muted small';
-      p.textContent = 'This node exposes no parameters.';
+      p.textContent = t('inspector.noParams', 'This node exposes no parameters.');
       this.list.appendChild(p);
       return;
     }
@@ -142,18 +154,18 @@ export class ParamsPanel {
     row.className = 'param';
     const label = document.createElement('label');
     label.className = 'param-label';
-    label.textContent = param.label || param.name;
+    label.textContent = param.label ? paramLabel(param.label) || param.label : paramLabel(param.name);
     const src = param.source || { default: 'type', range: 'type' };
     const srcNote = src.default === 'il' && src.range === 'il'
-      ? 'default and range recovered from the Gaea assembly'
+      ? t('src.ilBoth', 'default and range recovered from the Gaea assembly')
       : src.default === 'il'
-        ? 'default recovered from the Gaea assembly'
+        ? t('src.ilDefault', 'default recovered from the Gaea assembly')
         : src.range === 'il'
-          ? 'range recovered from the Gaea assembly'
+          ? t('src.ilRange', 'range recovered from the Gaea assembly')
           : src.default === 'registry'
-            ? 'hand-tuned for this implementation'
-            : 'conservative fallback (no recovered metadata)';
-    label.title = `${param.name}${param.description ? ` — ${param.description}` : ''}\n(${srcNote})`;
+            ? t('src.registry', 'hand-tuned for this implementation')
+            : t('src.fallback', 'conservative fallback (no recovered metadata)');
+    label.title = `${paramLabel(param.name)}${param.description ? ` — ${trDesc(param.description)}` : ''}\n(${srcNote})`;
     row.appendChild(label);
 
     const readout = document.createElement('span');
@@ -179,15 +191,15 @@ export class ParamsPanel {
         input.type = 'checkbox';
         input.checked = !!value;
         const txt = document.createElement('span');
-        txt.textContent = value ? 'on' : 'off';
+        txt.textContent = value ? t('unit.on', 'on') : t('unit.off', 'off');
         sw.appendChild(input); sw.appendChild(txt);
         control.appendChild(sw);
         readout.textContent = '';
         input.addEventListener('change', () => {
-          txt.textContent = input.checked ? 'on' : 'off';
+          txt.textContent = input.checked ? t('unit.on', 'on') : t('unit.off', 'off');
           this.commit(node, key, input.checked);
         });
-        this.controls.set(key, { write: (v) => { input.checked = !!v; txt.textContent = v ? 'on' : 'off'; } });
+        this.controls.set(key, { write: (v) => { input.checked = !!v; txt.textContent = v ? t('unit.on', 'on') : t('unit.off', 'off'); } });
         return row;
       }
 
@@ -196,12 +208,12 @@ export class ParamsPanel {
         const opts = param.options && param.options.length ? param.options : ['None'];
         for (const o of opts) {
           const opt = document.createElement('option');
-          opt.value = o; opt.textContent = o;
+          opt.value = o; opt.textContent = term(trOption(o)) || o;
           sel.appendChild(opt);
         }
         sel.value = String(value);
         control.appendChild(sel);
-        readout.textContent = opts.length + ' opt';
+        readout.textContent = `${opts.length} ${t('unit.opt', 'opt')}`;
         sel.addEventListener('change', () => this.commit(node, key, sel.value));
         this.controls.set(key, { write: (v) => { sel.value = String(v); } });
         return row;
@@ -393,8 +405,8 @@ export class ParamsPanel {
 function groupHeader(name, description) {
   const div = document.createElement('div');
   div.className = 'param-group';
-  div.textContent = name;
-  if (description) div.title = description;
+  div.textContent = term(name);
+  if (description) div.title = trDesc(description);
   return div;
 }
 

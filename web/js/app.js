@@ -1,4 +1,4 @@
-﻿/**
+/**
  * app.js — application bootstrap and wiring.
  *
  * Responsibilities: load the catalog, build the panels, own the single EvalController and
@@ -19,6 +19,7 @@ import { IMPLEMENTED, BY_NAME, NODES } from './registry.js';
 import { findTerminal, getNode } from './graph.js';
 import { fieldToPNG, download } from './export.js';
 import { $, $$, toast, fmtMs, fmt, esc } from './util.js';
+import { initI18n, setLang, currentLang, t } from './i18n.js';
 
 /* ------------------------------------------------------------------ module singletons */
 
@@ -44,6 +45,19 @@ function setGraphHint(text) { const el = $('#graph-hint'); if (el) el.textConten
 
 async function init() {
   try {
+    // Localisation first: it rewrites the static markup before any panel renders,
+    // so the first paint is already in the selected language.
+    await initI18n();
+    const langSel = $('#sel-lang');
+    if (langSel) {
+      langSel.value = currentLang();
+      langSel.addEventListener('change', (e) => {
+        // Reload on purpose: labels are produced in several panels, and rebuilding
+        // the view from the same state is safer than a translation pass.
+        Promise.resolve(setLang(e.target.value)).then(() => location.reload());
+      });
+    }
+
     const catalog = await loadCatalogFromDisk();
     loadCatalog(catalog);
     // Coverage bookkeeping, all derived rather than hard-coded:
