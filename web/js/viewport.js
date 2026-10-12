@@ -175,11 +175,19 @@ export class Viewport {
      * Worker can be created. `meshWorker.diagnostics()` explains the mode, because in
      * a non-secure context the Worker API does not exist at all and the difference is
      * otherwise invisible.
+     *
+     * `onMeshMode` fires whenever that mode or the last build time changes, so the UI
+     * can keep a persistent readout in sync rather than relying on a toast that
+     * disappears before it is read.
      */
-    this.meshWorker = new MeshWorkerController();
+    this.onMeshMode = opts.onMeshMode || null;
+    this.meshWorker = new MeshWorkerController({
+      onChange: (diag) => { if (this.onMeshMode) this.onMeshMode(diag); },
+    });
     this.meshWorker.init().then((res) => {
       if (!res.ok) this.onStatus(`3D mesh building runs on the UI thread — ${res.reason}`);
       else this._schedule();
+      if (this.onMeshMode) this.onMeshMode(this.meshWorker.diagnostics());
     }).catch(() => { /* inline fallback already in place */ });
   }
 

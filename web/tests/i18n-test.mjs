@@ -73,6 +73,15 @@ ok(i18n.t('toolbar.export', 'Export PNG') === '导出 PNG', 'toolbar.export tran
 ok(i18n.t('library.title', 'Node Library') === '节点库', 'library.title translated');
 ok(i18n.t('inspector.tabParams', 'Parameters') === '参数', 'inspector.tabParams translated');
 
+// The 3D mesh-mode readout is part of the UI contract. A missing key would render
+// English inside a Chinese UI, which is the half-translated state this file exists
+// to prevent.
+for (const key of ['preview.meshInWorker', 'preview.meshOnUiThread', 'preview.meshStarting', 'preview.meshUnknown']) {
+  const value = i18n.t(key, `__MISSING__${key}`);
+  ok(value !== `__MISSING__${key}`, `ui dictionary defines ${key}`, value);
+  ok(/[\u4e00-\u9fff]/.test(value), `${key} renders in Chinese`, value);
+}
+
 // t() falls back to the supplied English when a key is absent
 ok(i18n.t('no.such.key', 'Fallback') === 'Fallback', 'missing ui key falls back to English');
 

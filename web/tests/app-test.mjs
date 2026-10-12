@@ -1,4 +1,4 @@
-﻿/**
+/**
  * app-test.mjs — runs the ENTIRE application under Node with a DOM shim.
  *
  *   node web/tests/app-test.mjs
@@ -134,6 +134,52 @@ vp.setExaggeration(1.6);
 ok(vp.exaggeration === 1.6, 'exaggeration applied');
 vp.setExaggeration(1);
 ok(vp.available3D === false, 'WebGL2 correctly reported unavailable under the shim');
+
+// --- mesh offload readout -------------------------------------------------
+// The user reported not seeing any indication of where meshing happens. That was a
+// real visibility bug: the note was a 4.2s toast, and the overlay line was gated on
+// a mesh already existing, so the first 3D frame showed nothing. These assertions
+// pin the replacement.
+ok(typeof mod.meshOffloadKey === 'function', 'meshOffloadKey is exported for assertion');
+
+ok(
+  mod.meshOffloadKey({ mode: 'worker', lastMs: 3.5 }) === 'preview.meshInWorker',
+  'worker mode maps to the worker key',
+  mod.meshOffloadKey({ mode: 'worker', lastMs: 3.5 }),
+);
+ok(
+  mod.meshOffloadKey({ mode: 'inline', reason: 'not a secure context' }) === 'preview.meshOnUiThread',
+  'a permanent inline fallback maps to the UI-thread key',
+  mod.meshOffloadKey({ mode: 'inline', reason: 'not a secure context' }),
+);
+ok(
+  mod.meshOffloadKey({ mode: 'inline', reason: 'not initialised' }) === 'preview.meshStarting',
+  'pre-init state is distinguished from a permanent fallback',
+  mod.meshOffloadKey({ mode: 'inline', reason: 'not initialised' }),
+);
+ok(
+  mod.meshOffloadKey(null) === 'preview.meshUnknown',
+  'a missing diagnostic maps to the unknown key',
+);
+
+// Every key the readout can emit is namespaced; the dictionary itself is asserted
+// in i18n-test.mjs, which owns the localisation contract.
+for (const key of ['preview.meshInWorker', 'preview.meshOnUiThread', 'preview.meshStarting', 'preview.meshUnknown']) {
+  ok(typeof key === 'string' && key.startsWith('preview.mesh'), `readout key is namespaced: ${key}`);
+}
+
+// The persistent surfaces must exist in the shipped markup, not only in JS.
+for (const id of ['vp-mesh', 'vp-mesh-note']) {
+  ok(!!shim.registry.byId.get(id), `#${id} exists in the DOM (persistent readout)`);
+}
+
+// Mesh building must be offloadable at all on this path, and the controller must
+// report why when it is not.
+const mw = vp.meshWorker;
+ok(!!mw, 'viewport owns a mesh worker controller');
+const mdiag = mw.diagnostics();
+ok(mdiag.mode === 'inline', 'under Node there is no Worker, so mode is inline', mdiag.mode);
+ok(typeof mdiag.reason === 'string' && mdiag.reason.length > 0, 'the fallback states a reason', mdiag.reason);
 
 /* ------------------------------------------------------------------ graph editing */
 

@@ -20,7 +20,7 @@
 import { buildMesh, sampleCountFor } from './mesh-build.js';
 
 export class MeshWorkerController {
-  constructor() {
+  constructor(opts = {}) {
     this.worker = null;
     this.ready = false;
     this.dead = false;
@@ -33,6 +33,14 @@ export class MeshWorkerController {
     this.builds = 0;
     this.workerBuilds = 0;
     this.offloadRatio = 0;
+    /** Called whenever the mode or the last build time changes, so the UI can refresh. */
+    this.onChange = opts.onChange || null;
+  }
+
+  _changed() {
+    if (this.onChange) {
+      try { this.onChange(this.diagnostics()); } catch { /* a UI callback must not break building */ }
+    }
   }
 
   /**
@@ -96,6 +104,7 @@ export class MeshWorkerController {
       this.ready = true;
       this.reason = 'worker active';
       worker.onmessage = (ev) => this._handle(ev.data || {});
+      this._changed();
       return { ok: true, mode: 'worker' };
     } catch (err) {
       this.dead = true;
@@ -188,6 +197,7 @@ export class MeshWorkerController {
     if (entry) {
       this.lastMs = msg.buildMs;
       this.lastMode = 'worker';
+      this._changed();
       if (entry.superseded) {
         entry.resolve(null);
       } else {
@@ -219,6 +229,7 @@ export class MeshWorkerController {
     const buildMs = now() - t0;
     this.lastMs = buildMs;
     this.lastMode = 'inline';
+    this._changed();
     return { ...res, mode: 'inline', buildMs, token: req.token };
   }
 

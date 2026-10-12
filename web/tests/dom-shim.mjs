@@ -415,7 +415,7 @@ export function installDomShim({ url = 'http://127.0.0.1:8080/', catalog, device
     'param-list', 'page-params', 'page-info',
     'info-eval', 'info-timings', 'info-errors', 'info-coverage',
     'viewport', 'view-canvas-2d', 'view-canvas-3d', 'vp-overlay', 'vp-mode', 'vp-subject',
-    'vp-stats', 'vp-fallback', 'sources', 'toast',
+    'vp-stats', 'vp-fallback', 'vp-mesh', 'vp-mesh-note', 'sources', 'toast',
   ];
   for (const id of ids) {
     const tag = id.startsWith('view-canvas') ? 'canvas' : id.startsWith('btn') ? 'button' : 'div';

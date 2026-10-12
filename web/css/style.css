@@ -280,6 +280,11 @@ table.kv td:last-child { font-family: var(--mono); font-size: 11px; text-align: 
 }
 .vp-tools { display: flex; align-items: center; gap: 6px; }
 
+/* Persistent readout of where 3D mesh geometry is built. It warns rather than
+   hides, because "no worker available" and "worker not started yet" present the
+   same way but need different fixes. */
+#vp-mesh.warn { color: var(--warn); border-color: #6b552f; }
+
 .sources { display: flex; gap: 6px; padding: 5px 8px; border-top: 1px solid var(--line-soft); flex: 0 0 auto; overflow-x: auto; }
 .source-chip {
   border: 1px solid var(--line); background: var(--bg-2); border-radius: 999px;

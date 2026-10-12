@@ -82,7 +82,14 @@ async function init() {
     viewport = new Viewport($('#view-canvas-2d'), $('#view-canvas-3d'), {
       // The layout box the canvases fill; measured instead of a hidden canvas.
       host: document.querySelector('#viewport .vp-body') || $('#viewport'),
-      onStatus: (m) => { toast(m, 'error', 4200); $('#vp-fallback').hidden = false; $('#vp-fallback').textContent = m; },
+      onStatus: (m) => {
+        // #vp-fallback is owned by the WebGL-unavailable case, so mesh-worker
+        // problems get their own persistent line instead of fighting over it.
+        const el = $('#vp-mesh-note');
+        if (el) { el.hidden = false; el.textContent = m; }
+        toast(m, 'error', 9000);
+      },
+      onMeshMode: () => { updateMeshBadge(); updateOverlay(); },
     });
     state.glAvailable = viewport.available3D;
     if (!viewport.available3D) {
@@ -250,6 +257,7 @@ function setViewMode(mode) {
   $('#btn-view2d').classList.toggle('active', mode === '2d');
   $('#btn-view3d').classList.toggle('active', mode === '3d');
   $('#vp-mode').textContent = mode === '3d' ? '3D' : '2D';
+  updateMeshBadge();
   updateOverlay();
 }
 
@@ -349,6 +357,47 @@ function pickAndShowField() {
   updateOverlay();
 }
 
+/**
+ * Which i18n key describes the current mesh-building mode. Split from the label so
+ * the categorisation can be asserted without depending on the dictionary, and so
+ * "worker unavailable" and "worker not started yet" stay distinguishable — they look
+ * the same to the user but need different fixes.
+ */
+export function meshOffloadKey(diag) {
+  if (!diag) return 'preview.meshUnknown';
+  if (diag.mode === 'worker') return 'preview.meshInWorker';
+  if (!diag.reason || diag.reason === 'not initialised') return 'preview.meshStarting';
+  return 'preview.meshOnUiThread';
+}
+
+/** Display label for the mesh mode, localised. */
+function meshOffloadLabel(diag) {
+  const key = meshOffloadKey(diag);
+  const english = {
+    'preview.meshInWorker': 'mesh in worker',
+    'preview.meshOnUiThread': 'mesh on UI thread',
+    'preview.meshStarting': 'mesh starting…',
+    'preview.meshUnknown': 'mesh mode unknown',
+  }[key];
+  const base = t(key, english);
+  if (key === 'preview.meshInWorker' && diag && Number.isFinite(diag.lastMs)) {
+    return `${base} ${fmtMs(diag.lastMs)}`;
+  }
+  return base;
+}
+
+/** Persistent badge in the preview header; unlike a toast it cannot be missed. */
+function updateMeshBadge() {
+  const el = $('#vp-mesh');
+  if (!el) return;
+  const diag = viewport && viewport.meshWorker ? viewport.meshWorker.diagnostics() : null;
+  const mode = diag ? diag.mode : 'unknown';
+  el.textContent = meshOffloadLabel(diag);
+  el.classList.toggle('warn', mode !== 'worker');
+  el.title = diag && diag.reason ? diag.reason : '';
+  el.hidden = state.viewMode !== '3d';
+}
+
 function updateOverlay() {
   const el = $('#vp-overlay');
   if (!el) return;
@@ -357,16 +406,16 @@ function updateOverlay() {
   if (f) {
     lines.push(`${f.size} x ${f.size}  min ${fmt(f.min, 3)}  max ${fmt(f.max, 3)}  mean ${fmt(f.mean, 3)}  sd ${fmt(f.std, 3)}`);
   }
-  if (state.viewMode === '3d' && viewport && viewport.meshInfo) {
-    const m = viewport.meshInfo;
-    // Surface where the mesh was built. When a Worker is unavailable the geometry
-    // is rebuilt on the UI thread, which is the difference between smooth orbiting
-    // and visible stutter — so it is stated rather than left to be felt.
-    const diag = viewport.meshWorker ? viewport.meshWorker.diagnostics() : null;
-    const where = diag && diag.mode === 'worker'
-      ? `mesh in worker${Number.isFinite(diag.lastMs) ? ` ${fmtMs(diag.lastMs)}` : ''}`
-      : 'mesh on UI thread';
-    lines.push(`${m.vertices.toLocaleString()} verts · ${m.triangles.toLocaleString()} tris · stride ${m.stride} · ${where} · drag orbit, wheel zoom, dbl-click reset`);
+  if (state.viewMode === '3d') {
+    // The mesh line is shown whether or not a mesh exists yet, so the offload mode
+    // is never hidden behind "geometry not built yet". A transient toast was easy to
+    // miss and this is the difference between smooth and stuttering interaction.
+    const diag = viewport && viewport.meshWorker ? viewport.meshWorker.diagnostics() : null;
+    const m = viewport ? viewport.meshInfo : null;
+    const props = m
+      ? `${m.vertices.toLocaleString()} verts · ${m.triangles.toLocaleString()} tris · stride ${m.stride}`
+      : 'building mesh…';
+    lines.push(`${props} · ${meshOffloadLabel(diag)} · drag orbit, wheel zoom, dbl-click reset`);
   } else if (state.viewMode === '2d') {
     lines.push('1:1 pixel view — switch to 3D for shaded relief');
   }
