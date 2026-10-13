@@ -1,0 +1,11 @@
+{
+  "appChildren": 1,
+  "bootError": false,
+  "paletteRows": 182,
+  "categories": 10,
+  "svgGraph": true,
+  "svgNodes": 9,
+  "coverage": "77/182",
+  "inspector": true,
+  "statusbar": ""
+}

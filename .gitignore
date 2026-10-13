@@ -74,3 +74,12 @@ id_rsa*
 .npmrc.local
 .credentials*
 secrets.*
+
+# Vite build output. 
+ode_modules/ and .npm-cache/ are already above.
+web/dist/
+
+# Browser profiles created by the headless verification scripts (tools/verify-*.mjs, shot.mjs,
+# measure-*.mjs). Each holds hundreds of files, and a run interrupted before its cleanup leaves one
+# behind -- which showed up as 245 spurious untracked files in git status.
+.chrome-*/

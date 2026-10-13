@@ -24,6 +24,7 @@
  * index.html instead — see web/vendor/README.md.
  */
 import * as THREE from '../vendor/three/three.module.js';
+import { ViewportOverlay } from './overlays.js';
 
 const VERT = `
 attribute vec3 aNormal;
@@ -48,6 +49,8 @@ uniform vec3 uLightDir;
 uniform float uAmbient;
 uniform float uExposure;
 uniform sampler2D uHeight;
+uniform sampler2D uOverlay;      // reference layer, sampled through the terrain UVs
+uniform float uOverlayAmt;       // 0 = off, so the default costs one branch
 uniform float uNormalRes;
 uniform vec2 uNormalScale;
 uniform vec2 uTexel;
@@ -180,6 +183,13 @@ void main() {
   float spec = pow(max(dot(n, normalize(l + v)), 0.0), uSpec.y) * uSpec.x;
   lit += vec3(spec) * ao;
 
+  // The overlay is applied in the LIT domain, so a reference grid stays readable across the
+  // whole height range instead of disappearing in the shadows.
+  if (uOverlayAmt > 0.0) {
+    vec4 ov = texture2D(uOverlay, vGrid);
+    lit = mix(lit, mix(lit, ov.rgb, ov.a), uOverlayAmt);
+  }
+
   gl_FragColor = vec4(toSrgb(lit * uExposure), 1.0);
 }`;
 
@@ -225,6 +235,11 @@ export class Renderer3D {
         alpha: false,
         antialias: true,
       });
+
+    // Gaea's viewport overlays (Resources/Overlays) are REFERENCE LAYERS drawn over the frame,
+    // not node inputs, so they live here rather than in a kernel. Created alongside the renderer
+    // and left invisible until `setOverlay` names one.
+    this.overlay = new ViewportOverlay(canvas.clientWidth || 1, canvas.clientHeight || 1);
       // The canvas already has a device-pixel-sized backing store managed by
       // viewport.resize(); three.js must not resize it behind our back.
       this.renderer.setPixelRatio(1);
@@ -247,6 +262,10 @@ export class Renderer3D {
         uAOI: { value: new THREE.Vector3(4.0, 9.0, 0.42) },
         uSpec: { value: new THREE.Vector3(0.055, 42.0, 0.0) },
         uEye: { value: new THREE.Vector3() },
+        // The overlay is drawn THROUGH the terrain's own UVs, so it needs no scene and no
+          // camera of its own -- see the note on ViewportOverlay.
+        uOverlay: { value: null },
+        uOverlayAmt: { value: 0 },
       };
 
       this.material = new THREE.ShaderMaterial({
@@ -320,6 +339,7 @@ export class Renderer3D {
       t.wrapT = THREE.ClampToEdgeWrapping;
       t.needsUpdate = true;
       if (this.texture) this.texture.dispose();
+      if (this.overlay) this.overlay.dispose();
       this.texture = t;
       this.uniforms.uHeight.value = t;
       this._texSize = size;
@@ -351,7 +371,45 @@ export class Renderer3D {
     if (this.ok) this.uniforms.uRamp.value = RAMP_INDEX[name] ?? 0;
   }
 
+  /**
+   * Show one of Gaea's viewport overlays by name, or null to hide it.
+   *
+   * Returns false when the texture is not loaded, so a caller can name the missing overlay rather
+   * than showing an empty frame -- these assets are gitignored vendor data and an unextracted
+   * clone is an ordinary state.
+   */
+  /**
+   * Show one of Gaea's reference layers ON the terrain, or null to hide it.
+   *
+   * Returns false when the texture is not loaded, so a caller can name what is missing instead of
+   * rendering nothing. The texture is looked up in the same `ViewportOverlay` cache the loader
+   * fills; only the drawing changed.
+   */
+  setOverlay(name, opacity) {
+    if (!this.overlay) return false;
+    if (name === null || name === undefined || name === '') {
+      this.overlay.show(null);
+      this.uniforms.uOverlayAmt.value = 0;
+      return true;
+    }
+    if (!this.overlay.show(name, opacity)) return false;
+    this.uniforms.uOverlay.value = this.overlay.textures.get(name);
+    this.uniforms.uOverlayAmt.value = Math.max(0, Math.min(1, opacity ?? this.overlay.opacity));
+    return true;
+  }
+
+  /** Per-overlay readiness, for a status readout. */
+  overlayStatus() {
+    return this.overlay ? this.overlay.status() : [];
+  }
+
+  /** Load the overlay textures; awaitable before any evaluation. */
+  loadOverlays() {
+    return this.overlay ? this.overlay.loadAll() : Promise.resolve({ loaded: 0, failed: [] });
+  }
+
   resize(width, height) {
+    if (this.overlay) this.overlay.resize(width, height);
     if (!this.ok) return;
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / Math.max(1, height);
@@ -363,6 +421,8 @@ export class Renderer3D {
     if (!this.ok) return;
     if (clear) this.renderer.setClearColor(clear.r, clear.g, clear.b, clear.a ?? 1);
     this.renderer.render(this.scene, this.camera);
+    // No screen-space pass. The overlay is a texture on the terrain's material, so it is drawn by
+    // the same draw call as the terrain and cannot cover the rest of the page.
   }
 
   get drawCalls() {

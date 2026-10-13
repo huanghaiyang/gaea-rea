@@ -15,7 +15,14 @@
  * so a missing translation degrades to readable text, never to a blank.
  */
 
+// THE SOURCE LANGUAGE, not the starting language. The markup and every fallback
+// string are English and the dictionaries translate FROM them, so t() short-circuits
+// when the current language equals this. Setting it to zh made t("library.title")
+// return the literal key in Chinese mode -- headings rendered as dictionary keys.
 const DEFAULT_LANG = 'en';
+
+/** The language the UI starts in when nothing else decides. */
+const START_LANG = 'zh';
 const SUPPORTED = ['en', 'zh'];
 
 /** @type {{lang: string, ui: Record<string,string>, terms: Record<string,string>}} */
@@ -41,7 +48,7 @@ function detectLang() {
     /* storage unavailable (private mode) — fall through */
   }
   const nav = (navigator.languages && navigator.languages[0]) || navigator.language || '';
-  return /^zh\b/i.test(nav) ? 'zh' : DEFAULT_LANG;
+  return /^zh\b/i.test(nav) ? 'zh' : START_LANG;
 }
 
 /* -------------------------------------------------------------------- loading */

@@ -21,6 +21,7 @@ import { fieldToPNG, download } from './export.js';
 import { $, $$, toast, fmtMs, fmt, esc } from './util.js';
 import { initI18n, setLang, currentLang, t } from './i18n.js';
 import { preloadCLUTs, clutStatus } from './clut.js';
+import { preloadThresholds, thresholdStatus } from './kernels/halftone.js';
 
 /* ------------------------------------------------------------------ module singletons */
 
@@ -57,6 +58,26 @@ async function init() {
         // the view from the same state is safer than a translation pass.
         Promise.resolve(setLang(e.target.value)).then(() => location.reload());
       });
+    }
+
+    // The Halftone node's threshold maps, decoded alongside the palettes.
+    //
+    // Same reasoning as the CLUTs: the kernels are synchronous and the maps are a fetched file,
+    // so the set has to be in the cache before a graph using Halftone is evaluated. Also
+    // non-fatal -- the maps come from the same gitignored `web/assets/`, so a clone that has not
+    // run tools/extract-magick.py is an ordinary state, and during it the two diffusion patterns
+    // still work while the sixteen ordered ones fall back to Floyd-Steinberg.
+    try {
+      const th = await preloadThresholds();
+      if (!th.loaded) {
+        console.warn(
+          '[halftone] no threshold maps available; ordered patterns will fall back to '
+          + 'Floyd-Steinberg. Run tools/extract-magick.py to regenerate web/assets/magick/.',
+        );
+      }
+      window.__thresholdStatus = thresholdStatus();
+    } catch (e) {
+      console.warn('[halftone] threshold preload failed.', e);
     }
 
     // Gaea's eight built-in palette textures, decoded up front.

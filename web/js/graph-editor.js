@@ -43,9 +43,14 @@ export class GraphEditor {
     this._schedule = rafThrottle(() => this.draw());
     this._bind();
     this.resize();
-    bus.on('graph:replaced', () => { this.frameAll(); this._schedule(); });
-    bus.on('selection:changed', () => this._schedule());
-    bus.on('node:changed', () => this._schedule());
+    // The unsubscribers are KEPT. Dropping them, as the first version did, leaves three live
+    // closures pointing at a detached canvas as soon as a caller stops using the editor -- which
+    // is exactly what a Vue unmount does.
+    this._busOff = [
+      bus.on('graph:replaced', () => { this.frameAll(); this._schedule(); }),
+      bus.on('selection:changed', () => this._schedule()),
+      bus.on('node:changed', () => this._schedule()),
+    ];
   }
 
   /* ------------------------------------------------------------ geometry */
@@ -309,6 +314,21 @@ export class GraphEditor {
   }
 
   /* ------------------------------------------------------------ render */
+
+  /**
+   * Detach from the bus.
+   *
+   * The canvas listeners added in `_bind()` are anonymous and attached to the canvas itself, so
+   * they are released with the element and are deliberately not tracked here.
+   */
+  dispose() {
+    if (this._busOff) {
+      for (const off of this._busOff) {
+        try { off(); } catch { /* an already-detached handler is not an error */ }
+      }
+      this._busOff = null;
+    }
+  }
 
   draw() {
     const ctx = this.ctx;

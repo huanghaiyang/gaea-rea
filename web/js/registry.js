@@ -45,6 +45,7 @@ import { gaeaLake } from './kernels/lake.js';
 import { gaeaLichtenberg, gaeaOrigami, gaeaAperture, gaeaAccumulator } from './kernels/ops4.js';
 import { gaeaGraphicEQ, gaeaPockmarks, gaeaOutcrops, gaeaRockMap, gaeaBulbous } from './kernels/ops3.js';
 import { gaeaAngle, gaeaFilter, gaeaEdge, gaeaRoughen, gaeaCraggy } from './kernels/ops2.js';
+import { gaeaHalftone, HALFTONE_PATTERN_NAMES } from './kernels/halftone.js';
 import { gaeaCLUTer, CLUT_NAMES } from './clut.js';
 import { gaeaThreshold, gaeaSoftClip, gaeaTerraces, gaeaPixelate, gaeaCurvature } from './kernels/ops.js';
 import { AUTHORITATIVE_PARAMS, authoritativeParam } from './param-authority.js';
@@ -712,6 +713,34 @@ export const NODES = [
       Level: { d: 0.4, min: 0, max: 1, step: 0.005 },
       Depth: { d: 0.5, min: 0, max: 1, step: 0.01 },
       Shore: { d: 0.05, min: 0.001, max: 0.5, step: 0.001 },
+    },
+  },
+  // Halftone -- the second node backed by extracted vendor data.
+  //
+  // Its managed Build() is
+  //
+  //     RenderAsMask(true);
+  //     Migrated.HalftoneProcess(input, Posterize ? Depth : (-1), Pattern, maps)
+  //
+  // `maps` is the threshold-map set and `Pattern` picks from it. THE ENUM IS IMAGEMAGICK'S MAP
+  // SET: `HalftonePattern` has eighteen values and sixteen of them are threshold maps that
+  // `tools/extract-magick.py` pulls out of Resources/Magick/thresholds.xml, with the enum value
+  // lowerecased matching the map name for O2X2 through the six C-maps. Two pair by SHAPE rather
+  // than name -- DIAG is `diag5x5` and HLINE is `hlines12x4` -- and `HALFTONE_PATTERNS` flags
+  // those with `byName: true` so a reader can tell a recovered correspondence from an assumed one.
+  //
+  // The remaining two, FloydSteinberg and Riemersma, are NOT maps. They are error diffusion and
+  // its Hilbert-curve variant, and neither can be a lookup because each cell's threshold depends
+  // on the error carried in from cells already visited. Both are implemented as their published
+  // algorithms, which is why the node is `approx` even though sixteen of its patterns are exact.
+  {
+    name: 'Halftone', algorithm: gaeaHalftone, category: CAT.FX,
+    summary: 'Dithers the field with one of ImageMagick\'s threshold maps, or by error diffusion. Posterize off dithers to black and white.',
+    inputs: [H()], outputs: [MASK('Output')], note: 'approx',
+    params: {
+      Pattern: { d: 'FloydSteinberg', options: HALFTONE_PATTERN_NAMES, hint: 'Sixteen ordered maps decoded from Resources/Magick, plus two error-diffusion forms.' },
+      Posterize: { d: false, hint: 'When off, Depth is passed as -1 and the result is binary.' },
+      Depth: { d: 5, min: 2, max: 64, step: 1, hint: 'Only takes effect when Posterize is set.' },
     },
   },
   // CLUTer -- the first node wired to EXTRACTED VENDOR DATA rather than to a formula.
