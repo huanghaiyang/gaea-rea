@@ -473,6 +473,90 @@ export function directionalWarp(ctx) {
 
 /* ================================================================== Blur family */
 
+/**
+ * Gaea's FastBlur, transcribed from `FastBlur_Process` → `FUN_180053e80`.
+ *
+ * NOT a Gaussian. Gaea's blur is an ITERATED SEPARABLE BOX FILTER:
+ *
+ *     radius = min(requestedRadius, width/2 - 1, height/2 - 1)
+ *     for (i = 0; i < iterations; i++) { horizontalBox(radius); verticalBox(radius); }
+ *
+ * The iteration count is the caller's fourth rect field, and the radius cap comes from a
+ * `min()` helper (`FUN_180048880`) applied against half the grid minus one on each axis — so
+ * a blur can never exceed the field it runs on.
+ *
+ * WHY THIS IS WORTH REPLACING A GAUSSIAN WITH
+ * Iterating a box filter converges towards a Gaussian but is not one. At one or two
+ * iterations the kernel is visibly flatter in the centre and sharper at the edge than a
+ * Gaussian of comparable width, so substituting a true Gaussian changes the image in a way a
+ * user would notice as "this build's Blur looks different". Gaea's own look is the box
+ * iteration, so that is what is implemented here.
+ *
+ * WHAT IS NOT TRANSCRIBED
+ * `FUN_18000fc90` — the inner box kernel for radii up to 32 — is 23 KB of runtime-dispatched
+ * unrolled SIMD (three feature levels selected by `DAT_1803fc000`), and `FUN_180015800`
+ * handles the larger radii. Those bodies carry no algorithmic information a sliding window
+ * does not already express, so this uses a plain running-sum window whose arithmetic is
+ * exactly the box filter the SIMD computes. That makes this `approx`: the STRUCTURE is
+ * Gaea's, the summation order is not.
+ *
+ * @param {object} field `{data, channels, size, channel}`
+ * @param {number} requestedRadius
+ * @param {number} iterations
+ * @returns {object} a new field
+ */
+export function gaeaFastBlur(field, requestedRadius, iterations) {
+  const size = field.size;
+  const iter = Math.max(0, Math.floor(Number.isFinite(iterations) ? iterations : 1));
+  // The cap is Gaea's: min(requested, w/2 - 1, h/2 - 1), floored at zero.
+  const cap = Math.min(Math.floor(size / 2) - 1, Math.floor(size / 2) - 1);
+  const radius = Math.max(0, Math.min(Math.floor(requestedRadius), cap));
+
+  const src = new Float32Array(size * size);
+  const ch = field.channels || 1;
+  for (let i = 0; i < src.length; i++) {
+    const v = field.data[i * ch];
+    src[i] = Number.isFinite(v) ? v : 0;
+  }
+  if (iter === 0 || radius <= 0) {
+    return { data: src, channels: 1, size, channel: field.channel || 'height' };
+  }
+
+  let a = src;
+  let b = new Float32Array(size * size);
+  const win = 2 * radius + 1;
+
+  for (let it = 0; it < iter; it++) {
+    // Horizontal: a running sum per row, with edges extended by clamping.
+    for (let y = 0; y < size; y++) {
+      const row = y * size;
+      let sum = 0;
+      for (let k = -radius; k <= radius; k++) sum += a[row + clamp(k, 0, size - 1)];
+      for (let x = 0; x < size; x++) {
+        b[row + x] = sum / win;
+        const out = clamp(x - radius, 0, size - 1);
+        const into = clamp(x + radius + 1, 0, size - 1);
+        sum += a[row + into] - a[row + out];
+      }
+    }
+    // Vertical, same window, reading what the horizontal pass produced.
+    const t = a; a = b; b = t;
+    for (let x = 0; x < size; x++) {
+      let sum = 0;
+      for (let k = -radius; k <= radius; k++) sum += a[clamp(k, 0, size - 1) * size + x];
+      for (let y = 0; y < size; y++) {
+        b[y * size + x] = sum / win;
+        const out = clamp(y - radius, 0, size - 1);
+        const into = clamp(y + radius + 1, 0, size - 1);
+        sum += a[into * size + x] - a[out * size + x];
+      }
+    }
+    const t2 = a; a = b; b = t2;
+  }
+
+  return { data: a, channels: 1, size, channel: field.channel || 'height' };
+}
+
 /** Blur 鈥?isotropic gaussian; Radius is in pixels. */
 export function blur(ctx) {
   const { params } = ctx;

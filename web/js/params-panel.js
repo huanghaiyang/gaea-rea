@@ -176,7 +176,10 @@ export class ParamsPanel {
     control.className = 'param-control';
     row.appendChild(control);
 
-    const key = param.name;
+    // Storage is keyed by `key`; `name` is only the label. They differ where the vendor
+    // catalogue repeats a label — Gaea's Erosion2 has three parameters called
+    // "Discharge Angle" — and using the name here would make those controls share one slot.
+    const key = param.key || param.name;
     const value = node.params && node.params[key] !== undefined ? node.params[key] : param.value;
 
     // Some vendor parameters declare an integer type but carry an option list; the option list
@@ -375,17 +378,18 @@ export class ParamsPanel {
    * snapshot per continuous interaction (cleared after 600ms of quiet) so undo steps are
    * meaningful rather than one-per-pixel.
    */
-  commit(node, name, value) {
-    this.snapshotOnce(node.id, name);
+  /** @param {string} key the parameter's storage key, not its display label */
+  commit(node, key, value) {
+    this.snapshotOnce(node.id, key);
     node.params = node.params || {};
-    node.params[name] = value;
-    this.onChange(name, value, node);
+    node.params[key] = value;
+    this.onChange(key, value, node);
   }
 
-  snapshotOnce(nodeId, name) {
-    const key = `${nodeId}:${name}`;
-    if (this.pendingSnapshot === key) return;
-    this.pendingSnapshot = key;
+  snapshotOnce(nodeId, key) {
+    const id = `${nodeId}:${key}`;
+    if (this.pendingSnapshot === id) return;
+    this.pendingSnapshot = id;
     snapshot();
     clearTimeout(this._snapTimer);
     this._snapTimer = setTimeout(() => { this.pendingSnapshot = null; }, 600);

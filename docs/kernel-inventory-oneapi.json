@@ -1,0 +1,784 @@
+{
+  "source": ".build\\spirv2",
+  "modules": {
+    "m00.spv": {
+      "modules_in_file": 1,
+      "entry_points": 12,
+      "kernels": [
+        "thermal_shaper::LaplacianLevel::create_subsequent_level()",
+        "thermal_shaper::LaplacianLevel::reconstruct_previous_level(thermal_shaper::Parameters const&)",
+        "thermal_shaper::ThermalShaper::process()",
+        "thermal_shaper::ThermalShaper::process_level",
+        "typeinfo name for thermal_shaper::LaplacianLevel::create_subsequent_level()",
+        "typeinfo name for thermal_shaper::LaplacianLevel::reconstruct_previous_level(thermal_shaper::Parameters const&)",
+        "typeinfo name for thermal_shaper::ThermalShaper::process()",
+        "typeinfo name for thermal_shaper::ThermalShaper::process_level"
+      ],
+      "extensions": []
+    },
+    "m01.spv": {
+      "modules_in_file": 1,
+      "entry_points": 20,
+      "kernels": [
+        "thermal::LaplacianLevel::LaplacianLevel(buffer",
+        "thermal::LaplacianLevel::create_subsequent_level(thermal::Parameters&)",
+        "thermal::LaplacianLevel::reconstruct_previous_level(thermal::Parameters const&)",
+        "thermal::Thermal::simulation(float, thermal::LaplacianLevel&, int, float)",
+        "typeinfo name for thermal::LaplacianLevel::LaplacianLevel(buffer",
+        "typeinfo name for thermal::LaplacianLevel::create_subsequent_level(thermal::Parameters&)",
+        "typeinfo name for thermal::LaplacianLevel::reconstruct_previous_level(thermal::Parameters const&)",
+        "typeinfo name for thermal::Thermal::simulation(float, thermal::LaplacianLevel&, int, float)"
+      ],
+      "extensions": []
+    },
+    "m02.spv": {
+      "modules_in_file": 1,
+      "entry_points": 4,
+      "kernels": [
+        "stamp_instancer::(anonymous namespace)::populate(queue&, float*, float*, float*, stamp_instancer::Instance*, stamp_instancer::Parameters&)",
+        "typeinfo name for stamp_instancer::(anonymous namespace)::populate(queue&, float*, float*, float*, stamp_instancer::Instance*, stamp_instancer::Parameters&)"
+      ],
+      "extensions": []
+    },
+    "m03.spv": {
+      "modules_in_file": 1,
+      "entry_points": 32,
+      "kernels": [
+        "parallel_erosion::LaplacianLevel::LaplacianLevel(queue&, parallel_erosion::LaplacianLevel*)",
+        "parallel_erosion::LaplacianLevel::init",
+        "parallel_erosion::LaplacianLevel::reconstruct_previous_level(parallel_erosion::Parameters const&, int)",
+        "parallel_erosion::ParallelErosion::create_random_directions(unsigned int, int, queue)",
+        "parallel_erosion::ParallelErosion::erode()",
+        "parallel_erosion::ParallelErosion::erode_level(parallel_erosion::LaplacianLevel*)",
+        "parallel_erosion::ParallelErosion::render_flow(buffer",
+        "parallel_erosion::ParallelErosion::shape",
+        "typeinfo name for parallel_erosion::LaplacianLevel::LaplacianLevel(queue&, parallel_erosion::LaplacianLevel*)",
+        "typeinfo name for parallel_erosion::LaplacianLevel::init",
+        "typeinfo name for parallel_erosion::LaplacianLevel::reconstruct_previous_level(parallel_erosion::Parameters const&, int)",
+        "typeinfo name for parallel_erosion::ParallelErosion::create_random_directions(unsigned int, int, queue)",
+        "typeinfo name for parallel_erosion::ParallelErosion::erode()",
+        "typeinfo name for parallel_erosion::ParallelErosion::erode_level(parallel_erosion::LaplacianLevel*)",
+        "typeinfo name for parallel_erosion::ParallelErosion::flow(buffer",
+        "typeinfo name for parallel_erosion::ParallelErosion::render_flow(buffer",
+        "typeinfo name for parallel_erosion::ParallelErosion::shape"
+      ],
+      "extensions": []
+    },
+    "m04.spv": {
+      "modules_in_file": 1,
+      "entry_points": 48,
+      "kernels": [
+        "MeshRasterizer::compute_tangent_space_normals(float*, float*, float*, vec",
+        "MeshRasterizer::process_vertices(usm_ptr",
+        "MeshRasterizer::process_vertices_with_displacement",
+        "MeshRasterizer::render",
+        "MeshRasterizer::render(float*, float*, float*, vec",
+        "MeshRasterizer::render3_cpu",
+        "typeinfo name for MeshRasterizer::compute_tangent_space_normals(float*, float*, float*, vec",
+        "typeinfo name for MeshRasterizer::process_vertices(usm_ptr",
+        "typeinfo name for MeshRasterizer::process_vertices_with_displacement",
+        "typeinfo name for MeshRasterizer::render",
+        "typeinfo name for MeshRasterizer::render(float*, float*, float*, vec",
+        "typeinfo name for MeshRasterizer::render3",
+        "typeinfo name for MeshRasterizer::render3_cpu",
+        "typeinfo name for detail::reduAuxCGFunc",
+        "typeinfo name for detail::reduCGFuncMulti"
+      ],
+      "extensions": []
+    },
+    "m05.spv": {
+      "modules_in_file": 1,
+      "entry_points": 26,
+      "kernels": [],
+      "extensions": []
+    },
+    "m06.spv": {
+      "modules_in_file": 1,
+      "entry_points": 27,
+      "kernels": [
+        "lighting::LaplacianLevel::reconstruct(lighting::Parameters const&)",
+        "lighting::LightingSYCL::compose_light()",
+        "lighting::LightingSYCL::compute_diffuse_light()",
+        "lighting::LightingSYCL::compute_hybrid_ao()",
+        "lighting::LightingSYCL::compute_normals_and_init_photonmap(lighting::Parameters const&, buffer",
+        "lighting::LightingSYCL::raytrace_shadows()",
+        "lighting::compute_normals_and_init_photonmap(lighting::Parameters const&, buffer",
+        "lighting::raytrace_ao(lighting::Parameters&, buffer",
+        "lighting::raytrace_ao_sl(lighting::Parameters&, buffer",
+        "typeinfo name for lighting::LaplacianLevel::reconstruct(lighting::Parameters const&)",
+        "typeinfo name for lighting::LightingSYCL::compose_light()",
+        "typeinfo name for lighting::LightingSYCL::compute_diffuse_light()",
+        "typeinfo name for lighting::LightingSYCL::compute_hybrid_ao()",
+        "typeinfo name for lighting::LightingSYCL::compute_normals_and_init_photonmap(lighting::Parameters const&, buffer",
+        "typeinfo name for lighting::LightingSYCL::raytrace_shadows()",
+        "typeinfo name for lighting::compute_normals_and_init_photonmap(lighting::Parameters const&, buffer",
+        "typeinfo name for lighting::raytrace_ao(lighting::Parameters&, buffer",
+        "typeinfo name for lighting::raytrace_ao_sl(lighting::Parameters&, buffer"
+      ],
+      "extensions": []
+    },
+    "m07.spv": {
+      "modules_in_file": 1,
+      "entry_points": 2,
+      "kernels": [],
+      "extensions": []
+    },
+    "m08.spv": {
+      "modules_in_file": 1,
+      "entry_points": 22,
+      "kernels": [
+        "flow::Flow::fill_pits(buffer",
+        "flow::Flow::flow(buffer",
+        "flow::Flow::process()",
+        "flow::LaplacianLevel::create_subsequent_level(flow::Parameters&)",
+        "flow::LaplacianLevel::reconstruct(flow::Parameters const&)",
+        "handler::fill",
+        "typeinfo name for flow::Flow::fill_pits(buffer",
+        "typeinfo name for flow::Flow::flow(buffer",
+        "typeinfo name for flow::Flow::process()",
+        "typeinfo name for flow::LaplacianLevel::create_subsequent_level(flow::Parameters&)",
+        "typeinfo name for flow::LaplacianLevel::reconstruct(flow::Parameters const&)",
+        "typeinfo name for handler::fill"
+      ],
+      "extensions": []
+    },
+    "m09.spv": {
+      "modules_in_file": 1,
+      "entry_points": 24,
+      "kernels": [
+        "color_transport::ColorTransport::color_transport(buffer",
+        "color_transport::ColorTransport::color_transport_full(buffer",
+        "color_transport::ColorTransport::fill_pits(buffer",
+        "color_transport::ColorTransport::process()",
+        "color_transport::LaplacianLevel::LaplacianLevel(buffer",
+        "color_transport::LaplacianLevel::create_subsequent_level(color_transport::Parameters&)",
+        "color_transport::LaplacianLevel::reconstruct(color_transport::Parameters const&)",
+        "typeinfo name for color_transport::ColorTransport::color_transport(buffer",
+        "typeinfo name for color_transport::ColorTransport::color_transport_full(buffer",
+        "typeinfo name for color_transport::ColorTransport::fill_pits(buffer",
+        "typeinfo name for color_transport::ColorTransport::process()",
+        "typeinfo name for color_transport::LaplacianLevel::LaplacianLevel(buffer",
+        "typeinfo name for color_transport::LaplacianLevel::create_subsequent_level(color_transport::Parameters&)",
+        "typeinfo name for color_transport::LaplacianLevel::reconstruct(color_transport::Parameters const&)"
+      ],
+      "extensions": []
+    },
+    "m10.spv": {
+      "modules_in_file": 1,
+      "entry_points": 16,
+      "kernels": [
+        "Cellular3D::render",
+        "typeinfo name for Cellular3D::render"
+      ],
+      "extensions": []
+    },
+    "m11.spv": {
+      "modules_in_file": 1,
+      "entry_points": 16,
+      "kernels": [],
+      "extensions": []
+    },
+    "m12.spv": {
+      "modules_in_file": 1,
+      "entry_points": 22,
+      "kernels": [
+        "resampling::downsample_box(buffer",
+        "resampling::downsample_box(usm_ptr",
+        "resampling::downsample_gaussian_5x5(usm_ptr",
+        "resampling::downsample_magic(buffer",
+        "resampling::downsample_magic(usm_ptr",
+        "resampling::sharpen_magic(buffer",
+        "resampling::sharpen_magic(usm_ptr",
+        "resampling::upsample_box(buffer",
+        "resampling::upsample_box(usm_ptr",
+        "resampling::upsample_magic(buffer",
+        "resampling::upsample_magic(usm_ptr",
+        "typeinfo name for resampling::downsample_box(buffer",
+        "typeinfo name for resampling::downsample_box(usm_ptr",
+        "typeinfo name for resampling::downsample_gaussian_5x5(usm_ptr",
+        "typeinfo name for resampling::downsample_magic(buffer",
+        "typeinfo name for resampling::downsample_magic(usm_ptr",
+        "typeinfo name for resampling::sharpen_magic(buffer",
+        "typeinfo name for resampling::sharpen_magic(usm_ptr",
+        "typeinfo name for resampling::upsample_box(buffer",
+        "typeinfo name for resampling::upsample_box(usm_ptr",
+        "typeinfo name for resampling::upsample_magic(buffer",
+        "typeinfo name for resampling::upsample_magic(usm_ptr"
+      ],
+      "extensions": []
+    }
+  },
+  "distinct_kernels": {
+    "typeinfo name for Cellular3D::render": 8,
+    "Cellular3D::render": 8,
+    "typeinfo name for thermal::Thermal::simulation(float, thermal::LaplacianLevel&, int, float)": 6,
+    "thermal::Thermal::simulation(float, thermal::LaplacianLevel&, int, float)": 6,
+    "typeinfo name for MeshRasterizer::render": 6,
+    "MeshRasterizer::render": 6,
+    "parallel_erosion::ParallelErosion::shape": 5,
+    "typeinfo name for parallel_erosion::ParallelErosion::shape": 5,
+    "typeinfo name for flow::Flow::fill_pits(buffer": 4,
+    "flow::Flow::fill_pits(buffer": 4,
+    "typeinfo name for color_transport::ColorTransport::fill_pits(buffer": 4,
+    "color_transport::ColorTransport::fill_pits(buffer": 4,
+    "parallel_erosion::ParallelErosion::erode_level(parallel_erosion::LaplacianLevel*)": 3,
+    "typeinfo name for parallel_erosion::ParallelErosion::erode_level(parallel_erosion::LaplacianLevel*)": 3,
+    "flow::Flow::process()": 3,
+    "typeinfo name for flow::Flow::process()": 3,
+    "color_transport::ColorTransport::process()": 3,
+    "typeinfo name for color_transport::ColorTransport::process()": 3,
+    "thermal_shaper::ThermalShaper::process()": 2,
+    "typeinfo name for thermal_shaper::ThermalShaper::process_level": 2,
+    "typeinfo name for thermal_shaper::ThermalShaper::process()": 2,
+    "thermal_shaper::ThermalShaper::process_level": 2,
+    "typeinfo name for thermal::LaplacianLevel::LaplacianLevel(buffer": 2,
+    "thermal::LaplacianLevel::LaplacianLevel(buffer": 2,
+    "stamp_instancer::(anonymous namespace)::populate(queue&, float*, float*, float*, stamp_instancer::Instance*, stamp_instancer::Parameters&)": 2,
+    "typeinfo name for stamp_instancer::(anonymous namespace)::populate(queue&, float*, float*, float*, stamp_instancer::Instance*, stamp_instancer::Parameters&)": 2,
+    "parallel_erosion::LaplacianLevel::init": 2,
+    "typeinfo name for parallel_erosion::ParallelErosion::render_flow(buffer": 2,
+    "typeinfo name for parallel_erosion::LaplacianLevel::init": 2,
+    "typeinfo name for MeshRasterizer::process_vertices(usm_ptr": 2,
+    "MeshRasterizer::compute_tangent_space_normals(float*, float*, float*, vec": 2,
+    "typeinfo name for MeshRasterizer::render(float*, float*, float*, vec": 2,
+    "MeshRasterizer::process_vertices(usm_ptr": 2,
+    "typeinfo name for MeshRasterizer::render3": 2,
+    "MeshRasterizer::render(float*, float*, float*, vec": 2,
+    "MeshRasterizer::process_vertices_with_displacement": 2,
+    "typeinfo name for detail::reduCGFuncMulti": 2,
+    "typeinfo name for MeshRasterizer::compute_tangent_space_normals(float*, float*, float*, vec": 2,
+    "typeinfo name for MeshRasterizer::process_vertices_with_displacement": 2,
+    "MeshRasterizer::render3_cpu": 2,
+    "typeinfo name for MeshRasterizer::render3_cpu": 2,
+    "typeinfo name for detail::reduAuxCGFunc": 2,
+    "typeinfo name for lighting::LaplacianLevel::reconstruct(lighting::Parameters const&)": 2,
+    "lighting::LightingSYCL::compose_light()": 2,
+    "typeinfo name for lighting::LightingSYCL::compose_light()": 2,
+    "typeinfo name for lighting::LightingSYCL::raytrace_shadows()": 2,
+    "lighting::LaplacianLevel::reconstruct(lighting::Parameters const&)": 2,
+    "typeinfo name for lighting::raytrace_ao(lighting::Parameters&, buffer": 2,
+    "typeinfo name for lighting::raytrace_ao_sl(lighting::Parameters&, buffer": 2,
+    "thermal_shaper::LaplacianLevel::create_subsequent_level()": 1,
+    "typeinfo name for thermal_shaper::LaplacianLevel::reconstruct_previous_level(thermal_shaper::Parameters const&)": 1,
+    "typeinfo name for thermal_shaper::LaplacianLevel::create_subsequent_level()": 1,
+    "thermal_shaper::LaplacianLevel::reconstruct_previous_level(thermal_shaper::Parameters const&)": 1,
+    "typeinfo name for thermal::LaplacianLevel::create_subsequent_level(thermal::Parameters&)": 1,
+    "thermal::LaplacianLevel::reconstruct_previous_level(thermal::Parameters const&)": 1,
+    "thermal::LaplacianLevel::create_subsequent_level(thermal::Parameters&)": 1,
+    "typeinfo name for thermal::LaplacianLevel::reconstruct_previous_level(thermal::Parameters const&)": 1,
+    "typeinfo name for parallel_erosion::LaplacianLevel::reconstruct_previous_level(parallel_erosion::Parameters const&, int)": 1,
+    "typeinfo name for parallel_erosion::ParallelErosion::create_random_directions(unsigned int, int, queue)": 1,
+    "parallel_erosion::ParallelErosion::erode()": 1,
+    "typeinfo name for parallel_erosion::LaplacianLevel::LaplacianLevel(queue&, parallel_erosion::LaplacianLevel*)": 1,
+    "typeinfo name for parallel_erosion::ParallelErosion::erode()": 1,
+    "parallel_erosion::LaplacianLevel::LaplacianLevel(queue&, parallel_erosion::LaplacianLevel*)": 1,
+    "parallel_erosion::LaplacianLevel::reconstruct_previous_level(parallel_erosion::Parameters const&, int)": 1,
+    "typeinfo name for parallel_erosion::ParallelErosion::flow(buffer": 1,
+    "parallel_erosion::ParallelErosion::create_random_directions(unsigned int, int, queue)": 1,
+    "parallel_erosion::ParallelErosion::render_flow(buffer": 1,
+    "lighting::compute_normals_and_init_photonmap(lighting::Parameters const&, buffer": 1,
+    "lighting::LightingSYCL::compute_normals_and_init_photonmap(lighting::Parameters const&, buffer": 1,
+    "lighting::raytrace_ao(lighting::Parameters&, buffer": 1,
+    "typeinfo name for lighting::LightingSYCL::compute_diffuse_light()": 1,
+    "typeinfo name for lighting::LightingSYCL::compute_normals_and_init_photonmap(lighting::Parameters const&, buffer": 1,
+    "lighting::LightingSYCL::compute_hybrid_ao()": 1,
+    "typeinfo name for lighting::compute_normals_and_init_photonmap(lighting::Parameters const&, buffer": 1,
+    "lighting::LightingSYCL::compute_diffuse_light()": 1,
+    "typeinfo name for lighting::LightingSYCL::compute_hybrid_ao()": 1,
+    "lighting::raytrace_ao_sl(lighting::Parameters&, buffer": 1,
+    "lighting::LightingSYCL::raytrace_shadows()": 1,
+    "flow::Flow::flow(buffer": 1,
+    "flow::LaplacianLevel::reconstruct(flow::Parameters const&)": 1,
+    "flow::LaplacianLevel::create_subsequent_level(flow::Parameters&)": 1,
+    "typeinfo name for flow::LaplacianLevel::reconstruct(flow::Parameters const&)": 1,
+    "typeinfo name for handler::fill": 1,
+    "typeinfo name for flow::Flow::flow(buffer": 1,
+    "handler::fill": 1,
+    "typeinfo name for flow::LaplacianLevel::create_subsequent_level(flow::Parameters&)": 1,
+    "color_transport::LaplacianLevel::LaplacianLevel(buffer": 1,
+    "typeinfo name for color_transport::LaplacianLevel::LaplacianLevel(buffer": 1,
+    "typeinfo name for color_transport::LaplacianLevel::create_subsequent_level(color_transport::Parameters&)": 1,
+    "color_transport::ColorTransport::color_transport_full(buffer": 1,
+    "color_transport::LaplacianLevel::create_subsequent_level(color_transport::Parameters&)": 1,
+    "color_transport::LaplacianLevel::reconstruct(color_transport::Parameters const&)": 1,
+    "typeinfo name for color_transport::LaplacianLevel::reconstruct(color_transport::Parameters const&)": 1,
+    "color_transport::ColorTransport::color_transport(buffer": 1,
+    "typeinfo name for color_transport::ColorTransport::color_transport(buffer": 1,
+    "typeinfo name for color_transport::ColorTransport::color_transport_full(buffer": 1,
+    "resampling::downsample_box(usm_ptr": 1,
+    "typeinfo name for resampling::downsample_box(usm_ptr": 1,
+    "resampling::upsample_box(usm_ptr": 1,
+    "typeinfo name for resampling::sharpen_magic(buffer": 1,
+    "resampling::upsample_magic(buffer": 1,
+    "typeinfo name for resampling::downsample_magic(buffer": 1,
+    "typeinfo name for resampling::sharpen_magic(usm_ptr": 1,
+    "resampling::downsample_magic(usm_ptr": 1,
+    "resampling::downsample_gaussian_5x5(usm_ptr": 1,
+    "resampling::upsample_magic(usm_ptr": 1,
+    "typeinfo name for resampling::upsample_box(usm_ptr": 1,
+    "resampling::sharpen_magic(buffer": 1,
+    "resampling::sharpen_magic(usm_ptr": 1,
+    "typeinfo name for resampling::upsample_magic(buffer": 1,
+    "typeinfo name for resampling::upsample_magic(usm_ptr": 1,
+    "resampling::downsample_box(buffer": 1,
+    "typeinfo name for resampling::downsample_gaussian_5x5(usm_ptr": 1,
+    "typeinfo name for resampling::downsample_box(buffer": 1,
+    "resampling::upsample_box(buffer": 1,
+    "typeinfo name for resampling::upsample_box(buffer": 1,
+    "typeinfo name for resampling::downsample_magic(usm_ptr": 1,
+    "resampling::downsample_magic(buffer": 1
+  },
+  "raw_names": {
+    "thermal_shaper::LaplacianLevel::create_subsequent_level()": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN14thermal_shaper14LaplacianLevel23create_subsequent_levelEvEUlT_E_EE"
+    ],
+    "typeinfo name for thermal_shaper::LaplacianLevel::reconstruct_previous_level(thermal_shaper::Parameters const&)": [
+      "_ZTSZN14thermal_shaper14LaplacianLevel26reconstruct_previous_levelERKNS_10ParametersEEUlT_E_"
+    ],
+    "thermal_shaper::ThermalShaper::process()": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN14thermal_shaper13ThermalShaper7processEvEUlT_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN14thermal_shaper13ThermalShaper7processEvEUlT_E0_EE"
+    ],
+    "typeinfo name for thermal_shaper::ThermalShaper::process_level": [
+      "_ZTSZN14thermal_shaper13ThermalShaper13process_levelILi0ELb1EEEvRNS_14LaplacianLevelEEUlT_E_",
+      "_ZTSZN14thermal_shaper13ThermalShaper13process_levelILi0ELb0EEEvRNS_14LaplacianLevelEEUlT_E_"
+    ],
+    "typeinfo name for thermal_shaper::ThermalShaper::process()": [
+      "_ZTSZN14thermal_shaper13ThermalShaper7processEvEUlT_E0_",
+      "_ZTSZN14thermal_shaper13ThermalShaper7processEvEUlT_E_"
+    ],
+    "thermal_shaper::ThermalShaper::process_level": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN14thermal_shaper13ThermalShaper13process_levelILi0ELb1EEEvRNS5_14LaplacianLevelEEUlT_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN14thermal_shaper13ThermalShaper13process_levelILi0ELb0EEEvRNS5_14LaplacianLevelEEUlT_E_EE"
+    ],
+    "typeinfo name for thermal_shaper::LaplacianLevel::create_subsequent_level()": [
+      "_ZTSZN14thermal_shaper14LaplacianLevel23create_subsequent_levelEvEUlT_E_"
+    ],
+    "thermal_shaper::LaplacianLevel::reconstruct_previous_level(thermal_shaper::Parameters const&)": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN14thermal_shaper14LaplacianLevel26reconstruct_previous_levelERKNS5_10ParametersEEUlT_E_EE"
+    ],
+    "typeinfo name for thermal::LaplacianLevel::LaplacianLevel(buffer": [
+      "_ZTSZZN7thermal14LaplacianLevelC1EON4sycl3_V16bufferIfLi2ENS2_6detail17aligned_allocatorIfEEvEES8_S8_S8_S8_RNS2_5queueEENKUlRNS2_7handlerEE_clESC_EUlT_E_",
+      "_ZTSZZN7thermal14LaplacianLevelC1ERKN4sycl3_V16bufferIfLi2ENS2_6detail17aligned_allocatorIfEEvEES9_S9_RNS2_5queueEPS0_ENKUlRNS2_7handlerEE_clESE_EUlT_E_"
+    ],
+    "typeinfo name for thermal::Thermal::simulation(float, thermal::LaplacianLevel&, int, float)": [
+      "_ZTSZZN7thermal7Thermal10simulationEfRNS_14LaplacianLevelEifENKUlRN4sycl3_V17handlerEE2_clES6_EUlT_E_",
+      "_ZTSZZN7thermal7Thermal10simulationEfRNS_14LaplacianLevelEifENKUlRN4sycl3_V17handlerEE4_clES6_EUlT_E_",
+      "_ZTSZZN7thermal7Thermal10simulationEfRNS_14LaplacianLevelEifENKUlRN4sycl3_V17handlerEE3_clES6_EUlT_E_",
+      "_ZTSZZN7thermal7Thermal10simulationEfRNS_14LaplacianLevelEifENKUlRN4sycl3_V17handlerEE0_clES6_EUlT_E_",
+      "_ZTSZZN7thermal7Thermal10simulationEfRNS_14LaplacianLevelEifENKUlRN4sycl3_V17handlerEE1_clES6_EUlT_E_",
+      "_ZTSZZN7thermal7Thermal10simulationEfRNS_14LaplacianLevelEifENKUlRN4sycl3_V17handlerEE_clES6_EUlT_E_"
+    ],
+    "typeinfo name for thermal::LaplacianLevel::create_subsequent_level(thermal::Parameters&)": [
+      "_ZTSZZN7thermal14LaplacianLevel23create_subsequent_levelERNS_10ParametersEENKUlRN4sycl3_V17handlerEE_clES6_EUlT_E_"
+    ],
+    "thermal::Thermal::simulation(float, thermal::LaplacianLevel&, int, float)": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN7thermal7Thermal10simulationEfRNS5_14LaplacianLevelEifENKUlRNS0_7handlerEE0_clESA_EUlT_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN7thermal7Thermal10simulationEfRNS5_14LaplacianLevelEifENKUlRNS0_7handlerEE2_clESA_EUlT_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN7thermal7Thermal10simulationEfRNS5_14LaplacianLevelEifENKUlRNS0_7handlerEE_clESA_EUlT_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN7thermal7Thermal10simulationEfRNS5_14LaplacianLevelEifENKUlRNS0_7handlerEE4_clESA_EUlT_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN7thermal7Thermal10simulationEfRNS5_14LaplacianLevelEifENKUlRNS0_7handlerEE3_clESA_EUlT_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN7thermal7Thermal10simulationEfRNS5_14LaplacianLevelEifENKUlRNS0_7handlerEE1_clESA_EUlT_E_EE"
+    ],
+    "thermal::LaplacianLevel::reconstruct_previous_level(thermal::Parameters const&)": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN7thermal14LaplacianLevel26reconstruct_previous_levelERKNS5_10ParametersEENKUlRNS0_7handlerEE_clESB_EUlT_E_EE"
+    ],
+    "thermal::LaplacianLevel::LaplacianLevel(buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN7thermal14LaplacianLevelC1EONS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESB_SB_SB_SB_RNS0_5queueEENKUlRNS0_7handlerEE_clESF_EUlT_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN7thermal14LaplacianLevelC1ERKNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESC_SC_RNS0_5queueEPS6_ENKUlRNS0_7handlerEE_clESH_EUlT_E_EE"
+    ],
+    "thermal::LaplacianLevel::create_subsequent_level(thermal::Parameters&)": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN7thermal14LaplacianLevel23create_subsequent_levelERNS5_10ParametersEENKUlRNS0_7handlerEE_clESA_EUlT_E_EE"
+    ],
+    "typeinfo name for thermal::LaplacianLevel::reconstruct_previous_level(thermal::Parameters const&)": [
+      "_ZTSZZN7thermal14LaplacianLevel26reconstruct_previous_levelERKNS_10ParametersEENKUlRN4sycl3_V17handlerEE_clES7_EUlT_E_"
+    ],
+    "stamp_instancer::(anonymous namespace)::populate(queue&, float*, float*, float*, stamp_instancer::Instance*, stamp_instancer::Parameters&)": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN15stamp_instancer12_GLOBAL__N_18populateERNS0_5queueEPfS9_S9_PNS5_8InstanceERNS5_10ParametersEEUlNS0_2idILi1EEEE0_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN15stamp_instancer12_GLOBAL__N_18populateERNS0_5queueEPfS9_S9_PNS5_8InstanceERNS5_10ParametersEEUlNS0_2idILi1EEEE_EE"
+    ],
+    "typeinfo name for stamp_instancer::(anonymous namespace)::populate(queue&, float*, float*, float*, stamp_instancer::Instance*, stamp_instancer::Parameters&)": [
+      "_ZTSZN15stamp_instancer12_GLOBAL__N_18populateERN4sycl3_V15queueEPfS5_S5_PNS_8InstanceERNS_10ParametersEEUlNS2_2idILi1EEEE0_",
+      "_ZTSZN15stamp_instancer12_GLOBAL__N_18populateERN4sycl3_V15queueEPfS5_S5_PNS_8InstanceERNS_10ParametersEEUlNS2_2idILi1EEEE_"
+    ],
+    "parallel_erosion::ParallelErosion::erode_level(parallel_erosion::LaplacianLevel*)": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN16parallel_erosion15ParallelErosion11erode_levelEPNS5_14LaplacianLevelEENKUlRNS0_7handlerEE_clESA_EUlNS0_2idILi2EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZZN16parallel_erosion15ParallelErosion11erode_levelEPNS5_14LaplacianLevelEENKUlRNS0_7handlerEE1_clESA_EUlNS0_2idILi1EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZZN16parallel_erosion15ParallelErosion11erode_levelEPNS5_14LaplacianLevelEENKUlRNS0_7handlerEE0_clESA_EUlNS0_2idILi1EEEE_EE"
+    ],
+    "typeinfo name for parallel_erosion::LaplacianLevel::reconstruct_previous_level(parallel_erosion::Parameters const&, int)": [
+      "_ZTSZZN16parallel_erosion14LaplacianLevel26reconstruct_previous_levelERKNS_10ParametersEiENKUlRN4sycl3_V17handlerEE_clES7_EUlT_E_"
+    ],
+    "parallel_erosion::LaplacianLevel::init": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN16parallel_erosion14LaplacianLevel4initILb1EEEvvENKUlRNS0_7handlerEE_clES9_EUlS4_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN16parallel_erosion14LaplacianLevel4initILb0EEEvvENKUlRNS0_7handlerEE_clES9_EUlS4_E_EE"
+    ],
+    "typeinfo name for parallel_erosion::ParallelErosion::create_random_directions(unsigned int, int, queue)": [
+      "_ZTSZZN16parallel_erosion15ParallelErosion24create_random_directionsEjiN4sycl3_V15queueEENKUlRNS2_7handlerEE_clES5_EUlT_E_"
+    ],
+    "typeinfo name for parallel_erosion::ParallelErosion::erode_level(parallel_erosion::LaplacianLevel*)": [
+      "_ZTSZZN16parallel_erosion15ParallelErosion11erode_levelEPNS_14LaplacianLevelEENKUlRN4sycl3_V17handlerEE0_clES6_EUlNS4_2idILi1EEEE_",
+      "_ZTSZZN16parallel_erosion15ParallelErosion11erode_levelEPNS_14LaplacianLevelEENKUlRN4sycl3_V17handlerEE1_clES6_EUlNS4_2idILi1EEEE_",
+      "_ZTSZZN16parallel_erosion15ParallelErosion11erode_levelEPNS_14LaplacianLevelEENKUlRN4sycl3_V17handlerEE_clES6_EUlNS4_2idILi2EEEE_"
+    ],
+    "parallel_erosion::ParallelErosion::erode()": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN16parallel_erosion15ParallelErosion5erodeEvENKUlRNS0_7handlerEE_clES8_EUlNS0_2idILi2EEEE_EE"
+    ],
+    "typeinfo name for parallel_erosion::ParallelErosion::render_flow(buffer": [
+      "_ZTSZZN16parallel_erosion15ParallelErosion11render_flowERN4sycl3_V16bufferINS_8ParticleELi1ENS2_6detail17aligned_allocatorIS4_EEvEERNS3_IjLi1ENS6_IjEEvEENS2_5rangeILi1EEERNS3_IfLi2ENS6_IfEEvEESH_RNS3_IiLi2ENS6_IiEEvEESK_SH_SH_ENKUlRNS2_7handlerEE_clESM_EUlNS2_7nd_itemILi1EEEE_",
+      "_ZTSZZN16parallel_erosion15ParallelErosion11render_flowERN4sycl3_V16bufferINS_8ParticleELi1ENS2_6detail17aligned_allocatorIS4_EEvEERNS3_IjLi1ENS6_IjEEvEENS2_5rangeILi1EEERNS3_IfLi2ENS6_IfEEvEESH_RNS3_IiLi2ENS6_IiEEvEESK_SH_SH_ENKUlRNS2_7handlerEE0_clESM_EUlNS2_2idILi2EEEE_"
+    ],
+    "typeinfo name for parallel_erosion::LaplacianLevel::init": [
+      "_ZTSZZN16parallel_erosion14LaplacianLevel4initILb0EEEvvENKUlRN4sycl3_V17handlerEE_clES5_EUlNS3_4itemILi2ELb1EEEE_",
+      "_ZTSZZN16parallel_erosion14LaplacianLevel4initILb1EEEvvENKUlRN4sycl3_V17handlerEE_clES5_EUlNS3_4itemILi2ELb1EEEE_"
+    ],
+    "parallel_erosion::ParallelErosion::shape": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN16parallel_erosion15ParallelErosion5shapeILb0EEEvRNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESC_SC_SC_SC_SC_ENKUlRNS0_7handlerEE_clESE_EUlNS0_2idILi2EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN16parallel_erosion15ParallelErosion5shapeILb0EEEvRNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESC_SC_SC_SC_SC_ENKUlRNS0_7handlerEE0_clESE_EUlNS0_2idILi2EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN16parallel_erosion15ParallelErosion5shapeILb1EEEvRNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESC_SC_SC_SC_SC_ENKUlRNS0_7handlerEE1_clESE_EUlNS0_2idILi2EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN16parallel_erosion15ParallelErosion5shapeILb1EEEvRNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESC_SC_SC_SC_SC_ENKUlRNS0_7handlerEE0_clESE_EUlNS0_2idILi2EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN16parallel_erosion15ParallelErosion5shapeILb1EEEvRNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESC_SC_SC_SC_SC_ENKUlRNS0_7handlerEE_clESE_EUlNS0_2idILi2EEEE_EE"
+    ],
+    "typeinfo name for parallel_erosion::ParallelErosion::shape": [
+      "_ZTSZZN16parallel_erosion15ParallelErosion5shapeILb1EEEvRN4sycl3_V16bufferIfLi2ENS3_6detail17aligned_allocatorIfEEvEES9_S9_S9_S9_S9_ENKUlRNS3_7handlerEE0_clESB_EUlNS3_2idILi2EEEE_",
+      "_ZTSZZN16parallel_erosion15ParallelErosion5shapeILb0EEEvRN4sycl3_V16bufferIfLi2ENS3_6detail17aligned_allocatorIfEEvEES9_S9_S9_S9_S9_ENKUlRNS3_7handlerEE0_clESB_EUlNS3_2idILi2EEEE_",
+      "_ZTSZZN16parallel_erosion15ParallelErosion5shapeILb0EEEvRN4sycl3_V16bufferIfLi2ENS3_6detail17aligned_allocatorIfEEvEES9_S9_S9_S9_S9_ENKUlRNS3_7handlerEE_clESB_EUlNS3_2idILi2EEEE_",
+      "_ZTSZZN16parallel_erosion15ParallelErosion5shapeILb1EEEvRN4sycl3_V16bufferIfLi2ENS3_6detail17aligned_allocatorIfEEvEES9_S9_S9_S9_S9_ENKUlRNS3_7handlerEE1_clESB_EUlNS3_2idILi2EEEE_",
+      "_ZTSZZN16parallel_erosion15ParallelErosion5shapeILb1EEEvRN4sycl3_V16bufferIfLi2ENS3_6detail17aligned_allocatorIfEEvEES9_S9_S9_S9_S9_ENKUlRNS3_7handlerEE_clESB_EUlNS3_2idILi2EEEE_"
+    ],
+    "typeinfo name for parallel_erosion::LaplacianLevel::LaplacianLevel(queue&, parallel_erosion::LaplacianLevel*)": [
+      "_ZTSZZN16parallel_erosion14LaplacianLevelC1ERN4sycl3_V15queueEPS0_ENKUlRNS2_7handlerEE_clES7_EUlT_E_"
+    ],
+    "typeinfo name for parallel_erosion::ParallelErosion::erode()": [
+      "_ZTSZZN16parallel_erosion15ParallelErosion5erodeEvENKUlRN4sycl3_V17handlerEE_clES4_EUlNS2_2idILi2EEEE_"
+    ],
+    "parallel_erosion::LaplacianLevel::LaplacianLevel(queue&, parallel_erosion::LaplacianLevel*)": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN16parallel_erosion14LaplacianLevelC1ERNS0_5queueEPS6_ENKUlRNS0_7handlerEE_clESB_EUlT_E_EE"
+    ],
+    "parallel_erosion::LaplacianLevel::reconstruct_previous_level(parallel_erosion::Parameters const&, int)": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN16parallel_erosion14LaplacianLevel26reconstruct_previous_levelERKNS5_10ParametersEiENKUlRNS0_7handlerEE_clESB_EUlT_E_EE"
+    ],
+    "typeinfo name for parallel_erosion::ParallelErosion::flow(buffer": [
+      "_ZTSZZN16parallel_erosion15ParallelErosion4flowERN4sycl3_V16bufferINS_8ParticleELi1ENS2_6detail17aligned_allocatorIS4_EEvEERNS3_IjLi1ENS6_IjEEvEESC_SC_NS2_5rangeILi1EEERNS3_IfLi2ENS6_IfEEvEESH_SH_ENKUlRNS2_7handlerEE_clESJ_EUlNS2_7nd_itemILi1EEEE_"
+    ],
+    "parallel_erosion::ParallelErosion::create_random_directions(unsigned int, int, queue)": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZZN16parallel_erosion15ParallelErosion24create_random_directionsEjiNS0_5queueEENKUlRNS0_7handlerEE_clES9_EUlT_E_EE"
+    ],
+    "parallel_erosion::ParallelErosion::render_flow(buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN16parallel_erosion15ParallelErosion11render_flowERNS0_6bufferINS5_8ParticleELi1ENS1_17aligned_allocatorIS8_EEvEERNS7_IjLi1ENS9_IjEEvEENS0_5rangeILi1EEERNS7_IfLi2ENS9_IfEEvEESK_RNS7_IiLi2ENS9_IiEEvEESN_SK_SK_ENKUlRNS0_7handlerEE0_clESP_EUlNS0_2idILi2EEEE_EE"
+    ],
+    "typeinfo name for MeshRasterizer::process_vertices(usm_ptr": [
+      "_ZTSZZN14MeshRasterizer16process_verticesER7usm_ptrIN4sycl3_V13vecIfLi3EEELi1EERNS2_5queueERN15mesh_rasterizer10ParametersEENKUlRNS2_7handlerEE_clESD_EUlNS2_2idILi1EEEE_",
+      "_ZTSZZN14MeshRasterizer16process_verticesER7usm_ptrIN4sycl3_V13vecIfLi3EEELi1EERNS2_5queueERN15mesh_rasterizer10ParametersEENKUlRNS2_7handlerEE0_clESD_EUlNS2_2idILi1EEEE_"
+    ],
+    "typeinfo name for MeshRasterizer::render": [
+      "_ZTSZN14MeshRasterizer6renderILb1ELb1ELb1ELb0EEEvfEUlN4sycl3_V12idILi1EEEE_",
+      "_ZTSZN14MeshRasterizer6renderILb1ELb0ELb1ELb0EEEvfEUlN4sycl3_V12idILi1EEEE0_",
+      "_ZTSZN14MeshRasterizer6renderILb1ELb1ELb1ELb0EEEvfEUlN4sycl3_V12idILi1EEEE0_",
+      "_ZTSZN14MeshRasterizer6renderILb0ELb1ELb1ELb0EEEvfEUlN4sycl3_V12idILi1EEEE0_",
+      "_ZTSZN14MeshRasterizer6renderILb0ELb1ELb1ELb0EEEvfEUlN4sycl3_V12idILi1EEEE_",
+      "_ZTSZN14MeshRasterizer6renderILb1ELb0ELb1ELb0EEEvfEUlN4sycl3_V12idILi1EEEE_"
+    ],
+    "MeshRasterizer::compute_tangent_space_normals(float*, float*, float*, vec": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN14MeshRasterizer29compute_tangent_space_normalsEPfS6_S6_PNS0_3vecIfLi2EEERSt6vectorINS7_IfLi3EEESaISB_EESE_EUlNS0_2idILi1EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN14MeshRasterizer29compute_tangent_space_normalsEPfS6_S6_PNS0_3vecIfLi2EEERSt6vectorINS7_IfLi3EEESaISB_EESE_EUlNS0_2idILi2EEEE_EE"
+    ],
+    "typeinfo name for MeshRasterizer::render(float*, float*, float*, vec": [
+      "_ZTSZN14MeshRasterizer6renderEPfS0_S0_PN4sycl3_V13vecIfLi3EEEEUlNS2_2idILi1EEEE_",
+      "_ZTSZN14MeshRasterizer6renderEPfS0_S0_PN4sycl3_V13vecIfLi3EEEEUlNS2_2idILi1EEEE0_"
+    ],
+    "MeshRasterizer::render": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN14MeshRasterizer6renderILb0ELb1ELb1ELb0EEEvfEUlNS0_2idILi1EEEE0_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN14MeshRasterizer6renderILb1ELb0ELb1ELb0EEEvfEUlNS0_2idILi1EEEE0_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN14MeshRasterizer6renderILb1ELb0ELb1ELb0EEEvfEUlNS0_2idILi1EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN14MeshRasterizer6renderILb0ELb1ELb1ELb0EEEvfEUlNS0_2idILi1EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN14MeshRasterizer6renderILb1ELb1ELb1ELb0EEEvfEUlNS0_2idILi1EEEE0_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN14MeshRasterizer6renderILb1ELb1ELb1ELb0EEEvfEUlNS0_2idILi1EEEE_EE"
+    ],
+    "MeshRasterizer::process_vertices(usm_ptr": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZZN14MeshRasterizer16process_verticesER7usm_ptrINS0_3vecIfLi3EEELi1EERNS0_5queueERN15mesh_rasterizer10ParametersEENKUlRNS0_7handlerEE0_clESH_EUlNS0_2idILi1EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZZN14MeshRasterizer16process_verticesER7usm_ptrINS0_3vecIfLi3EEELi1EERNS0_5queueERN15mesh_rasterizer10ParametersEENKUlRNS0_7handlerEE_clESH_EUlNS0_2idILi1EEEE_EE"
+    ],
+    "typeinfo name for MeshRasterizer::render3": [
+      "_ZTSZN14MeshRasterizer7render3ILb1ELb0ELb1ELb0EEEvvEUlN4sycl3_V17nd_itemILi1EEEE_",
+      "_ZTSZN14MeshRasterizer7render3ILb0ELb0ELb0ELb1EEEvvEUlN4sycl3_V17nd_itemILi1EEEE_"
+    ],
+    "MeshRasterizer::render(float*, float*, float*, vec": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN14MeshRasterizer6renderEPfS6_S6_PNS0_3vecIfLi3EEEEUlNS0_2idILi1EEEE0_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN14MeshRasterizer6renderEPfS6_S6_PNS0_3vecIfLi3EEEEUlNS0_2idILi1EEEE_EE"
+    ],
+    "MeshRasterizer::process_vertices_with_displacement": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZZN14MeshRasterizer34process_vertices_with_displacementILb0EEEvR7usm_ptrINS0_3vecIfLi3EEELi1EESB_RS7_IfLi2EESD_SD_RNS0_5queueERN15mesh_rasterizer10ParametersEENKUlRNS0_7handlerEE_clESK_EUlNS0_2idILi1EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZZN14MeshRasterizer34process_vertices_with_displacementILb1EEEvR7usm_ptrINS0_3vecIfLi3EEELi1EESB_RS7_IfLi2EESD_SD_RNS0_5queueERN15mesh_rasterizer10ParametersEENKUlRNS0_7handlerEE_clESK_EUlNS0_2idILi1EEEE_EE"
+    ],
+    "typeinfo name for detail::reduCGFuncMulti": [
+      "_ZTSZZN4sycl3_V16detail15reduCGFuncMultiINS1_9auto_nameEZNS1_22reduction_parallel_forIS3_LNS1_9reduction8strategyE0ELi1ENS0_3ext6oneapi12experimental10propertiesISt5tupleIJEEEEJNS1_14reduction_implIfNS0_7minimumIfEELi0ELy1ELb0EPfEENSE_IfNS0_7maximumIfEELi0ELy1ELb0ESH_EESI_SL_SI_SL_ZZ20compute_bounding_boxR7usm_ptrINS0_3vecIfLi3EEELi1EERNS0_5queueERfST_ST_ST_ST_ST_ENKUlRNS0_7handlerEE_clESV_EUlNS0_2idILi1EEERT_RT0_RT1_RT2_RT3_RT4_E_EEEvSV_NS0_5rangeIXT1_EEES15_DpT3_EUlSZ_DpRT0_E_Li1ESD_JSI_SL_SI_SL_SI_SL_EJLy0ELy1ELy2ELy3ELy4ELy5EEEEvSV_S11_RKNS0_8nd_rangeIXT1_EEES15_RSB_IJS1F_EESt16integer_sequenceIyJXspT4_EEEENKUlSZ_S11_E_clINS1_19KernelMultipleWGTagENS1_5tupleIJNS0_8accessorINS1_14ReducerElementIfSG_Lb0EEELi1ELNS0_6access4modeE1026ELNS1Z_6targetE2014ELNS1Z_11placeholderE0ENS8_22accessor_property_listIJEEEEENS1W_INS1X_IfSK_Lb0EEELi1ELS20_1026ELS21_2014ELS22_0ES24_EES25_S27_S25_S27_EEEEEDaSZ_S11_EUlNS0_7nd_itemILi1EEEE_",
+      "_ZTSZZN4sycl3_V16detail15reduCGFuncMultiINS1_9auto_nameEZNS1_22reduction_parallel_forIS3_LNS1_9reduction8strategyE0ELi1ENS0_3ext6oneapi12experimental10propertiesISt5tupleIJEEEEJNS1_14reduction_implIfNS0_7minimumIfEELi0ELy1ELb0EPfEENSE_IfNS0_7maximumIfEELi0ELy1ELb0ESH_EESI_SL_SI_SL_ZZ20compute_bounding_boxR7usm_ptrINS0_3vecIfLi3EEELi1EERNS0_5queueERfST_ST_ST_ST_ST_ENKUlRNS0_7handlerEE_clESV_EUlNS0_2idILi1EEERT_RT0_RT1_RT2_RT3_RT4_E_EEEvSV_NS0_5rangeIXT1_EEES15_DpT3_EUlSZ_DpRT0_E_Li1ESD_JSI_SL_SI_SL_SI_SL_EJLy0ELy1ELy2ELy3ELy4ELy5EEEEvSV_S11_RKNS0_8nd_rangeIXT1_EEES15_RSB_IJS1F_EESt16integer_sequenceIyJXspT4_EEEENKUlSZ_S11_E_clINS1_14KernelOneWGTagENS1_5tupleIJSH_SH_SH_SH_SH_SH_EEEEEDaSZ_S11_EUlNS0_7nd_itemILi1EEEE_"
+    ],
+    "typeinfo name for MeshRasterizer::compute_tangent_space_normals(float*, float*, float*, vec": [
+      "_ZTSZN14MeshRasterizer29compute_tangent_space_normalsEPfS0_S0_PN4sycl3_V13vecIfLi2EEERSt6vectorINS3_IfLi3EEESaIS7_EESA_EUlNS2_2idILi1EEEE_",
+      "_ZTSZN14MeshRasterizer29compute_tangent_space_normalsEPfS0_S0_PN4sycl3_V13vecIfLi2EEERSt6vectorINS3_IfLi3EEESaIS7_EESA_EUlNS2_2idILi2EEEE_"
+    ],
+    "typeinfo name for MeshRasterizer::process_vertices_with_displacement": [
+      "_ZTSZZN14MeshRasterizer34process_vertices_with_displacementILb0EEEvR7usm_ptrIN4sycl3_V13vecIfLi3EEELi1EES7_RS1_IfLi2EES9_S9_RNS3_5queueERN15mesh_rasterizer10ParametersEENKUlRNS3_7handlerEE_clESG_EUlNS3_2idILi1EEEE_",
+      "_ZTSZZN14MeshRasterizer34process_vertices_with_displacementILb1EEEvR7usm_ptrIN4sycl3_V13vecIfLi3EEELi1EES7_RS1_IfLi2EES9_S9_RNS3_5queueERN15mesh_rasterizer10ParametersEENKUlRNS3_7handlerEE_clESG_EUlNS3_2idILi1EEEE_"
+    ],
+    "MeshRasterizer::render3_cpu": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN14MeshRasterizer11render3_cpuILb0ELb0ELb0ELb1EEEvvEUlNS0_2idILi1EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN14MeshRasterizer11render3_cpuILb1ELb0ELb1ELb0EEEvvEUlNS0_2idILi1EEEE_EE"
+    ],
+    "typeinfo name for MeshRasterizer::render3_cpu": [
+      "_ZTSZN14MeshRasterizer11render3_cpuILb0ELb0ELb0ELb1EEEvvEUlN4sycl3_V12idILi1EEEE_",
+      "_ZTSZN14MeshRasterizer11render3_cpuILb1ELb0ELb1ELb0EEEvvEUlN4sycl3_V12idILi1EEEE_"
+    ],
+    "typeinfo name for detail::reduAuxCGFunc": [
+      "_ZTSZZN4sycl3_V16detail13reduAuxCGFuncINS1_9auto_nameEZNS1_22reduction_parallel_forIS3_LNS1_9reduction8strategyE0ELi1ENS0_3ext6oneapi12experimental10propertiesISt5tupleIJEEEEJNS1_14reduction_implIfNS0_7minimumIfEELi0ELy1ELb0EPfEENSE_IfNS0_7maximumIfEELi0ELy1ELb0ESH_EESI_SL_SI_SL_ZZ20compute_bounding_boxR7usm_ptrINS0_3vecIfLi3EEELi1EERNS0_5queueERfST_ST_ST_ST_ST_ENKUlRNS0_7handlerEE_clESV_EUlNS0_2idILi1EEERT_RT0_RT1_RT2_RT3_RT4_E_EEEvSV_NS0_5rangeIXT1_EEES15_DpT3_EUlSZ_DpRT0_E_JSI_SL_SI_SL_SI_SL_EJLy0ELy1ELy2ELy3ELy4ELy5EEEEySV_yyRSB_IJDpT1_EESt16integer_sequenceIyJXspT2_EEEENKUlSZ_S11_E_clINS1_26IsNonUsmReductionPredicateENS1_5tupleIJSH_SH_SH_SH_SH_SH_EEEEEDaSZ_S11_EUlNS0_7nd_itemILi1EEEE_",
+      "_ZTSZZN4sycl3_V16detail13reduAuxCGFuncINS1_9auto_nameEZNS1_22reduction_parallel_forIS3_LNS1_9reduction8strategyE0ELi1ENS0_3ext6oneapi12experimental10propertiesISt5tupleIJEEEEJNS1_14reduction_implIfNS0_7minimumIfEELi0ELy1ELb0EPfEENSE_IfNS0_7maximumIfEELi0ELy1ELb0ESH_EESI_SL_SI_SL_ZZ20compute_bounding_boxR7usm_ptrINS0_3vecIfLi3EEELi1EERNS0_5queueERfST_ST_ST_ST_ST_ENKUlRNS0_7handlerEE_clESV_EUlNS0_2idILi1EEERT_RT0_RT1_RT2_RT3_RT4_E_EEEvSV_NS0_5rangeIXT1_EEES15_DpT3_EUlSZ_DpRT0_E_JSI_SL_SI_SL_SI_SL_EJLy0ELy1ELy2ELy3ELy4ELy5EEEEySV_yyRSB_IJDpT1_EESt16integer_sequenceIyJXspT2_EEEENKUlSZ_S11_E_clINS1_23EmptyReductionPredicateENS1_5tupleIJNS0_8accessorINS1_14ReducerElementIfSG_Lb0EEELi1ELNS0_6access4modeE1026ELNS1X_6targetE2014ELNS1X_11placeholderE0ENS8_22accessor_property_listIJEEEEENS1U_INS1V_IfSK_Lb0EEELi1ELS1Y_1026ELS1Z_2014ELS20_0ES22_EES23_S25_S23_S25_EEEEEDaSZ_S11_EUlNS0_7nd_itemILi1EEEE_"
+    ],
+    "lighting::compute_normals_and_init_photonmap(lighting::Parameters const&, buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN8lighting34compute_normals_and_init_photonmapERKNS5_10ParametersERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEERNS9_IiLi2ENSA_IiEEvEERNS9_INS0_3vecIfLi3EEELi2ENSA_ISI_EEvEERNS0_5queueEENKUlRNS0_7handlerEE_clESP_EUlT_E_EE"
+    ],
+    "typeinfo name for lighting::LaplacianLevel::reconstruct(lighting::Parameters const&)": [
+      "_ZTSZZN8lighting14LaplacianLevel11reconstructERKNS_10ParametersEENKUlRN4sycl3_V17handlerEE_clES7_EUlT_E_",
+      "_ZTSZZN8lighting14LaplacianLevel11reconstructERKNS_10ParametersEENKUlRN4sycl3_V17handlerEE0_clES7_EUlT_E_"
+    ],
+    "lighting::LightingSYCL::compute_normals_and_init_photonmap(lighting::Parameters const&, buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN8lighting12LightingSYCL34compute_normals_and_init_photonmapERKNS5_10ParametersERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEERNSA_IiLi2ENSB_IiEEvEESE_ENKUlRNS0_7handlerEE_clESJ_EUlT_E_EE"
+    ],
+    "lighting::raytrace_ao(lighting::Parameters&, buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN8lighting11raytrace_aoERNS5_10ParametersERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEERNS8_INS0_3vecIfLi3EEELi2ENS9_ISE_EEvEESC_RNS8_IiLi2ENS9_IiEEvEERNS8_ISE_Li1ESF_vEERNS8_INSD_IfLi2EEELi1ENS9_ISN_EEvEERNS0_5queueEiiENKUlRNS0_7handlerEE0_clESU_EUlT_E_EE"
+    ],
+    "lighting::LightingSYCL::compose_light()": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN8lighting12LightingSYCL13compose_lightEvENKUlRNS0_7handlerEE0_clES8_EUlT_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN8lighting12LightingSYCL13compose_lightEvENKUlRNS0_7handlerEE_clES8_EUlT_E_EE"
+    ],
+    "typeinfo name for lighting::LightingSYCL::compute_diffuse_light()": [
+      "_ZTSZZN8lighting12LightingSYCL21compute_diffuse_lightEvENKUlRN4sycl3_V17handlerEE_clES4_EUlT_E_"
+    ],
+    "typeinfo name for lighting::LightingSYCL::compose_light()": [
+      "_ZTSZZN8lighting12LightingSYCL13compose_lightEvENKUlRN4sycl3_V17handlerEE0_clES4_EUlT_E_",
+      "_ZTSZZN8lighting12LightingSYCL13compose_lightEvENKUlRN4sycl3_V17handlerEE_clES4_EUlT_E_"
+    ],
+    "typeinfo name for lighting::LightingSYCL::compute_normals_and_init_photonmap(lighting::Parameters const&, buffer": [
+      "_ZTSZZN8lighting12LightingSYCL34compute_normals_and_init_photonmapERKNS_10ParametersERN4sycl3_V16bufferIfLi2ENS5_6detail17aligned_allocatorIfEEvEERNS6_IiLi2ENS8_IiEEvEESB_ENKUlRNS5_7handlerEE_clESG_EUlT_E_"
+    ],
+    "typeinfo name for lighting::LightingSYCL::raytrace_shadows()": [
+      "_ZTSZZN8lighting12LightingSYCL16raytrace_shadowsEvENKUlRN4sycl3_V17handlerEE_clES4_EUlNS2_7nd_itemILi1EEEE_",
+      "_ZTSZZN8lighting12LightingSYCL16raytrace_shadowsEvENKUlRN4sycl3_V17handlerEE0_clES4_EUlT_E_"
+    ],
+    "lighting::LaplacianLevel::reconstruct(lighting::Parameters const&)": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN8lighting14LaplacianLevel11reconstructERKNS5_10ParametersEENKUlRNS0_7handlerEE_clESB_EUlT_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN8lighting14LaplacianLevel11reconstructERKNS5_10ParametersEENKUlRNS0_7handlerEE0_clESB_EUlT_E_EE"
+    ],
+    "lighting::LightingSYCL::compute_hybrid_ao()": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN8lighting12LightingSYCL17compute_hybrid_aoEvENKUlRNS0_7handlerEE_clES8_EUlT_E_EE"
+    ],
+    "typeinfo name for lighting::compute_normals_and_init_photonmap(lighting::Parameters const&, buffer": [
+      "_ZTSZZN8lighting34compute_normals_and_init_photonmapERKNS_10ParametersERN4sycl3_V16bufferIfLi2ENS4_6detail17aligned_allocatorIfEEvEERNS5_IiLi2ENS7_IiEEvEERNS5_INS4_3vecIfLi3EEELi2ENS7_ISF_EEvEERNS4_5queueEENKUlRNS4_7handlerEE_clESM_EUlT_E_"
+    ],
+    "lighting::LightingSYCL::compute_diffuse_light()": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN8lighting12LightingSYCL21compute_diffuse_lightEvENKUlRNS0_7handlerEE_clES8_EUlT_E_EE"
+    ],
+    "typeinfo name for lighting::LightingSYCL::compute_hybrid_ao()": [
+      "_ZTSZZN8lighting12LightingSYCL17compute_hybrid_aoEvENKUlRN4sycl3_V17handlerEE_clES4_EUlT_E_"
+    ],
+    "typeinfo name for lighting::raytrace_ao(lighting::Parameters&, buffer": [
+      "_ZTSZZN8lighting11raytrace_aoERNS_10ParametersERN4sycl3_V16bufferIfLi2ENS3_6detail17aligned_allocatorIfEEvEERNS4_INS3_3vecIfLi3EEELi2ENS6_ISB_EEvEES9_RNS4_IiLi2ENS6_IiEEvEERNS4_ISB_Li1ESC_vEERNS4_INSA_IfLi2EEELi1ENS6_ISK_EEvEERNS3_5queueEiiENKUlRNS3_7handlerEE0_clESR_EUlT_E_",
+      "_ZTSZZN8lighting11raytrace_aoERNS_10ParametersERN4sycl3_V16bufferIfLi2ENS3_6detail17aligned_allocatorIfEEvEERNS4_INS3_3vecIfLi3EEELi2ENS6_ISB_EEvEES9_RNS4_IiLi2ENS6_IiEEvEERNS4_ISB_Li1ESC_vEERNS4_INSA_IfLi2EEELi1ENS6_ISK_EEvEERNS3_5queueEiiENKUlRNS3_7handlerEE_clESR_EUlNS3_7nd_itemILi1EEEE_"
+    ],
+    "lighting::raytrace_ao_sl(lighting::Parameters&, buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN8lighting14raytrace_ao_slERNS5_10ParametersERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEERNS8_INS0_3vecIfLi3EEELi2ENS9_ISE_EEvEESC_RNS8_IiLi2ENS9_IiEEvEERNS8_ISE_Li1ESF_vEERNS8_INSD_IfLi2EEELi1ENS9_ISN_EEvEERNS8_IfLi1ESA_vEERNS0_5queueEifENKUlRNS0_7handlerEE0_clESW_EUlT_E_EE"
+    ],
+    "typeinfo name for lighting::raytrace_ao_sl(lighting::Parameters&, buffer": [
+      "_ZTSZZN8lighting14raytrace_ao_slERNS_10ParametersERN4sycl3_V16bufferIfLi2ENS3_6detail17aligned_allocatorIfEEvEERNS4_INS3_3vecIfLi3EEELi2ENS6_ISB_EEvEES9_RNS4_IiLi2ENS6_IiEEvEERNS4_ISB_Li1ESC_vEERNS4_INSA_IfLi2EEELi1ENS6_ISK_EEvEERNS4_IfLi1ES7_vEERNS3_5queueEifENKUlRNS3_7handlerEE_clEST_EUlNS3_7nd_itemILi1EEEE_",
+      "_ZTSZZN8lighting14raytrace_ao_slERNS_10ParametersERN4sycl3_V16bufferIfLi2ENS3_6detail17aligned_allocatorIfEEvEERNS4_INS3_3vecIfLi3EEELi2ENS6_ISB_EEvEES9_RNS4_IiLi2ENS6_IiEEvEERNS4_ISB_Li1ESC_vEERNS4_INSA_IfLi2EEELi1ENS6_ISK_EEvEERNS4_IfLi1ES7_vEERNS3_5queueEifENKUlRNS3_7handlerEE0_clEST_EUlT_E_"
+    ],
+    "lighting::LightingSYCL::raytrace_shadows()": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN8lighting12LightingSYCL16raytrace_shadowsEvENKUlRNS0_7handlerEE0_clES8_EUlT_E_EE"
+    ],
+    "flow::Flow::process()": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN4flow4Flow7processEvENKUlRNS0_7handlerEE0_clES8_EUlS4_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN4flow4Flow7processEvENKUlRNS0_7handlerEE1_clES8_EUlS4_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN4flow4Flow7processEvENKUlRNS0_7handlerEE_clES8_EUlS4_E_EE"
+    ],
+    "flow::Flow::flow(buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZZN4flow4Flow4flowERNS0_6bufferINS0_3vecIfLi2EEELi1ENS1_17aligned_allocatorIS9_EEvEEjjjjRNS7_IfLi2ENSA_IfEEvEESG_SD_ENKUlRNS0_7handlerEE_clESI_EUlT_E_EE"
+    ],
+    "typeinfo name for flow::Flow::process()": [
+      "_ZTSZZN4flow4Flow7processEvENKUlRN4sycl3_V17handlerEE_clES4_EUlNS2_4itemILi2ELb1EEEE_",
+      "_ZTSZZN4flow4Flow7processEvENKUlRN4sycl3_V17handlerEE0_clES4_EUlNS2_4itemILi2ELb1EEEE_",
+      "_ZTSZZN4flow4Flow7processEvENKUlRN4sycl3_V17handlerEE1_clES4_EUlNS2_4itemILi2ELb1EEEE_"
+    ],
+    "typeinfo name for flow::Flow::fill_pits(buffer": [
+      "_ZTSZZN4flow4Flow9fill_pitsERN4sycl3_V16bufferIfLi2ENS2_6detail17aligned_allocatorIfEEvEES8_ENKUlRNS2_7handlerEE_clESA_EUlT_E_",
+      "_ZTSZZN4flow4Flow9fill_pitsERN4sycl3_V16bufferIfLi2ENS2_6detail17aligned_allocatorIfEEvEES8_S8_ENKUlRNS2_7handlerEE0_clESA_EUlNS2_4itemILi2ELb1EEEE_",
+      "_ZTSZZN4flow4Flow9fill_pitsERN4sycl3_V16bufferIfLi2ENS2_6detail17aligned_allocatorIfEEvEES8_ENKUlRNS2_7handlerEE0_clESA_EUlNS2_4itemILi2ELb1EEEE_",
+      "_ZTSZZN4flow4Flow9fill_pitsERN4sycl3_V16bufferIfLi2ENS2_6detail17aligned_allocatorIfEEvEES8_S8_ENKUlRNS2_7handlerEE_clESA_EUlT_E_"
+    ],
+    "flow::Flow::fill_pits(buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN4flow4Flow9fill_pitsERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESB_SB_ENKUlRNS0_7handlerEE_clESD_EUlT_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN4flow4Flow9fill_pitsERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESB_SB_ENKUlRNS0_7handlerEE0_clESD_EUlS4_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN4flow4Flow9fill_pitsERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESB_ENKUlRNS0_7handlerEE_clESD_EUlT_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN4flow4Flow9fill_pitsERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESB_ENKUlRNS0_7handlerEE0_clESD_EUlS4_E_EE"
+    ],
+    "flow::LaplacianLevel::reconstruct(flow::Parameters const&)": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN4flow14LaplacianLevel11reconstructERKNS5_10ParametersEENKUlRNS0_7handlerEE_clESB_EUlT_E_EE"
+    ],
+    "flow::LaplacianLevel::create_subsequent_level(flow::Parameters&)": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN4flow14LaplacianLevel23create_subsequent_levelERNS5_10ParametersEENKUlRNS0_7handlerEE_clESA_EUlT_E_EE"
+    ],
+    "typeinfo name for flow::LaplacianLevel::reconstruct(flow::Parameters const&)": [
+      "_ZTSZZN4flow14LaplacianLevel11reconstructERKNS_10ParametersEENKUlRN4sycl3_V17handlerEE_clES7_EUlT_E_"
+    ],
+    "typeinfo name for handler::fill": [
+      "_ZTSZN4sycl3_V17handler4fillIfLi2ELNS0_6access4modeE1025ELNS3_6targetE2014ELNS3_11placeholderE0ENS0_3ext6oneapi22accessor_property_listIJEEEEEvNS0_8accessorIT_XT0_EXT1_EXT2_EXT3_ET4_EERKSC_EUlNS0_2idILi2EEEE_"
+    ],
+    "typeinfo name for flow::Flow::flow(buffer": [
+      "_ZTSZZN4flow4Flow4flowERN4sycl3_V16bufferINS2_3vecIfLi2EEELi1ENS2_6detail17aligned_allocatorIS5_EEvEEjjjjRNS3_IfLi2ENS7_IfEEvEESD_SA_ENKUlRNS2_7handlerEE_clESF_EUlT_E_"
+    ],
+    "handler::fill": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZNS0_7handler4fillIfLi2ELNS0_6access4modeE1025ELNS7_6targetE2014ELNS7_11placeholderE0ENS0_3ext6oneapi22accessor_property_listIJEEEEEvNS0_8accessorIT_XT0_EXT1_EXT2_EXT3_ET4_EERKSG_EUlNS0_2idILi2EEEE_EE"
+    ],
+    "typeinfo name for flow::LaplacianLevel::create_subsequent_level(flow::Parameters&)": [
+      "_ZTSZZN4flow14LaplacianLevel23create_subsequent_levelERNS_10ParametersEENKUlRN4sycl3_V17handlerEE_clES6_EUlT_E_"
+    ],
+    "color_transport::LaplacianLevel::LaplacianLevel(buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN15color_transport14LaplacianLevelC1ERKNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEERNS0_5queueEPS6_ENKUlRNS0_7handlerEE_clESH_EUlT_E_EE"
+    ],
+    "color_transport::ColorTransport::process()": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN15color_transport14ColorTransport7processEvENKUlRNS0_7handlerEE0_clES8_EUlS4_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN15color_transport14ColorTransport7processEvENKUlRNS0_7handlerEE1_clES8_EUlS4_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN15color_transport14ColorTransport7processEvENKUlRNS0_7handlerEE_clES8_EUlS4_E_EE"
+    ],
+    "typeinfo name for color_transport::ColorTransport::fill_pits(buffer": [
+      "_ZTSZZN15color_transport14ColorTransport9fill_pitsERN4sycl3_V16bufferIfLi2ENS2_6detail17aligned_allocatorIfEEvEES8_S8_ENKUlRNS2_7handlerEE_clESA_EUlT_E_",
+      "_ZTSZZN15color_transport14ColorTransport9fill_pitsERN4sycl3_V16bufferIfLi2ENS2_6detail17aligned_allocatorIfEEvEES8_S8_ENKUlRNS2_7handlerEE0_clESA_EUlNS2_4itemILi2ELb1EEEE_",
+      "_ZTSZZN15color_transport14ColorTransport9fill_pitsERN4sycl3_V16bufferIfLi2ENS2_6detail17aligned_allocatorIfEEvEES8_ENKUlRNS2_7handlerEE0_clESA_EUlNS2_4itemILi2ELb1EEEE_",
+      "_ZTSZZN15color_transport14ColorTransport9fill_pitsERN4sycl3_V16bufferIfLi2ENS2_6detail17aligned_allocatorIfEEvEES8_ENKUlRNS2_7handlerEE_clESA_EUlT_E_"
+    ],
+    "color_transport::ColorTransport::fill_pits(buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN15color_transport14ColorTransport9fill_pitsERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESB_ENKUlRNS0_7handlerEE0_clESD_EUlS4_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN15color_transport14ColorTransport9fill_pitsERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESB_ENKUlRNS0_7handlerEE_clESD_EUlT_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN15color_transport14ColorTransport9fill_pitsERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESB_SB_ENKUlRNS0_7handlerEE_clESD_EUlT_E_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN15color_transport14ColorTransport9fill_pitsERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESB_SB_ENKUlRNS0_7handlerEE0_clESD_EUlS4_E_EE"
+    ],
+    "typeinfo name for color_transport::LaplacianLevel::LaplacianLevel(buffer": [
+      "_ZTSZZN15color_transport14LaplacianLevelC1ERKN4sycl3_V16bufferIfLi2ENS2_6detail17aligned_allocatorIfEEvEERNS2_5queueEPS0_ENKUlRNS2_7handlerEE_clESE_EUlT_E_"
+    ],
+    "typeinfo name for color_transport::LaplacianLevel::create_subsequent_level(color_transport::Parameters&)": [
+      "_ZTSZZN15color_transport14LaplacianLevel23create_subsequent_levelERNS_10ParametersEENKUlRN4sycl3_V17handlerEE_clES6_EUlT_E_"
+    ],
+    "color_transport::ColorTransport::color_transport_full(buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZZN15color_transport14ColorTransport20color_transport_fullERNS0_6bufferINS0_3vecIfLi2EEELi1ENS1_17aligned_allocatorIS9_EEvEEjjfjRNS7_IfLi2ENSA_IfEEvEESG_SG_SG_SG_SG_SG_SG_SD_SG_bENKUlRNS0_7handlerEE_clESI_EUlT_E_EE"
+    ],
+    "typeinfo name for color_transport::ColorTransport::process()": [
+      "_ZTSZZN15color_transport14ColorTransport7processEvENKUlRN4sycl3_V17handlerEE1_clES4_EUlNS2_4itemILi2ELb1EEEE_",
+      "_ZTSZZN15color_transport14ColorTransport7processEvENKUlRN4sycl3_V17handlerEE_clES4_EUlNS2_4itemILi2ELb1EEEE_",
+      "_ZTSZZN15color_transport14ColorTransport7processEvENKUlRN4sycl3_V17handlerEE0_clES4_EUlNS2_4itemILi2ELb1EEEE_"
+    ],
+    "color_transport::LaplacianLevel::create_subsequent_level(color_transport::Parameters&)": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN15color_transport14LaplacianLevel23create_subsequent_levelERNS5_10ParametersEENKUlRNS0_7handlerEE_clESA_EUlT_E_EE"
+    ],
+    "color_transport::LaplacianLevel::reconstruct(color_transport::Parameters const&)": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN15color_transport14LaplacianLevel11reconstructERKNS5_10ParametersEENKUlRNS0_7handlerEE_clESB_EUlT_E_EE"
+    ],
+    "typeinfo name for color_transport::LaplacianLevel::reconstruct(color_transport::Parameters const&)": [
+      "_ZTSZZN15color_transport14LaplacianLevel11reconstructERKNS_10ParametersEENKUlRN4sycl3_V17handlerEE_clES7_EUlT_E_"
+    ],
+    "color_transport::ColorTransport::color_transport(buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZZN15color_transport14ColorTransport15color_transportERNS0_6bufferINS0_3vecIfLi2EEELi1ENS1_17aligned_allocatorIS9_EEvEEjjfjRNS7_IfLi2ENSA_IfEEvEESG_SG_SG_SG_SG_SG_SG_SD_SG_bENKUlRNS0_7handlerEE_clESI_EUlT_E_EE"
+    ],
+    "typeinfo name for color_transport::ColorTransport::color_transport(buffer": [
+      "_ZTSZZN15color_transport14ColorTransport15color_transportERN4sycl3_V16bufferINS2_3vecIfLi2EEELi1ENS2_6detail17aligned_allocatorIS5_EEvEEjjfjRNS3_IfLi2ENS7_IfEEvEESD_SD_SD_SD_SD_SD_SD_SA_SD_bENKUlRNS2_7handlerEE_clESF_EUlT_E_"
+    ],
+    "typeinfo name for color_transport::ColorTransport::color_transport_full(buffer": [
+      "_ZTSZZN15color_transport14ColorTransport20color_transport_fullERN4sycl3_V16bufferINS2_3vecIfLi2EEELi1ENS2_6detail17aligned_allocatorIS5_EEvEEjjfjRNS3_IfLi2ENS7_IfEEvEESD_SD_SD_SD_SD_SD_SD_SA_SD_bENKUlRNS2_7handlerEE_clESF_EUlT_E_"
+    ],
+    "typeinfo name for Cellular3D::render": [
+      "_ZTSZN10Cellular3D6renderILi0EEEvPfS1_S1_EUlN4sycl3_V12idILi1EEEE_",
+      "_ZTSZN10Cellular3D6renderILi1EEEvPfS1_S1_EUlN4sycl3_V12idILi2EEEE1_",
+      "_ZTSZN10Cellular3D6renderILi1EEEvPfS1_S1_EUlN4sycl3_V12idILi2EEEE0_",
+      "_ZTSZN10Cellular3D6renderILi0EEEvPfS1_S1_EUlN4sycl3_V12idILi2EEEE0_",
+      "_ZTSZN10Cellular3D6renderILi0EEEvPfS1_S1_EUlN4sycl3_V12idILi2EEEE_",
+      "_ZTSZN10Cellular3D6renderILi1EEEvPfS1_S1_EUlN4sycl3_V12idILi2EEEE_",
+      "_ZTSZN10Cellular3D6renderILi0EEEvPfS1_S1_EUlN4sycl3_V12idILi2EEEE1_",
+      "_ZTSZN10Cellular3D6renderILi1EEEvPfS1_S1_EUlN4sycl3_V12idILi1EEEE_"
+    ],
+    "Cellular3D::render": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN10Cellular3D6renderILi0EEEvPfS7_S7_EUlNS0_2idILi2EEEE0_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN10Cellular3D6renderILi1EEEvPfS7_S7_EUlNS0_2idILi2EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN10Cellular3D6renderILi0EEEvPfS7_S7_EUlNS0_2idILi2EEEE1_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN10Cellular3D6renderILi1EEEvPfS7_S7_EUlNS0_2idILi2EEEE0_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN10Cellular3D6renderILi1EEEvPfS7_S7_EUlNS0_2idILi2EEEE1_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN10Cellular3D6renderILi0EEEvPfS7_S7_EUlNS0_2idILi1EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi1ELb1EEELi1EZN10Cellular3D6renderILi1EEEvPfS7_S7_EUlNS0_2idILi1EEEE_EE",
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN10Cellular3D6renderILi0EEEvPfS7_S7_EUlNS0_2idILi2EEEE_EE"
+    ],
+    "resampling::downsample_box(usm_ptr": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN10resamplingL14downsample_boxER7usm_ptrIfLi2EES8_EUlT_E_EE"
+    ],
+    "typeinfo name for resampling::downsample_box(usm_ptr": [
+      "_ZTSZN10resamplingL14downsample_boxER7usm_ptrIfLi2EES2_EUlT_E_"
+    ],
+    "resampling::upsample_box(usm_ptr": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN10resamplingL12upsample_boxER7usm_ptrIfLi2EEEUlT_E_EE"
+    ],
+    "typeinfo name for resampling::sharpen_magic(buffer": [
+      "_ZTSZZN10resamplingL13sharpen_magicERN4sycl3_V16bufferIfLi2ENS1_6detail17aligned_allocatorIfEEvEERNS1_5queueEENKUlRNS1_7handlerEE_clESB_EUlT_E_"
+    ],
+    "resampling::upsample_magic(buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN10resamplingL14upsample_magicERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEERNS0_5queueEENKUlRNS0_7handlerEE_clESE_EUlT_E_EE"
+    ],
+    "typeinfo name for resampling::downsample_magic(buffer": [
+      "_ZTSZZN10resamplingL16downsample_magicERN4sycl3_V16bufferIfLi2ENS1_6detail17aligned_allocatorIfEEvEES7_RNS1_5queueEENKUlRNS1_7handlerEE_clESB_EUlT_E_"
+    ],
+    "typeinfo name for resampling::sharpen_magic(usm_ptr": [
+      "_ZTSZN10resamplingL13sharpen_magicER7usm_ptrIfLi2EEEUlT_E_"
+    ],
+    "resampling::downsample_magic(usm_ptr": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN10resamplingL16downsample_magicER7usm_ptrIfLi2EES8_EUlT_E_EE"
+    ],
+    "resampling::downsample_gaussian_5x5(usm_ptr": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN10resamplingL23downsample_gaussian_5x5ER7usm_ptrIfLi2EES8_EUlT_E_EE"
+    ],
+    "resampling::upsample_magic(usm_ptr": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN10resamplingL14upsample_magicER7usm_ptrIfLi2EEEUlT_E_EE"
+    ],
+    "typeinfo name for resampling::upsample_box(usm_ptr": [
+      "_ZTSZN10resamplingL12upsample_boxER7usm_ptrIfLi2EEEUlT_E_"
+    ],
+    "resampling::sharpen_magic(buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN10resamplingL13sharpen_magicERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEERNS0_5queueEENKUlRNS0_7handlerEE_clESE_EUlT_E_EE"
+    ],
+    "resampling::sharpen_magic(usm_ptr": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZN10resamplingL13sharpen_magicER7usm_ptrIfLi2EEEUlT_E_EE"
+    ],
+    "typeinfo name for resampling::upsample_magic(buffer": [
+      "_ZTSZZN10resamplingL14upsample_magicERN4sycl3_V16bufferIfLi2ENS1_6detail17aligned_allocatorIfEEvEERNS1_5queueEENKUlRNS1_7handlerEE_clESB_EUlT_E_"
+    ],
+    "typeinfo name for resampling::upsample_magic(usm_ptr": [
+      "_ZTSZN10resamplingL14upsample_magicER7usm_ptrIfLi2EEEUlT_E_"
+    ],
+    "resampling::downsample_box(buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN10resamplingL14downsample_boxERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESA_RNS0_5queueEENKUlRNS0_7handlerEE_clESE_EUlT_E_EE"
+    ],
+    "typeinfo name for resampling::downsample_gaussian_5x5(usm_ptr": [
+      "_ZTSZN10resamplingL23downsample_gaussian_5x5ER7usm_ptrIfLi2EES2_EUlT_E_"
+    ],
+    "typeinfo name for resampling::downsample_box(buffer": [
+      "_ZTSZZN10resamplingL14downsample_boxERN4sycl3_V16bufferIfLi2ENS1_6detail17aligned_allocatorIfEEvEES7_RNS1_5queueEENKUlRNS1_7handlerEE_clESB_EUlT_E_"
+    ],
+    "resampling::upsample_box(buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN10resamplingL12upsample_boxERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEERNS0_5queueEENKUlRNS0_7handlerEE_clESE_EUlT_E_EE"
+    ],
+    "typeinfo name for resampling::upsample_box(buffer": [
+      "_ZTSZZN10resamplingL12upsample_boxERN4sycl3_V16bufferIfLi2ENS1_6detail17aligned_allocatorIfEEvEERNS1_5queueEENKUlRNS1_7handlerEE_clESB_EUlT_E_"
+    ],
+    "typeinfo name for resampling::downsample_magic(usm_ptr": [
+      "_ZTSZN10resamplingL16downsample_magicER7usm_ptrIfLi2EES2_EUlT_E_"
+    ],
+    "resampling::downsample_magic(buffer": [
+      "_ZTSN4sycl3_V16detail18RoundedRangeKernelINS0_4itemILi2ELb1EEELi2EZZN10resamplingL16downsample_magicERNS0_6bufferIfLi2ENS1_17aligned_allocatorIfEEvEESA_RNS0_5queueEENKUlRNS0_7handlerEE_clESE_EUlT_E_EE"
+    ]
+  }
+}

@@ -1,126 +1,120 @@
-# Gaea's oneAPI kernels are embedded SPIR-V
+# Gaea's oneAPI kernels: an interface inventory, not implementations
 
-## What was found
+> **Correction.** An earlier version of this document claimed that `Gaea.oneAPI.dll`'s
+> embedded SPIR-V made Gaea's particle-erosion **bodies** readable, and that the SPIR-V route
+> therefore removed the need for Ghidra. **That was wrong and is retracted here.** It rested
+> on a carve that ran from one SPIR-V magic to the next, swallowing a `0x17171717` fill
+> pattern and the adjacent data after it. That trailing region decoded as plausible
+> instructions — 76 "functions" with recognisable names — which made a metadata blob look
+> like executable code.
 
-`Gaea.oneAPI.dll` (15,393,280 bytes) contains **13 embedded SPIR-V modules**. SPIR-V is a
-well-specified IR, not opaque machine code, so these are **readable kernel bodies** — and
-they carry C++ symbol names from Intel's DPC++ (generator `0x6000e`).
+## What the modules actually are
 
-This changes the earlier conclusion in `gaps-vs-gaea.md`. That document recorded, correctly
-for the time, that the native kernels were never disassembled and that only 15 kernel
-signatures were known. But `Gaea.oneAPI.dll` did not need disassembling: **Gaea's actual
-particle-erosion kernels can be read out of it directly**, with names, without Ghidra.
+`Gaea.oneAPI.dll` (15,393,280 bytes) contains **13 embedded SPIR-V modules**, each ~76,000 to
+82,000 words. With the carve stopped correctly at the filler, every one of them audits as
+**reflection metadata only**:
 
-| Module | Entry points | Content |
-| --- | --- | --- |
-| `module00.spv` | 12 | `thermal_shaper` (Laplacian pyramid + ThermalShaper) |
-| `module01.spv` | 20 | `thermal` (Thermal simulation + LaplacianLevel) |
-| **`module03.spv`** | (76 functions) | **`parallel_erosion` — Gaea's Erosion2 particle erosion** |
-| `module11.spv` | — | additional `thermal` entry points |
+| Module | instructions | types | constants | functions | debug/reflection |
+| --- | --- | --- | --- | --- | --- |
+| m00–m12 (each) | ~5,500 | **0** | **0** | **0** | ~5,500 |
 
-`Gaea.AdaptiveCpp.dll` and `Gaea.Native.dll` contain **no** SPIR-V, so those two backends
-still need native disassembly. The oneAPI backend does not.
+The instruction census for `m12.spv` accounts for all 5,537 instructions exactly:
 
-## Recovered API surface
+```
+5441 OpString   56 OpName   22 OpEntryPoint   10 OpCapability
+   4 other      2 OpExtInstImport   1 OpMemoryModel   1 OpSource
+```
 
-Demangled with `c++filt`. This is Gaea's own code, not inferred:
+No `OpType*`, no `OpConstant*`, no `OpFunction`. **There are no algorithm bodies in these
+modules, no literals and no control flow.**
 
-### `parallel_erosion::ParallelErosion`
+The `0x17171717` pattern that follows each module is why the first carve overran: it is a
+repeated-byte filler, and the word there encodes as `wordCount = 0x1717, opcode = 0x1717`,
+which is not a valid instruction. Stopping at an undefined opcode recovers the exact module
+boundary. `tools/spirv-recarve.py` does that; `tools/spirv-content-audit.py` proves the
+resulting content class.
 
-| Symbol | Notes |
+## What the modules DO give, and it is worth having
+
+They carry `OpEntryPoint` and `OpName`, and DPC++ mangles the **full C++ signature** into the
+kernel name. So the blobs yield a genuine **interface inventory**:
+
+**118 distinct kernel owners** across 13 modules, in 10 namespaces:
+
+| Namespace | Kernels |
 | --- | --- |
-| `erode()` | top-level driver |
-| `erode_level(LaplacianLevel*)` | **three** inner passes |
-| `flow(buffer<Particle,1>&, buffer<unsigned int,1>&, range<1>, buffer<float,2>&, …, buffer<int,2>&, …, buffer<float,2>&, buffer<float,2>&)` | the particle-flow kernel; operates on a **`Particle`** array |
-| `render_flow(buffer<Particle,1>&, buffer<unsigned int,1>&, …)` | splats particles into the heightfield |
-| `shape<false>(…)` / `shape<true>(…)` | shaping, templated on a bool |
-| `create_random_directions(unsigned int, int, queue)` | precomputed random-direction table |
-| `add_atomic<float, accessor<float,2,…>>(…)` | **atomic** accumulation into a float 2-D field |
-| `add_atomic<unsigned int, accessor<unsigned int,1,…>>(…)` | atomic accumulation into a uint 1-D field |
-| `sample<accessor<float,2,…>>(…)` | bilinear sampler |
+| `resampling` | `downsample_box`, `upsample_box`, `downsample_magic`, `upsample_magic`, `sharpen_magic`, `downsample_gaussian_5x5` |
+| `parallel_erosion` | `erode`, `erode_level`, `flow`, `render_flow`, `shape<>`, `create_random_directions`, `LaplacianLevel::*` |
+| `thermal` | `Thermal::simulation`, `LaplacianLevel::*` |
+| `thermal_shaper` | `process`, `process_level`, `LaplacianLevel::*` |
+| `flow` | `Flow::flow`, `fill_pits`, `process`, `LaplacianLevel::reconstruct` |
+| `color_transport` | `color_transport`, `color_transport_full`, `fill_pits`, `process` |
+| `lighting` | `compute_normals_and_init_photonmap`, `raytrace_ao`, `raytrace_ao_sl`, `compute_diffuse_light`, `compute_hybrid_ao`, `raytrace_shadows`, `compose_light` |
+| `MeshRasterizer` | `render`, `render3`, `render3_cpu`, `process_vertices`, `process_vertices_with_displacement`, `compute_tangent_space_normals` |
+| `Cellular3D` | `render` |
+| `stamp_instancer` | `populate` |
 
-### `parallel_erosion::LaplacianLevel`
+Because the names are mangled signatures, each entry also states its **parameter types and
+arity** — for example `flow(buffer<parallel_erosion::Particle,1,…>&, buffer<unsigned int,1,…>&,
+range<1>, buffer<float,2>&, …, buffer<int,2>&, …, buffer<float,2>&, buffer<float,2>&)` — and
+confirms that `Particle` is a distinct struct type passed by buffer.
 
-| Symbol | Notes |
+That is a real finding: it is the **kernel interface**, obtained without disassembly. What it
+is not is an implementation.
+
+### The metadata does more than list names
+
+Because SYCL encodes the kernel's `item` dimensionality into the mangled type, the metadata
+also reports **how many passes a stage runs and in how many dimensions**. For
+`erode_level` it enumerates exactly three lambdas:
+
+```
+RoundedRangeKernel<item<1, true>, 1, erode_level(...)::{lambda(handler&)#1}...>
+RoundedRangeKernel<item<1, true>, 1, erode_level(...)::{lambda(handler&)#2}...>
+RoundedRangeKernel<item<2, true>, 2, erode_level(...)::{lambda(handler&)#3}...>
+```
+
+**Two 1-D passes and one 2-D pass.** This is an independent corroboration of what the Ghidra
+decompilation of `FUN_1801f1350` showed structurally — three parallel passes per iteration,
+two unconditional and one gated — and it adds a detail the native side did not make obvious,
+namely that two of them are 1-D. Two sources, different mechanisms, agreeing.
+
+That is the right role for these blobs: they cannot supply an algorithm, but they can
+**confirm structure** that a decompiler suggests, and they cannot be misled by calling
+conventions or inlining.
+
+## Consequence for the objective
+
+**Kernel bodies must come from disassembling the native libraries.** There is no shortcut
+through `Gaea.oneAPI.dll`. The two sources and what each yields:
+
+| Source | Yields |
 | --- | --- |
-| `LaplacianLevel(queue&, LaplacianLevel*)` | constructor takes a **parent-level pointer** |
-| `init<false>()` / `init<true>()` | templated initialisation |
-| `reconstruct_previous_level(Parameters const&, int)` | takes a **level index** |
-| `create_subsequent_level(Parameters&)` | builds the next level |
+| `Gaea.oneAPI.dll` SPIR-V | 118 kernel names, full C++ signatures, namespaces, arity |
+| `Gaea.Native.dll` via Ghidra | actual bodies: `ParallelErosion_Erode` and its call graph, the float constant pool, the 3×3 relaxation arithmetic |
+| `Gaea.AdaptiveCpp.dll` / `HIP.dll` | not yet opened; no SPIR-V in either |
 
-Structs `parallel_erosion::Particle` and `parallel_erosion::Parameters` are declared in the
-module, so their field layout is recoverable too.
-
-## Function sizes (basic blocks / instructions)
-
-Taken from the module's own function table, not estimated:
-
-| Kernel | Labels | Instructions |
-| --- | --- | --- |
-| `erode_level` pass 1 (`id<2>`) | 11 | 206 |
-| `erode_level` pass 2 (`id<1>`) | 1 | 91 |
-| `erode_level` pass 3 (`id<1>`) | 3 | 144 |
-| `render_flow` | 13 | 370 |
-| `erode` | 11 | 165 |
-| `shape<false>` pass A / B | 11 / 25 | 209 / 455 |
-| `shape<true>` pass A / B | 25 / 11 | 618 / 209 |
-| `LaplacianLevel::init<false>` / `<true>` | 1 / 1 | 156 / 192 |
-| `LaplacianLevel::reconstruct_previous_level` | 16 | 404 |
-| `LaplacianLevel::LaplacianLevel(queue&, parent*)` | 4 | 152 |
-
-## Concrete differences from this build's `Erosion2`
-
-Each of these is a real algorithmic divergence, observed in Gaea's symbols rather than
-guessed. This is the roadmap to moving `Erosion2` from `model` toward `exact`:
-
-1. **Random directions are precomputed, not drawn per step.**
-   `create_random_directions(unsigned int, int, queue)` builds a direction table that
-   `flow(...)` consumes. This build draws a fresh direction from an RNG at every droplet
-   step. That is not a detail: a shared, fixed direction field produces visibly different
-   flow organisation from per-step sampling.
-2. **Erosion accumulates through atomics.**
-   `add_atomic<float, accessor<float,2>>` and `add_atomic<unsigned int, accessor<unsigned int,1>>`
-   mean Gaea's parallel work-items accumulate contributions order-independently. This
-   build writes sequentially per droplet, so accumulation order differs.
-3. **`erode_level` runs three passes**, this build runs one. Sizes 206 / 91 / 144 suggest a
-   2-D pass followed by two 1-D passes — most likely a separable reduction or a second
-   sweep, not three independent 2-D kernels.
-4. **`shape` is far more elaborate** — up to 618 instructions against this build's single
-   `applyShaping` helper, and it is templated on a bool that selects between two variants.
-5. **`reconstruct_previous_level` takes a level index**, so the pyramid walk is driven by an
-   explicit index rather than by array order as here.
-6. **`LaplacianLevel` is a linked structure** (parent pointer in the constructor). This
-   build uses a flat array of levels, which is functionally similar but not the same shape
-   and would matter if a level were reused or depth varied per node.
-
-## Why this matters more than Ghidra here
-
-- It is the **actual implementation**, so anything read from it is ground truth, not a
-  published algorithm fitted to Gaea's parameter names.
-- It needs **no disassembler**, and therefore no multi-hour download: the extraction and
-  demangling tools are in `tools/`.
-- `Gaea.oneAPI.dll` covers the erosion kernels specifically named as the priority.
-
-Ghidra remains the only route to `Gaea.AdaptiveCpp.dll` and `Gaea.Native.dll`. Those matter
-because the backend is chosen at runtime, so a user on a non-Intel GPU runs different code.
-See `ghidra-setup.md` for the state of that.
+The recovered erosion work recorded in `gaea-erosion-kernel-recovered.md` is unaffected by
+this correction — it came from Ghidra all along.
 
 ## Reproduce
 
-```bash
-python tools/extract_spirv.py "D:/Gaea 2/Gaea.oneAPI.dll" .build/spirv   # 13 modules
-python tools/spirv-report.py .build/spirv/module03.spv --calls           # functions + call graph
-python tools/spirv-symbols.py .build/spirv/module03.spv --match parallel_erosion
+```
+python tools/spirv-recarve.py "D:/Gaea 2/Gaea.oneAPI.dll" .build/spirv2
+python tools/spirv-content-audit.py .build/spirv2      # -> all "metadata only"
+python tools/spirv-inventory.py .build/spirv2 --json docs/kernel-inventory-oneapi.json
+python tools/spirv-symbols.py .build/spirv2/m12.spv --match resampling
 ```
 
-`tools/spirv-symbols.py` demangles through `c++filt` and reports the API surface grouped by
-namespace. It reports raw names rather than guessing if no demangler is present.
+`spirv-dis.py`, `spirv-stats.py` and `spirv-opcodes.py` remain useful for diagnosing a carve,
+but note that there is nothing to disassemble in these modules — `--list` correctly reports
+zero functions, and that zero is the truthful answer, not a bug.
 
-## Limitations stated plainly
+## The lesson
 
-- This is **static** reading of an IR. It shows what the kernels *are*, not what they
-  produce at runtime.
-- SPIR-V instruction-level bodies are not yet decoded into C-like pseudocode here; what is
-  established is the API surface, symbol set, struct declarations and function sizes.
-- The modules are DPC++ output for the **oneAPI backend only**. Behaviour under
-  `AdaptiveCpp` is not covered by this evidence and must not be assumed identical.
+The error was not the parse itself but the conclusion drawn from it. An over-long carve
+produced 76 functions with convincing names, and the names matched the kernel inventory, so
+the result looked corroborated. It was not: the names came from the metadata's `OpName`
+records and the "bodies" came from unrelated bytes. **A carve whose end is guessed cannot be
+used to claim that code exists.** Checking the census — does the module contain *any*
+`OpType*` or `OpFunction` — would have settled it in one step, and that check is now a tool.

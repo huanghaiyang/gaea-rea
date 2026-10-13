@@ -35,6 +35,15 @@ yarn-error.log*
 # ---------------------------------------------------------------------------
 evidence/
 
+# Extracted Gaea assets: CLUT palette textures, overlay PNGs and ImageMagick tables. These are
+# vendor material, so committing them would redistribute Gaea's proprietary data -- the same
+# reason evidence/ is ignored above. They are REGENERABLE from a local Gaea installation:
+#     python tools/extract-assets.py     -> web/assets/color, web/assets/overlays
+#     python tools/extract-magick.py     -> web/assets/magick
+# A fresh clone therefore has no assets until those two run, which is deliberate: the scripts
+# are committed, the vendor bytes are not.
+web/assets/
+
 # Stray error/stdout capture files produced by the analysis scripts.
 _err.txt
 _stdout.txt

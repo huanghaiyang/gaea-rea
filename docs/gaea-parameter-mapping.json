@@ -1,0 +1,491 @@
+{
+  "schema": "gaea-parameter-mapping/1",
+  "scope": "QuadSpinner.Gaea.Engine.SyclFunctions.ParallelErosion.Parameters, Gaea 2.3.1",
+  "method": {
+    "fieldNameSource": "evidence/decompiled/Gaea.Nodes.whole.cs, the object initializer at the Erosions.PE call site",
+    "fieldTypeSource": "evidence/kernels/raw/Gaea.Engine.dll.SyclFunctions.members.txt, the ParallelErosion.Parameters block",
+    "caveat": "Eazfuscator renamed every field, so names cannot be joined textually. The join is by ORDER: the obfuscated suffixes are sequential, and their count matches the field count exactly."
+  },
+  "validation": {
+    "claim": "The order is not assumed; it is forced by the field types.",
+    "evidence": [
+      "The type list contains exactly one Int32, at index 7. The only integer parameter is Seed.",
+      "The type list contains exactly one Boolean, at index 22 (last). The only boolean parameter is NoErosion.",
+      "The obfuscated suffixes 0x759..0x76f form a contiguous run of 23 values, matching the 23 declared fields; the 3 values absent from the call site (0x75d, 0x75f, 0x762) are simply not set by PE()."
+    ]
+  },
+  "signature": {
+    "source": "Gaea.Nodes.whole.cs, Erosions.PE declaration",
+    "method": "internal static Map[] PE(Map map, Map mask = null, float Duration = 10f, float Downcutting = 0.25f, float DowncuttingType = 0f, float ErosionScale = 1000f, float SuspendedLoadDischargeAmount = 1f, float SuspendedLoadDischargeAngle = 24f, float BedLoadDischargeAmount = 0f, float BedLoadDischargeAngle = 15f, float CoarseSedimentsDischargeAmount = 0f, float CoarseSedimentsDischargeAngle = 10f, float Shape = 0.2f, float ShapeSharpness = 0.6f, float ShapeDetailScale = 0.8f, int Seed = 0, float DepositionBoost = 0f, float ExtraDepositionBoost = 0f, bool NoErosion = false)",
+    "defaults": {
+      "Duration": 10,
+      "Downcutting": 0.25,
+      "DowncuttingType": 0,
+      "ErosionScale": 1000,
+      "SuspendedLoadDischargeAmount": 1,
+      "SuspendedLoadDischargeAngle": 24,
+      "BedLoadDischargeAmount": 0,
+      "BedLoadDischargeAngle": 15,
+      "CoarseSedimentsDischargeAmount": 0,
+      "CoarseSedimentsDischargeAngle": 10,
+      "Shape": 0.2,
+      "ShapeSharpness": 0.6,
+      "ShapeDetailScale": 0.8,
+      "Seed": 0,
+      "DepositionBoost": 0,
+      "ExtraDepositionBoost": 0,
+      "NoErosion": false
+    }
+  },
+  "callChain": [
+    "Erosion2 node",
+    "Erosions.PE  (managed, Gaea.Nodes.dll)",
+    "QuadSpinner.ErosionWrapper.ErodeTerrain  (C++/CLI, Gaea.CE.dll)",
+    "QuadSpinner.Gaea.Engine.SyclFunctions.ParallelErosion.Simulation  (Gaea.Engine.dll)",
+    "parallel_erosion::ParallelErosion::erode  (SPIR-V in Gaea.oneAPI.dll)",
+    "ParallelErosion_Erode  (native export in Gaea.Native.dll @ 0x18003cfe0)"
+  ],
+  "fields": [
+    {
+      "index": 0,
+      "type": "Resolution",
+      "obfuscatedSuffix": "759",
+      "name": "map.Resolution"
+    },
+    {
+      "index": 1,
+      "type": "Single",
+      "obfuscatedSuffix": "75a",
+      "name": "\\uf55c\\uf0ba\\ue6d3.Terrain.Width"
+    },
+    {
+      "index": 2,
+      "type": "Single",
+      "obfuscatedSuffix": "75b",
+      "name": "\\uf55c\\uf0ba\\ue6d3.Terrain.Height"
+    },
+    {
+      "index": 3,
+      "type": "Single",
+      "obfuscatedSuffix": "75c",
+      "name": "ErosionScale",
+      "peArgument": "ErosionScale",
+      "default": 1000
+    },
+    {
+      "index": 4,
+      "type": "Single",
+      "obfuscatedSuffix": "75d",
+      "name": null
+    },
+    {
+      "index": 5,
+      "type": "Single",
+      "obfuscatedSuffix": "75e",
+      "name": "Duration",
+      "peArgument": "Duration",
+      "default": 10
+    },
+    {
+      "index": 6,
+      "type": "Single",
+      "obfuscatedSuffix": "75f",
+      "name": null
+    },
+    {
+      "index": 7,
+      "type": "Int32",
+      "obfuscatedSuffix": "760",
+      "name": "Seed",
+      "peArgument": "Seed",
+      "default": 0
+    },
+    {
+      "index": 8,
+      "type": "Single",
+      "obfuscatedSuffix": "761",
+      "name": "Downcutting",
+      "peArgument": "Downcutting",
+      "default": 0.25
+    },
+    {
+      "index": 9,
+      "type": "Single",
+      "obfuscatedSuffix": "762",
+      "name": null
+    },
+    {
+      "index": 10,
+      "type": "Single",
+      "obfuscatedSuffix": "763",
+      "name": "Shape",
+      "peArgument": "Shape",
+      "default": 0.2
+    },
+    {
+      "index": 11,
+      "type": "Single",
+      "obfuscatedSuffix": "764",
+      "name": "ShapeSharpness",
+      "peArgument": "ShapeSharpness",
+      "default": 0.6
+    },
+    {
+      "index": 12,
+      "type": "Single",
+      "obfuscatedSuffix": "765",
+      "name": "ShapeDetailScale",
+      "peArgument": "ShapeDetailScale",
+      "default": 0.8
+    },
+    {
+      "index": 13,
+      "type": "Single",
+      "obfuscatedSuffix": "766",
+      "name": "SuspendedLoadDischargeAmount",
+      "peArgument": "SuspendedLoadDischargeAmount",
+      "default": 1
+    },
+    {
+      "index": 14,
+      "type": "Single",
+      "obfuscatedSuffix": "767",
+      "name": "SuspendedLoadDischargeAngle",
+      "peArgument": "SuspendedLoadDischargeAngle",
+      "default": 24
+    },
+    {
+      "index": 15,
+      "type": "Single",
+      "obfuscatedSuffix": "768",
+      "name": "BedLoadDischargeAmount",
+      "peArgument": "BedLoadDischargeAmount",
+      "default": 0
+    },
+    {
+      "index": 16,
+      "type": "Single",
+      "obfuscatedSuffix": "769",
+      "name": "BedLoadDischargeAngle",
+      "peArgument": "BedLoadDischargeAngle",
+      "default": 15
+    },
+    {
+      "index": 17,
+      "type": "Single",
+      "obfuscatedSuffix": "76a",
+      "name": "CoarseSedimentsDischargeAmount",
+      "peArgument": "CoarseSedimentsDischargeAmount",
+      "default": 0
+    },
+    {
+      "index": 18,
+      "type": "Single",
+      "obfuscatedSuffix": "76b",
+      "name": "CoarseSedimentsDischargeAngle",
+      "peArgument": "CoarseSedimentsDischargeAngle",
+      "default": 10
+    },
+    {
+      "index": 19,
+      "type": "Single",
+      "obfuscatedSuffix": "76c",
+      "name": "DowncuttingType",
+      "peArgument": "DowncuttingType",
+      "default": 0
+    },
+    {
+      "index": 20,
+      "type": "Single",
+      "obfuscatedSuffix": "76d",
+      "name": "DepositionBoost",
+      "peArgument": "DepositionBoost",
+      "default": 0
+    },
+    {
+      "index": 21,
+      "type": "Single",
+      "obfuscatedSuffix": "76e",
+      "name": "ExtraDepositionBoost",
+      "peArgument": "ExtraDepositionBoost",
+      "default": 0
+    },
+    {
+      "index": 22,
+      "type": "Boolean",
+      "obfuscatedSuffix": "76f",
+      "name": "NoErosion",
+      "peArgument": "NoErosion",
+      "default": false
+    }
+  ],
+  "gapsInThisBuildImplementation": {
+    "note": "Parameters Gaea exposes for Erosion2 that web/js/registry.js does not implement. Listed because an unimplemented parameter is a behaviour difference, not a cosmetic one.",
+    "missing": [
+      "SuspendedLoadDischargeAngle",
+      "BedLoadDischargeAmount",
+      "BedLoadDischargeAngle",
+      "CoarseSedimentsDischargeAngle",
+      "DowncuttingType"
+    ],
+    "partiallyMapped": [
+      "SuspendedLoadDischargeAmount -> 'Suspended Load' (amount only, angle dropped)",
+      "CoarseSedimentsDischargeAmount -> 'Coarse Sediments' (amount only, angle dropped)"
+    ],
+    "renamed": {
+      "ErosionScale": "currently registered as 'Erosion Scale'",
+      "ShapeSharpness": "currently registered as 'Shape Sharpness'",
+      "ShapeDetailScale": "currently registered as 'Shape Detail Scale'",
+      "Seed": "currently 'Seed'"
+    }
+  },
+  "derivedBy": "tools/verify-parameter-mapping.py",
+  "checkResults": {
+    "suffixSpan": "0x759..0x76f",
+    "declaredFields": 23,
+    "assignedAtCallSite": 20,
+    "unassignedSuffixes": [
+      "75d",
+      "75f",
+      "762"
+    ],
+    "singleInt32AtIndex": 7,
+    "singleBooleanAtIndex": 22
+  },
+  "nodeVsKernel": {
+    "catalogueParameterCount": 23,
+    "kernelParameterCount": 17,
+    "duplicateUiNames": [
+      "Discharge Angle"
+    ],
+    "uiParameters": [
+      {
+        "index": 0,
+        "name": "Duration",
+        "type": "Single",
+        "ilDefault": 10,
+        "ilMin": 1,
+        "ilMax": 200,
+        "description": "Controls how long erosion runs. Longer durations produce more elaborate terrain reshaping, while shorter durations help preserve original forms."
+      },
+      {
+        "index": 1,
+        "name": "Downcutting",
+        "type": "Single",
+        "ilDefault": 0.25,
+        "ilMin": 0,
+        "ilMax": 1,
+        "description": "Governs how deeply water cuts into the terrain, carving valleys and channels."
+      },
+      {
+        "index": 2,
+        "name": "Erosion Scale",
+        "type": "Single",
+        "ilDefault": 1000,
+        "ilMin": 1,
+        "ilMax": 20000,
+        "description": "Sets the overall size of erosion features, from fine gullies to massive ravines."
+      },
+      {
+        "index": 3,
+        "name": "Seed",
+        "type": "Int32",
+        "ilDefault": null,
+        "ilMin": null,
+        "ilMax": null,
+        "description": "Randomizes the erosion pattern while keeping other settings the same."
+      },
+      {
+        "index": 4,
+        "name": "NoErosion",
+        "type": "Boolean",
+        "ilDefault": null,
+        "ilMin": null,
+        "ilMax": null,
+        "description": ""
+      },
+      {
+        "index": 5,
+        "name": "Suspended Load",
+        "type": "Single",
+        "ilDefault": 1,
+        "ilMin": 0,
+        "ilMax": 1,
+        "description": "Fine, light sediments that travel far and fill gullies with subtle detail."
+      },
+      {
+        "index": 6,
+        "name": "Discharge Angle",
+        "type": "Single",
+        "ilDefault": 10,
+        "ilMin": 0,
+        "ilMax": 45,
+        "description": "Sets the slope at which suspended load settles."
+      },
+      {
+        "index": 7,
+        "name": "Bed Load",
+        "type": "Single",
+        "ilDefault": 0,
+        "ilMin": 0,
+        "ilMax": 1,
+        "description": "Heavier sediments like gravel that fill and shape gullies and slopes."
+      },
+      {
+        "index": 8,
+        "name": "Discharge Angle",
+        "type": "Single",
+        "ilDefault": 10,
+        "ilMin": 0,
+        "ilMax": 45,
+        "description": "Sets the slope at which suspended load settles."
+      },
+      {
+        "index": 9,
+        "name": "Coarse Sediments",
+        "type": "Single",
+        "ilDefault": 0,
+        "ilMin": 0,
+        "ilMax": 1,
+        "description": "The heaviest materials (boulders, scree) that deposit on steep slopes."
+      },
+      {
+        "index": 10,
+        "name": "Discharge Angle",
+        "type": "Single",
+        "ilDefault": 10,
+        "ilMin": 0,
+        "ilMax": 45,
+        "description": "Sets the slope at which suspended load settles."
+      },
+      {
+        "index": 11,
+        "name": "DepositionBoost",
+        "type": "Single",
+        "ilDefault": 0,
+        "ilMin": 0,
+        "ilMax": 1,
+        "description": ""
+      },
+      {
+        "index": 12,
+        "name": "ExtraDepositionBoost",
+        "type": "Single",
+        "ilDefault": null,
+        "ilMin": null,
+        "ilMax": null,
+        "description": ""
+      },
+      {
+        "index": 13,
+        "name": "Shape",
+        "type": "Single",
+        "ilDefault": 0.2,
+        "ilMin": 0,
+        "ilMax": 1,
+        "description": "Enables artistic control over how erosion reshapes terrain."
+      },
+      {
+        "index": 14,
+        "name": "Shape Sharpness",
+        "type": "Single",
+        "ilDefault": 0.6,
+        "ilMin": 0,
+        "ilMax": 1,
+        "description": "Defines how sharp or concave ridges become after erosion."
+      },
+      {
+        "index": 15,
+        "name": "Shape Detail Scale",
+        "type": "Single",
+        "ilDefault": 0.25,
+        "ilMin": 0,
+        "ilMax": 1,
+        "description": "Sets the scale of simulated details, from broad ravines to fine gullies."
+      },
+      {
+        "index": 16,
+        "name": "Enable",
+        "type": "Boolean",
+        "ilDefault": null,
+        "ilMin": null,
+        "ilMax": null,
+        "description": "Toggles orographic influence on or off."
+      },
+      {
+        "index": 17,
+        "name": "Directional Precipitation",
+        "type": "Boolean",
+        "ilDefault": null,
+        "ilMin": null,
+        "ilMax": null,
+        "description": "Simulates rain falling more intensely from one direction to create rain shadows."
+      },
+      {
+        "index": 18,
+        "name": "Direction",
+        "type": "Int32",
+        "ilDefault": 0,
+        "ilMin": 0,
+        "ilMax": 360,
+        "description": "Sets the direction from which rainfall comes most strongly."
+      },
+      {
+        "index": 19,
+        "name": "Rain Shadow",
+        "type": "Single",
+        "ilDefault": 0.8,
+        "ilMin": 0,
+        "ilMax": 1,
+        "description": "Controls how strongly terrain blocks rainfall from certain directions."
+      },
+      {
+        "index": 20,
+        "name": "Slope",
+        "type": "Float2",
+        "ilDefault": 0,
+        "ilMin": null,
+        "ilMax": null,
+        "description": "Limits rainfall effects to specific elevation ranges."
+      },
+      {
+        "index": 21,
+        "name": "Altitude",
+        "type": "Float2",
+        "ilDefault": 0,
+        "ilMin": null,
+        "ilMax": null,
+        "description": "Limits rainfall effects to specific slope ranges."
+      },
+      {
+        "index": 22,
+        "name": "Reverse",
+        "type": "Boolean",
+        "ilDefault": null,
+        "ilMin": null,
+        "ilMax": null,
+        "description": "Inverts the influence mask for creative control."
+      }
+    ],
+    "kernelParametersInFieldOrder": [
+      "ErosionScale",
+      "Duration",
+      "Seed",
+      "Downcutting",
+      "Shape",
+      "ShapeSharpness",
+      "ShapeDetailScale",
+      "SuspendedLoadDischargeAmount",
+      "SuspendedLoadDischargeAngle",
+      "BedLoadDischargeAmount",
+      "BedLoadDischargeAngle",
+      "CoarseSedimentsDischargeAmount",
+      "CoarseSedimentsDischargeAngle",
+      "DowncuttingType",
+      "DepositionBoost",
+      "ExtraDepositionBoost",
+      "NoErosion"
+    ],
+    "note": "Duplicate 'Discharge Angle' entries are distinguished only by position: each follows the load parameter it belongs to. Gaea's own descriptions for all three are identical, so the description cannot be used to tell them apart."
+  }
+}

@@ -1,0 +1,6853 @@
+{
+  "source": "evidence/decompiled/Gaea.Nodes.whole.cs",
+  "method": "parse managed Node subclasses for [Parameter] attributes and ImageMagick calls",
+  "caveat": "ImageMagick call detection is textual and variable-name based, so it can miss a call made through a differently named local, and can false-positive on a method that merely shares a name. It is a work list, not a proof of the call graph.",
+  "counts": {
+    "nodeSubclasses": 195,
+    "inCatalog": 182,
+    "imageMagickBacked": 5
+  },
+  "nodes": {
+    "AO": {
+      "line": 22214,
+      "attrs": [
+        "Family(\"Aspect\")",
+        "Toolbox(NodeCategory.Derive)",
+        "ShortCode(\"cth\")",
+        "Classification(Classification.Mask)"
+      ],
+      "params": [
+        {
+          "name": "Quality",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Enhance",
+          "meta": "0.5f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Accumulator": {
+      "line": 14040,
+      "attrs": [
+        "Family(\"Landscape\")",
+        "Toolbox(NodeCategory.Terrain)",
+        "ShortCode(\"ny\")",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Type",
+          "meta": "Parameters.Enum,AccumulatorType.SnowMask,0f,1f"
+        },
+        {
+          "name": "RestrictToGroup",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Warning",
+          "meta": "Parameters.ComputedString"
+        }
+      ],
+      "imOps": []
+    },
+    "Adjust": {
+      "line": 23786,
+      "attrs": [
+        "Family(\"Transform\")",
+        "ShortCode(\"ap\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Multiply",
+          "meta": "1f,0.001f,10f"
+        },
+        {
+          "name": "Shaper",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Clamp",
+          "meta": "0f,1f,0f,1f"
+        },
+        {
+          "name": "Clip",
+          "meta": "0f,1f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Anastomosis": {
+      "line": 34500,
+      "attrs": [
+        "Family(\"Erosion\")",
+        "ShortCode(\"cx\")",
+        "Toolbox(NodeCategory.Colorize)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Impact",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "Width",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "Depth",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "Downcutting",
+          "meta": "Parameters.Enum,AnastomosisDowncutting.Flows,0f,1f"
+        },
+        {
+          "name": "Quality",
+          "meta": "Parameters.Enum,RelativeQuality.Quarter,0f,1f"
+        },
+        {
+          "name": "SmoothEdges",
+          "meta": "true,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Angle": {
+      "line": 22150,
+      "attrs": [
+        "Family(\"Render\")",
+        "Toolbox(NodeCategory.Output)",
+        "ShortCode(\"ao\")",
+        "Classification(Classification.Mask)"
+      ],
+      "params": [
+        {
+          "name": "Azimuth",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Range",
+          "meta": "0f,1f,0f,1f"
+        },
+        {
+          "name": "Falloff",
+          "meta": "0.2f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Aperture": {
+      "line": 23999,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "Toolbox(NodeCategory.Modify)",
+        "ShortCode(\"lv\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Mode",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Size",
+          "meta": "0.01,0f,1f"
+        },
+        {
+          "name": "Shape",
+          "meta": "Parameters.HorizontalListNoLabel"
+        },
+        {
+          "name": "VerticesCount",
+          "meta": "4f,4f,32f"
+        },
+        {
+          "name": "CornerAngle",
+          "meta": "90f,0f,180f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Antialiased",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Autolevel": {
+      "line": 24156,
+      "attrs": [
+        "Family(\"Utilities\")",
+        "ShortCode(\"blo\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [],
+      "imOps": []
+    },
+    "BlobRemover": {
+      "line": 24175,
+      "attrs": [
+        "Family(\"Blur\")",
+        "ShortCode(\"b\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Range",
+          "meta": "0.05f,0f,1f"
+        },
+        {
+          "name": "Connectivity",
+          "meta": "4f,4f,8f"
+        },
+        {
+          "name": "EnforceQuantization",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Quantization",
+          "meta": "64f,16f,128f"
+        }
+      ],
+      "imOps": [
+        "Threshold",
+        "ConnectedComponents",
+        "Grayscale"
+      ]
+    },
+    "Blur": {
+      "line": 24278,
+      "attrs": [
+        "Family(\"Scatter\")",
+        "ShortCode(\"bo\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Radius",
+          "meta": "0.1f,0f,2f"
+        }
+      ],
+      "imOps": []
+    },
+    "Bomber": {
+      "line": 24333,
+      "attrs": [
+        "Family(\"Structure\")",
+        "ShortCode(\"bu\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Iterations",
+          "meta": "50f,2f,500f"
+        },
+        {
+          "name": "Multiplier",
+          "meta": "1f,0f,100f"
+        },
+        {
+          "name": "Size",
+          "meta": "0.2f,0.6f,0f,1f"
+        },
+        {
+          "name": "SizeDistribution",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Rotation",
+          "meta": "0f,1f,0f,1f"
+        },
+        {
+          "name": "MaintainProportions",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "VariableHeight",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "0.8f,1f,0f,1f"
+        },
+        {
+          "name": "Distribution",
+          "meta": "Parameters.HorizontalList,BombDistribution.Random,0f,1f"
+        },
+        {
+          "name": "Jitter",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "FadeEdges",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "BlendMode",
+          "meta": "Parameters.Enum,BombBlendMode.Max,0f,1f"
+        },
+        {
+          "name": "Quality",
+          "meta": "Parameters.Enum,ResizeQuality.Medium,0f,1f"
+        },
+        {
+          "name": "AddInput",
+          "meta": "Parameters.Command,\"port-connect\""
+        }
+      ],
+      "imOps": []
+    },
+    "Bulbous": {
+      "line": 24695,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "ShortCode(\"cl\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Jitter",
+          "meta": "0f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "CLUTer": {
+      "line": 8760,
+      "attrs": [
+        "Family(\"Cartography\")",
+        "Toolbox(NodeCategory.Surface)",
+        "ShortCode(\"cn\")",
+        "Classification(Classification.Mask)"
+      ],
+      "params": [
+        {
+          "name": "GradientData",
+          "meta": "Parameters.GradientEditor"
+        },
+        {
+          "name": "Bias",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Hue",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Saturation",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Lightness",
+          "meta": "0f,-1f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Canyon": {
+      "line": 14118,
+      "attrs": [
+        "Family(\"Extended\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "ShortCode(\"ll\")",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalList,CanyonStyle.Eroded,0f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "0.35f,0f,1f"
+        },
+        {
+          "name": "Slot",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "Valley",
+          "meta": "0.4f,0f,1f"
+        },
+        {
+          "name": "Surrounding",
+          "meta": "0.6f,0f,1f"
+        },
+        {
+          "name": "Depth",
+          "meta": "0.5f,0.0001f,1f"
+        },
+        {
+          "name": "StructualWarp",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "DetailWarp",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "AlternateStyle",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Cartography": {
+      "line": 8272,
+      "attrs": [
+        "Family(\"Color\")",
+        "Toolbox(NodeCategory.Colorize)",
+        "ShortCode(\"clt\")",
+        "Classification(Classification.Colorizer)"
+      ],
+      "params": [
+        {
+          "name": "Accuracy",
+          "meta": "0.3f,0f,1f"
+        },
+        {
+          "name": "GradientStyle",
+          "meta": "Parameters.HorizontalListNoLabel,MapGradientStyle.Smooth,0f,1f"
+        },
+        {
+          "name": "EqualizeGradient",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Reverse",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Erode",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "LandPalette",
+          "meta": "Parameters.Enum,CartographyLandPalette.Minimal,0f,1f"
+        },
+        {
+          "name": "LandContours",
+          "meta": "5f,3f,50f"
+        },
+        {
+          "name": "LandContourIntenstity",
+          "meta": "0.4f,1f,0f,1f"
+        },
+        {
+          "name": "LandBias",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "WaterPalette",
+          "meta": "Parameters.Enum,CartographyWaterPalette.Classic,0f,1f"
+        },
+        {
+          "name": "WaterContours",
+          "meta": "5f,3f,50f"
+        },
+        {
+          "name": "WaterContourIntenstity",
+          "meta": "0.4f,1f,0f,1f"
+        },
+        {
+          "name": "WaterBias",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Trim",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "GridCount",
+          "meta": "20f,4f,100f"
+        },
+        {
+          "name": "GridIntenstity",
+          "meta": "0.5f,1f,0f,1f"
+        },
+        {
+          "name": "GridStyle",
+          "meta": "Parameters.Enum,MapGridStyle.OverWater,0f,1f"
+        },
+        {
+          "name": "BoundaryThickness",
+          "meta": "2f,1f,10f"
+        },
+        {
+          "name": "ContourThickness",
+          "meta": "1f,1f,10f"
+        },
+        {
+          "name": "GridThickness",
+          "meta": "1f,1f,10f"
+        }
+      ],
+      "imOps": []
+    },
+    "Cellular": {
+      "line": 14302,
+      "attrs": [
+        "Family(\"Extended\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "ShortCode(\"c3\")",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Size",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Density",
+          "meta": "1f,0f,10f"
+        },
+        {
+          "name": "Jitter",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "MetricMorph",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "DistanceMetric",
+          "meta": "Parameters.Enum,DistanceMetric.Euclidian_Chebyshev,0f,1f"
+        },
+        {
+          "name": "CoordinateAxesJitter",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "CAJClustering",
+          "meta": "1f,1f,5f"
+        },
+        {
+          "name": "Anisotropy",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "DistanceFunction",
+          "meta": "Parameters.Enum,DistanceFunction.Hash,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Cellular3D": {
+      "line": 14475,
+      "attrs": [
+        "Family(\"Gradient\")",
+        "ShortCode(\"con\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Size",
+          "meta": "0.1f,0.0001f,0.5f"
+        },
+        {
+          "name": "Gap",
+          "meta": "0f,0f,0.5f"
+        },
+        {
+          "name": "JitterX",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "JitterY",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "JitterZ",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "ScaleX",
+          "meta": "1f,0.1f,10f"
+        },
+        {
+          "name": "ScaleY",
+          "meta": "1f,0.1f,10f"
+        },
+        {
+          "name": "ScaleZ",
+          "meta": "1f,0.1f,10f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "NormalizeInput",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Chokepoint": {
+      "line": 38481,
+      "attrs": [
+        "Family(\"Routing\")",
+        "Toolbox(NodeCategory.Utility)",
+        "ShortCode(\"c\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [],
+      "imOps": []
+    },
+    "Clamp": {
+      "line": 24745,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "ShortCode(\"ci\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Mode",
+          "meta": "Parameters.HorizontalList,ClampMode.Standard,0f,1f"
+        },
+        {
+          "name": "Value",
+          "meta": "0f,1f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Clip": {
+      "line": 24833,
+      "attrs": [
+        "Family(\"Aspect\")",
+        "Toolbox(NodeCategory.Derive)",
+        "ShortCode(\"cv\")",
+        "Classification(Classification.Mask)"
+      ],
+      "params": [
+        {
+          "name": "Min",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Max",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "AutoClip",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "ColorErosion": {
+      "line": 34678,
+      "attrs": [
+        "Family(\"Erosion\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "ShortCode(\"cr\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "TransportDistance",
+          "meta": "0.5f,0f,2f"
+        },
+        {
+          "name": "SedimentDensity",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Blend",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "ColorHold",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "FlowVolume",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "LaminarFlow",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Diffusion",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "ColorThreshold": {
+      "line": 22298,
+      "attrs": [
+        "Family(\"Utilities\")",
+        "Toolbox(NodeCategory.Utility)",
+        "ShortCode(\"de\")",
+        "Classification(Classification.Mask)"
+      ],
+      "params": [
+        {
+          "name": "Falloff",
+          "meta": "0.2f,0.0001f,1f"
+        }
+      ],
+      "imOps": [
+        "Alpha",
+        "Transparent",
+        "Separate",
+        "Negate",
+        "Clone"
+      ]
+    },
+    "Combine": {
+      "line": 38501,
+      "attrs": [
+        "Family(\"Routing\")",
+        "ShortCode(\"cm\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Ratio",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "Mode",
+          "meta": "Parameters.OptionGrid,BlendMode.Blend,0f,1f"
+        },
+        {
+          "name": "Clamp",
+          "meta": "Parameters.HorizontalList,ClampType.Clamp,0f,1f"
+        },
+        {
+          "name": "SwitchInputs",
+          "meta": "Parameters.Command,\"replace\""
+        },
+        {
+          "name": "AddInput",
+          "meta": "Parameters.Command,\"port-connect\""
+        },
+        {
+          "name": "Enhance",
+          "meta": "Parameters.HorizontalList,ProcessInput.None,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Compare": {
+      "line": 38707,
+      "attrs": [
+        "Family(\"Routing\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Mode",
+          "meta": "Parameters.HorizontalList,CompareMode.AB,0f,1f"
+        },
+        {
+          "name": "Comparison",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Colorized",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Perpendicular",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Swap",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Cone": {
+      "line": 14730,
+      "attrs": [
+        "Family(\"Basic\")",
+        "ShortCode(\"k\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "1f,0f,4f"
+        },
+        {
+          "name": "Height",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "X",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Y",
+          "meta": "0.5f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Constant": {
+      "line": 14846,
+      "attrs": [
+        "Family(\"Basic\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "ShortCode(\"ck\")",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Output",
+          "meta": "Parameters.Enum,ConstantType.Height,0f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Color",
+          "meta": "0.5f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Contours": {
+      "line": 8899,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "Toolbox(NodeCategory.Colorize)",
+        "ShortCode(\"ga\")",
+        "Classification(Classification.Colorizer)"
+      ],
+      "params": [
+        {
+          "name": "Count",
+          "meta": "36f,8f,256f"
+        },
+        {
+          "name": "Subdivision",
+          "meta": "6f,1f,10f"
+        },
+        {
+          "name": "Accuracy",
+          "meta": "0.7f,0f,1f"
+        },
+        {
+          "name": "LineIntensity",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "SubIntensity",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "LineThickness",
+          "meta": "1f,1f,20f"
+        }
+      ],
+      "imOps": []
+    },
+    "Cracks": {
+      "line": 14952,
+      "attrs": [
+        "Family(\"Rocky\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Generator)",
+        "ShortCode(\"cg\")"
+      ],
+      "params": [
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Octaves",
+          "meta": "1f,1f,10f"
+        },
+        {
+          "name": "Scale",
+          "meta": "0.25f,0.0001f,1f"
+        },
+        {
+          "name": "Depth",
+          "meta": "0.35f,0.0001f,1f"
+        },
+        {
+          "name": "Jitter",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "WarpStrength",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "WarpSize",
+          "meta": "0.35f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "ScaleX",
+          "meta": "2f,0f,100f"
+        },
+        {
+          "name": "ScaleY",
+          "meta": "2f,0f,100f"
+        }
+      ],
+      "imOps": []
+    },
+    "Craggy": {
+      "line": 15128,
+      "attrs": [
+        "Family(\"Primitive\")",
+        "Toolbox(NodeCategory.Terrain)",
+        "Classification(Classification.Generator)",
+        "ShortCode(\"cra\")"
+      ],
+      "params": [
+        {
+          "name": "Size",
+          "meta": "1.5f,0.2f,2f"
+        },
+        {
+          "name": "Depth",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Shape",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Crater": {
+      "line": 15208,
+      "attrs": [
+        "Family(\"Landscape\")",
+        "ShortCode(\"cf\")",
+        "Toolbox(NodeCategory.Terrain)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalList,CraterStyle.New,0f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "0.3f,0.0001f,1f"
+        },
+        {
+          "name": "Formation",
+          "meta": "0.65f,0.0001f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "0.65f,0.0001f,1f"
+        },
+        {
+          "name": "Rim",
+          "meta": "Parameters.HorizontalList,ShortSharp.Soft,0f,1f"
+        },
+        {
+          "name": "Shape",
+          "meta": "-0.5f,-1f,1f"
+        },
+        {
+          "name": "X",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Y",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "CraterField": {
+      "line": 15417,
+      "attrs": [
+        "Family(\"Basic\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "1f,0.0001f,6f"
+        },
+        {
+          "name": "Depth",
+          "meta": "1f,0.0001f,2f"
+        },
+        {
+          "name": "Density",
+          "meta": "1f,0.0001f,2f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "X",
+          "meta": "0f,-10f,10f"
+        },
+        {
+          "name": "Y",
+          "meta": "0f,-10f,10f"
+        }
+      ],
+      "imOps": []
+    },
+    "Crumble": {
+      "line": 34862,
+      "attrs": [
+        "Family(\"Snow\")",
+        "ShortCode(\"ds\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Duration",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Strength",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Coverage",
+          "meta": "0.75f,0f,1f"
+        },
+        {
+          "name": "Horizontal",
+          "meta": "0.45f,0f,1f"
+        },
+        {
+          "name": "Vertical",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "RockHardness",
+          "meta": "0.45f,0f,1f"
+        },
+        {
+          "name": "Edge",
+          "meta": "0.45f,0f,1f"
+        },
+        {
+          "name": "Downcutting",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Depth",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "Direction",
+          "meta": "Parameters.HorizontalList,GradientDirection.X,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Curvature": {
+      "line": 24906,
+      "attrs": [
+        "Family(\"Profile\")",
+        "ShortCode(\"cu\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Range",
+          "meta": "0f,1f,0f,1f"
+        },
+        {
+          "name": "Type",
+          "meta": "Parameters.HorizontalListNoLabel"
+        },
+        {
+          "name": "Falloff",
+          "meta": "0.2f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Curve": {
+      "line": 24971,
+      "attrs": [
+        "Toolbox(NodeCategory.Simulate)",
+        "Family(\"Scatter\")",
+        "ShortCode(\"db\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "CurveSpline",
+          "meta": "Parameters.Custom"
+        },
+        {
+          "name": "Mode",
+          "meta": "Parameters.HorizontalList,AbsoluteRelative.Absolute,0f,1f"
+        },
+        {
+          "name": "FitCurve",
+          "meta": "Parameters.Command"
+        }
+      ],
+      "imOps": []
+    },
+    "DataExtractor": {
+      "line": 22357,
+      "attrs": [
+        "Family(\"Generative\")",
+        "Toolbox(NodeCategory.Derive)",
+        "ShortCode(\"fl1\")",
+        "Classification(Classification.Mask)"
+      ],
+      "params": [
+        {
+          "name": "Data",
+          "meta": "Parameters.HorizontalListNoLabel,DataExtraction.ModifierMask,0f,1f"
+        },
+        {
+          "name": "Layer",
+          "meta": "1f,1f,6f"
+        },
+        {
+          "name": "Level",
+          "meta": "0.03f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Debris": {
+      "line": 25062,
+      "attrs": [
+        "Family(\"Profile\")",
+        "Toolbox(NodeCategory.Modify)",
+        "ShortCode(\"df\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "DebrisAmount",
+          "meta": "1000f,1f,1000000f"
+        },
+        {
+          "name": "AmountMultiplier",
+          "meta": "1f,0f,10f"
+        },
+        {
+          "name": "Scale",
+          "meta": "1f,0.1f,100f"
+        },
+        {
+          "name": "Friction",
+          "meta": "0.62f,0f,1f"
+        },
+        {
+          "name": "Restitution",
+          "meta": "0.4f,0f,1f"
+        },
+        {
+          "name": "Size",
+          "meta": "1f,6f,0.1f,20f"
+        },
+        {
+          "name": "Height",
+          "meta": "1f,0.0001f,10f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "Shape",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "RenderStillRocks",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Distribution",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "ExportPointCloud",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Deflate": {
+      "line": 25388,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "ShortCode(\"dn\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Amount",
+          "meta": "0.5f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Denoise": {
+      "line": 25420,
+      "attrs": [
+        "Family(\"Transform\")",
+        "ShortCode(\"di\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Type",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Amount",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Passes",
+          "meta": "1f,1f,10f"
+        }
+      ],
+      "imOps": []
+    },
+    "Dilate": {
+      "line": 25484,
+      "attrs": [
+        "Family(\"Warp\")",
+        "ShortCode(\"dw\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Size",
+          "meta": "0.01,0f,1f"
+        },
+        {
+          "name": "Shape",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Iterations",
+          "meta": "1f,1f,25f"
+        },
+        {
+          "name": "Kernel",
+          "meta": "Parameters.Enum,KernalType.Cross,0f,1f"
+        },
+        {
+          "name": "Invert",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "DirectionalWarp": {
+      "line": 25588,
+      "attrs": [
+        "Family(\"Transform\")",
+        "ShortCode(\"rt\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Strength",
+          "meta": "0.25f,0f,5f"
+        },
+        {
+          "name": "Direction",
+          "meta": "45f,0f,360f"
+        },
+        {
+          "name": "EdgeBehaviour",
+          "meta": "Parameters.Enum,EdgeBehaviour.Mirror,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Distance": {
+      "line": 25665,
+      "attrs": [
+        "Family(\"Erosion\")",
+        "ShortCode(\"ee\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Method",
+          "meta": "Parameters.HorizontalList,DistanceMode.RT,0f,1f"
+        },
+        {
+          "name": "Mode",
+          "meta": "Parameters.HorizontalList,DistanceRTStyle.Asterisk,0f,1f"
+        },
+        {
+          "name": "Directions",
+          "meta": "3f,1f,24f"
+        },
+        {
+          "name": "Skew",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Angle",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "AngularJitter",
+          "meta": "0f,0f,2f"
+        },
+        {
+          "name": "Falloff",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Threshold",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "FalloffJitter",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Distress": {
+      "line": 15588,
+      "attrs": [
+        "Family(\"Extended\")",
+        "ShortCode(\"dot\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Octaves",
+          "meta": "10f,10f,50f"
+        },
+        {
+          "name": "Scale",
+          "meta": "0.8f,0f,1f"
+        },
+        {
+          "name": "Depth",
+          "meta": "0.33f,0f,1f"
+        },
+        {
+          "name": "Influence",
+          "meta": "0.8f,0f,1f"
+        },
+        {
+          "name": "Formation",
+          "meta": "0.8f,0f,1f"
+        },
+        {
+          "name": "ScaleX",
+          "meta": "1f,0.0001f,100f"
+        },
+        {
+          "name": "ScaleY",
+          "meta": "1f,0.0001f,100f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "DotNoise": {
+      "line": 15779,
+      "attrs": [
+        "Family(\"Basic\")",
+        "ShortCode(\"vm\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalList,DotNoiseStyle.Dot,0f,1f"
+        },
+        {
+          "name": "Iterations",
+          "meta": "50f,2f,500f"
+        },
+        {
+          "name": "Multiplier",
+          "meta": "1f,0f,20f"
+        },
+        {
+          "name": "Size",
+          "meta": "0.2f,0.6f,0.0001f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "0.2f,0.0001f,1f"
+        },
+        {
+          "name": "BlendMode",
+          "meta": "Parameters.Enum,BombBlendMode.Max,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Draw": {
+      "line": 15944,
+      "attrs": [
+        "Family(\"Extended\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "ShortCode(\"dr\")",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Soften",
+          "meta": "0f,0f,5f"
+        },
+        {
+          "name": "Height",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "OpenPainter",
+          "meta": "Parameters.Command,\"brush\""
+        }
+      ],
+      "imOps": []
+    },
+    "DriftNoise": {
+      "line": 16396,
+      "attrs": [
+        "Family(\"Landscape\")",
+        "Toolbox(NodeCategory.Terrain)",
+        "ShortCode(\"du\")",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Passes",
+          "meta": "2f,2f,10f"
+        },
+        {
+          "name": "Chaos",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "ScaleLarge",
+          "meta": "0.4f,0.05f,1f"
+        },
+        {
+          "name": "ScaleSmall",
+          "meta": "0.4f,0.05f,1f"
+        },
+        {
+          "name": "TurbulenceLarge",
+          "meta": "0.4f,0.15f,1f"
+        },
+        {
+          "name": "TurbulenceSmall",
+          "meta": "0.4f,0.1f,1f"
+        },
+        {
+          "name": "WindDirectionLarge",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "WindDirectionSmall",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "OverlapShapes",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "DuneSea": {
+      "line": 16573,
+      "attrs": [
+        "Family(\"Assets\")",
+        "ShortCode(\"f\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.25f,0.1f,0.5f"
+        },
+        {
+          "name": "DuneType",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Chaos",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Undulation",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Height",
+          "meta": "0.25f,0.01f,1f"
+        },
+        {
+          "name": "Softness",
+          "meta": "10f,5f,50f"
+        },
+        {
+          "name": "Sharpness",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Dusting": {
+      "line": 35057,
+      "attrs": [
+        "Family(\"Erosion\")",
+        "ShortCode(\"ce\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Strength",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Snowline",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Falloff",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Directional",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Peaks",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Coverage",
+          "meta": "0.15f,0f,1f"
+        },
+        {
+          "name": "SlopeCoverage",
+          "meta": "0f,0.5f,0f,1f"
+        },
+        {
+          "name": "Flow",
+          "meta": "0.15f,0f,1f"
+        },
+        {
+          "name": "Melt",
+          "meta": "0.4f,0f,1f"
+        },
+        {
+          "name": "Gritty",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "IncludeExistingSnow",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "ArtisticControl",
+          "meta": "0f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "EasyErosion": {
+      "line": 25976,
+      "attrs": [
+        "Family(\"Structure\")",
+        "ShortCode(\"ed\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Style",
+          "meta": "Parameters.OptionGrid"
+        },
+        {
+          "name": "Influence",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "BiasAngle",
+          "meta": "Parameters.HorizontalList,GradientDirection.X,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Edge": {
+      "line": 26193,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "Toolbox(NodeCategory.Modify)",
+        "ShortCode(\"eq\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalList,EdgeStyle.Square,0f,1f"
+        },
+        {
+          "name": "Size",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Pixels",
+          "meta": "2f,1f,500f"
+        },
+        {
+          "name": "Softness",
+          "meta": "0.25f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Equalize": {
+      "line": 26279,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "ShortCode(\"xt\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Factor",
+          "meta": "1f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Erosion": {
+      "line": 35377,
+      "attrs": [
+        "Family(\"Erosion\")",
+        "ShortCode(\"e2\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Duration",
+          "meta": "0.04f,0.0001f,1f"
+        },
+        {
+          "name": "RockSoftness",
+          "meta": "0.65f,0.05f,1f"
+        },
+        {
+          "name": "Strength",
+          "meta": "0.5f,0.0001f,1f"
+        },
+        {
+          "name": "Downcutting",
+          "meta": "0.1,0f,1f"
+        },
+        {
+          "name": "Inhibition",
+          "meta": "0.5f,0f,5f"
+        },
+        {
+          "name": "BaseLevel",
+          "meta": "0f,0f,5f"
+        },
+        {
+          "name": "FeatureScale",
+          "meta": "2000f,5f,20000f"
+        },
+        {
+          "name": "RealScale",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "TerrainScale",
+          "meta": "10000f,500f,20000f"
+        },
+        {
+          "name": "Verticality",
+          "meta": "2000f,5f,20000f"
+        },
+        {
+          "name": "Debris",
+          "meta": "0f,0f,5f"
+        },
+        {
+          "name": "Volume",
+          "meta": "0f,0f,5f"
+        },
+        {
+          "name": "SedimentRemoval",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "AreaEffect",
+          "meta": "Parameters.Enum,AreaEffect.None,0f,1f"
+        },
+        {
+          "name": "BiasType",
+          "meta": "Parameters.HorizontalList,BiasType.Altitude,0f,1f"
+        },
+        {
+          "name": "Bias",
+          "meta": "0.7,0f,1f"
+        },
+        {
+          "name": "Reverse",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "AggressiveMode",
+          "meta": "true,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Erosion2": {
+      "line": 35758,
+      "attrs": [
+        "Family(\"Snow\")",
+        "ShortCode(\"gl\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Duration",
+          "meta": "10f,1f,200f"
+        },
+        {
+          "name": "Downcutting",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "ErosionScale",
+          "meta": "1000f,1f,20000f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "NoErosion",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "SuspendedLoadDischargeAmount",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "SuspendedLoadDischargeAngle",
+          "meta": "24f,0f,45f"
+        },
+        {
+          "name": "BedLoadDischargeAmount",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "BedLoadDischargeAngle",
+          "meta": "15f,0f,45f"
+        },
+        {
+          "name": "CoarseSedimentsDischargeAmount",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "CoarseSedimentsDischargeAngle",
+          "meta": "10f,0f,45f"
+        },
+        {
+          "name": "DepositionBoost",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Shape",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "ShapeSharpness",
+          "meta": "0.6f,0f,1f"
+        },
+        {
+          "name": "ShapeDetailScale",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Enable",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "DirectionalPrecipitation",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "RainShadow",
+          "meta": "0.8f,0f,1f"
+        },
+        {
+          "name": "Slope",
+          "meta": "0f,90f,0f,90f"
+        },
+        {
+          "name": "Altitude",
+          "meta": "0f,1f,0f,1f"
+        },
+        {
+          "name": "Reverse",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Export": {
+      "line": 11518,
+      "attrs": [
+        "Family(\"Assets\")",
+        "Toolbox(NodeCategory.Output)",
+        "ShortCode(\"me\")",
+        "Classification(Classification.Export)"
+      ],
+      "params": [
+        {
+          "name": "Format",
+          "meta": "Parameters.OptionsGridDehumanized,FileFormats.EXR,0f,1f"
+        },
+        {
+          "name": "Location",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "OutputPath",
+          "meta": "Parameters.Folder"
+        },
+        {
+          "name": "IfFileExists",
+          "meta": "Parameters.HorizontalList,OverwriteMode.Overwrite,0f,1f"
+        },
+        {
+          "name": "HoudiniOut",
+          "meta": "Parameters.Command,\"transfer-out\""
+        }
+      ],
+      "imOps": []
+    },
+    "Extend": {
+      "line": 26312,
+      "attrs": [
+        "Family(\"Profile\")",
+        "Classification(Classification.Processor)",
+        "Toolbox(NodeCategory.Modify)",
+        "ShortCode(\"fi\")"
+      ],
+      "params": [
+        {
+          "name": "Value",
+          "meta": "0f,1f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "File": {
+      "line": 16735,
+      "attrs": [
+        "Family(\"Assets\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "RelativePath",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "IsRGB",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "EnforceLinearGamma",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "AllowUnclamped",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "CropToSquare",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "HoudiniIn",
+          "meta": "Parameters.Command,\"transfer-in\""
+        },
+        {
+          "name": "PurgeCache",
+          "meta": "Parameters.Command,\"file-shredder\""
+        },
+        {
+          "name": "NeverCache",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Filter": {
+      "line": 26346,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "Toolbox(NodeCategory.Modify)",
+        "ShortCode(\"fp\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Mode",
+          "meta": "Parameters.Enum,FilterMode.LowPass,0f,1f"
+        },
+        {
+          "name": "Frequency",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Gain",
+          "meta": "1f,0f,5f"
+        },
+        {
+          "name": "Q",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "KeepDC",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Flip": {
+      "line": 26452,
+      "attrs": [
+        "Family(\"Profile\")",
+        "Toolbox(NodeCategory.Modify)",
+        "ShortCode(\"fo\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Type",
+          "meta": "Parameters.HorizontalList"
+        }
+      ],
+      "imOps": []
+    },
+    "FlowMap": {
+      "line": 22688,
+      "attrs": [
+        "Family(\"Aspect\")",
+        "Toolbox(NodeCategory.Derive)",
+        "ShortCode(\"h\")",
+        "Classification(Classification.Mask)"
+      ],
+      "params": [
+        {
+          "name": "FlowLength",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "FlowVolume",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "FlowMapClassic": {
+      "line": 22520,
+      "attrs": [
+        "Family(\"Generative\")",
+        "Toolbox(NodeCategory.Derive)",
+        "ShortCode(\"fl\")",
+        "Classification(Classification.Mask)"
+      ],
+      "params": [
+        {
+          "name": "Rainfall",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "Primary",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Secondary",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Tertiary",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Quaternary",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Simulate2X",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Enhance",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Quality",
+          "meta": "Parameters.HorizontalList,RelativeQuality.Quarter,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Fold": {
+      "line": 26487,
+      "attrs": [
+        "Family(\"Terrace\")",
+        "ShortCode(\"ft\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Waveform",
+          "meta": "Parameters.Enum,FoldWaveform.Sine,0f,1f"
+        },
+        {
+          "name": "Folds",
+          "meta": "2.0,0f,10f"
+        },
+        {
+          "name": "Symmetric",
+          "meta": "true,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "FractalTerraces": {
+      "line": 26558,
+      "attrs": [
+        "Family(\"Profile\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"gq\")"
+      ],
+      "params": [
+        {
+          "name": "Spacing",
+          "meta": "0.1,0f,1f"
+        },
+        {
+          "name": "Octaves",
+          "meta": "12f,1f,12f"
+        },
+        {
+          "name": "Intensity",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "Shape",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "MacroOctaves",
+          "meta": "5f,1f,12f"
+        },
+        {
+          "name": "MicroShape",
+          "meta": "-0f,-1f,1f"
+        },
+        {
+          "name": "Character",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "ThicknessUniformity",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "HardnessUniformity",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "StrataDetails",
+          "meta": "0.6,0f,1f"
+        },
+        {
+          "name": "TiltAmount",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "TiltSeed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "WarpAmount",
+          "meta": "0.33,0f,1f"
+        },
+        {
+          "name": "WarpSize",
+          "meta": "0.33,0f,1f"
+        },
+        {
+          "name": "WarpStyle",
+          "meta": "Parameters.Enum,ABCD.A,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Gabor": {
+      "line": 17132,
+      "attrs": [
+        "Family(\"Gradient\")",
+        "ShortCode(\"do\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Size",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "Entropy",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "Anisotropy",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "AnisotropyAzimuth",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Gain",
+          "meta": "0.5f,0.0001f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Gamma": {
+      "line": 9012,
+      "attrs": [
+        "Family(\"Cartography\")",
+        "Toolbox(NodeCategory.Surface)",
+        "ShortCode(\"gr\")",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "GammaValue",
+          "meta": "0.44f,0f,4f"
+        },
+        {
+          "name": "Automatic",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": [
+        "AutoGamma",
+        "GammaCorrect"
+      ]
+    },
+    "Gate": {
+      "line": 41727,
+      "attrs": [
+        "Family(\"Utilities\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Generator)",
+        "ShortCode(\"var\")"
+      ],
+      "params": [],
+      "imOps": []
+    },
+    "Glacier": {
+      "line": 36297,
+      "attrs": [
+        "Family(\"Water\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Scale2",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Thickness",
+          "meta": "0.8f,0f,4f"
+        },
+        {
+          "name": "Height",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Breakage",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "RoughEdges",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "Chipped",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "SecondaryBreakage",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "DiagonalBreakage",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "DiagonalBreakageDirection",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "BreakageCount",
+          "meta": "2f,2f,10f"
+        },
+        {
+          "name": "FlowBreakage",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Extreme",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "FlowBreakageDepth",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Substructure",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "SubstructureDensity",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "SubstructureDepth",
+          "meta": "0.25f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "GraphicEQ": {
+      "line": 26923,
+      "attrs": [
+        "Family(\"Superficial\")",
+        "ShortCode(\"gt\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Band1",
+          "meta": "1f,0f,2f"
+        },
+        {
+          "name": "Band2",
+          "meta": "1f,0f,2f"
+        },
+        {
+          "name": "Band3",
+          "meta": "1f,0f,2f"
+        },
+        {
+          "name": "Band4",
+          "meta": "1f,0f,2f"
+        },
+        {
+          "name": "Band5",
+          "meta": "1f,0f,2f"
+        },
+        {
+          "name": "Band6",
+          "meta": "1f,0f,2f"
+        },
+        {
+          "name": "Band7",
+          "meta": "1f,0f,2f"
+        }
+      ],
+      "imOps": []
+    },
+    "Grid": {
+      "line": 9084,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "Toolbox(NodeCategory.Colorize)",
+        "ShortCode(\"hu\")",
+        "Classification(Classification.Colorizer)"
+      ],
+      "params": [
+        {
+          "name": "Subdivision",
+          "meta": "2f,1f,10f"
+        },
+        {
+          "name": "LineIntensity",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "SubIntensity",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "LineThickness",
+          "meta": "1f,1f,20f"
+        }
+      ],
+      "imOps": []
+    },
+    "GroundTexture": {
+      "line": 27047,
+      "attrs": [
+        "Family(\"Render\")",
+        "Toolbox(NodeCategory.Output)",
+        "Classification(Classification.Mask)"
+      ],
+      "params": [
+        {
+          "name": "Method",
+          "meta": "Parameters.HorizontalList,SharpenMethod.Frequency,0f,1f"
+        },
+        {
+          "name": "Strength",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Coverage",
+          "meta": "0.33f,0f,1f"
+        },
+        {
+          "name": "Density",
+          "meta": "0f,-1f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "HSL": {
+      "line": 9163,
+      "attrs": [
+        "Family(\"Render\")",
+        "Toolbox(NodeCategory.Output)",
+        "ShortCode(\"lx\")",
+        "Classification(Classification.Colorizer)"
+      ],
+      "params": [
+        {
+          "name": "Hue",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Saturation",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Lightness",
+          "meta": "0f,-1f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Halftone": {
+      "line": 27138,
+      "attrs": [
+        "Family(\"Utilities\")",
+        "ShortCode(\"hl\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Pattern",
+          "meta": "Parameters.OptionsGridDehumanized,HalftonePattern.FloydSteinberg,0f,1f"
+        },
+        {
+          "name": "Posterize",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Depth",
+          "meta": "5f,2f,64f"
+        }
+      ],
+      "imOps": []
+    },
+    "Heal": {
+      "line": 27234,
+      "attrs": [
+        "Family(\"Erosion\")",
+        "ShortCode(\"hi\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Reconstruction",
+          "meta": "0.3f,0f,1f"
+        },
+        {
+          "name": "Passes",
+          "meta": "1f,1f,10f"
+        }
+      ],
+      "imOps": [
+        "WaveletDenoise"
+      ]
+    },
+    "Height": {
+      "line": 22762,
+      "attrs": [
+        "Family(\"Utilities\")",
+        "Toolbox(NodeCategory.Utility)",
+        "ShortCode(\"ma\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Range",
+          "meta": "0f,0.5f,0f,1f"
+        },
+        {
+          "name": "Falloff",
+          "meta": "0.2f,0.0001f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Hemisphere": {
+      "line": 17260,
+      "attrs": [
+        "Family(\"Primitive\")",
+        "Toolbox(NodeCategory.Terrain)",
+        "Classification(Classification.Generator)",
+        "ShortCode(\"is\")"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "1f,0f,4f"
+        },
+        {
+          "name": "Height",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "X",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Y",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Flatten",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Hillify": {
+      "line": 27287,
+      "attrs": [
+        "Family(\"Erosion\")",
+        "ShortCode(\"hf\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Coverage",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Creep",
+          "meta": "Parameters.HorizontalList,HillCoverage.Moderate,0f,1f"
+        },
+        {
+          "name": "Surface",
+          "meta": "Parameters.HorizontalList,HillSurface.Eroded,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "HydroFix": {
+      "line": 27371,
+      "attrs": [
+        "Family(\"Snow\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"if\")"
+      ],
+      "params": [
+        {
+          "name": "Downcutting",
+          "meta": "0.1f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "IceFloe": {
+      "line": 27412,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Size",
+          "meta": "0.3f,0f,1f"
+        },
+        {
+          "name": "Density",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Layers",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Thickness",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Shaper1",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Shaper2",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Reverse",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Reverse2",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Island": {
+      "line": 17388,
+      "attrs": [
+        "Family(\"Gradient\")",
+        "ShortCode(\"lg\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Size",
+          "meta": "0.25f,0.0001f,1f"
+        },
+        {
+          "name": "Chaos",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Lake": {
+      "line": 36665,
+      "attrs": [
+        "Toolbox(NodeCategory.Simulate)",
+        "Family(\"Water\")",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"rv\")"
+      ],
+      "params": [
+        {
+          "name": "Type",
+          "meta": "Parameters.HorizontalList,LakeType.Simple,0f,1f"
+        },
+        {
+          "name": "X",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Y",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "WaterLevel",
+          "meta": "0.01f,0f,1f"
+        },
+        {
+          "name": "RenderSurface",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Precipitation",
+          "meta": "10f,0f,300f"
+        },
+        {
+          "name": "SmallLakes",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "FloodControl",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "WaterFloor",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "ShoreSize",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "AltitudeBias",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "SizeBias",
+          "meta": "0f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Layers": {
+      "line": 39186,
+      "attrs": [
+        "Family(\"Routing\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"lb\")"
+      ],
+      "params": [
+        {
+          "name": "Blend2",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Blend3",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Blend4",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Blend5",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Blend6",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Blend7",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Blend8",
+          "meta": "1f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Lichtenberg": {
+      "line": 27640,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalList,ABC.A,0f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "0.4f,0f,1f"
+        },
+        {
+          "name": "Complexity",
+          "meta": "2f,1f,6f"
+        },
+        {
+          "name": "Depth",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "Expand",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Bias",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "LightX": {
+      "line": 9228,
+      "attrs": [
+        "Family(\"Utilities\")",
+        "Toolbox(NodeCategory.Colorize)",
+        "ShortCode(\"rm\")",
+        "Classification(Classification.Colorizer)"
+      ],
+      "params": [
+        {
+          "name": "DirectionSelection",
+          "meta": "Parameters.HorizontalListNoLabel,LightingDirectionType.Manual,0f,1f"
+        },
+        {
+          "name": "North",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Latitude",
+          "meta": "60f,-90f,90f"
+        },
+        {
+          "name": "DayOfYear",
+          "meta": "1f,1f,365f"
+        },
+        {
+          "name": "SolarHour",
+          "meta": "10f,0f,24f"
+        },
+        {
+          "name": "SunAzimuth",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "SunElevation",
+          "meta": "30f,0f,90f"
+        },
+        {
+          "name": "AngularDiameter",
+          "meta": "0.5,0f,20f"
+        },
+        {
+          "name": "DirectLight",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Shadows",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "AmbientLight",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "AmbientOcclusion",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Quality",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Exposure",
+          "meta": "1f,0f,4f"
+        },
+        {
+          "name": "SunIntensity",
+          "meta": "1f,0f,2f"
+        },
+        {
+          "name": "AmbientIntensity",
+          "meta": "1f,0f,2f"
+        },
+        {
+          "name": "AirDensity",
+          "meta": "1f,0f,2f"
+        },
+        {
+          "name": "Haze",
+          "meta": "1f,0f,2f"
+        },
+        {
+          "name": "Ozone",
+          "meta": "1f,0f,2f"
+        },
+        {
+          "name": "AutomaticColors",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "GroundBrightness",
+          "meta": "0.65f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "LineNoise": {
+      "line": 17526,
+      "attrs": [
+        "Family(\"Primitive\")",
+        "ShortCode(\"m\")",
+        "Toolbox(NodeCategory.Terrain)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "BucketSize",
+          "meta": "Parameters.HorizontalList,LineNoiseSize.X1,0f,1f"
+        },
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalList,LineNoiseStyle.Sharp,0f,1f"
+        },
+        {
+          "name": "Clamp",
+          "meta": "1f,0.0001f,1f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "LinearGradient": {
+      "line": 17455,
+      "attrs": [
+        "Classification(Classification.Generator)",
+        "Toolbox(NodeCategory.Primitive)",
+        "Family(\"Basic\")",
+        "ShortCode(\"ln\")"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "1f,0f,4f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Edge",
+          "meta": "Parameters.Enum"
+        }
+      ],
+      "imOps": []
+    },
+    "LoopBegin": {
+      "line": 39413,
+      "attrs": [
+        "Family(\"Routing\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"le\")"
+      ],
+      "params": [],
+      "imOps": []
+    },
+    "LoopEnd": {
+      "line": 39481,
+      "attrs": [
+        "Family(\"Routing\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Primed",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "PrimedBuild",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Loops",
+          "meta": "2f,2f,50f"
+        },
+        {
+          "name": "MutateSeeds",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "MacroPort": {
+      "line": 40222,
+      "attrs": [
+        "Family(\"Utilities\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Generator)",
+        "ShortCode(\"mth\")"
+      ],
+      "params": [
+        {
+          "name": "Direction",
+          "meta": "Parameters.HorizontalList,TransferDirection.Input,0f,1f"
+        },
+        {
+          "name": "Display",
+          "meta": "Parameters.HorizontalList,DisplayIntent.Heightfield,0f,1f"
+        },
+        {
+          "name": "IsOptional",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Fallback",
+          "meta": "Parameters.HorizontalList,FallbackMap.Null,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Mask": {
+      "line": 22811,
+      "attrs": [
+        "Family(\"Aspect\")",
+        "Toolbox(NodeCategory.Derive)",
+        "ShortCode(\"nm\")",
+        "Classification(Classification.Colorizer)"
+      ],
+      "params": [],
+      "imOps": []
+    },
+    "Match": {
+      "line": 27762,
+      "attrs": [
+        "Family(\"Blur\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"md\")"
+      ],
+      "params": [
+        {
+          "name": "Mode",
+          "meta": "Parameters.HorizontalList,MatchType.Height,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "MathX": {
+      "line": 40397,
+      "attrs": [
+        "Family(\"Routing\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Colorizer)",
+        "ShortCode(\"mx\")"
+      ],
+      "params": [
+        {
+          "name": "Expression",
+          "meta": "Parameters.TextBox"
+        },
+        {
+          "name": "OpenEditor",
+          "meta": "Parameters.Command,\"terminal-2\""
+        },
+        {
+          "name": "NormalizedCoordinates",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Median": {
+      "line": 27810,
+      "attrs": [
+        "Family(\"Shape\")",
+        "ShortCode(\"msf\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Mode",
+          "meta": "Parameters.HorizontalList,MedianType.Advanced2,0f,1f"
+        },
+        {
+          "name": "Strength",
+          "meta": "Parameters.HorizontalList,MedianStrength.X1,0f,1f"
+        },
+        {
+          "name": "Horizontal",
+          "meta": "2f,2f,50f"
+        },
+        {
+          "name": "Vertical",
+          "meta": "2f,2f,50f"
+        },
+        {
+          "name": "Iterations",
+          "meta": "1f,1f,50f"
+        },
+        {
+          "name": "Quality",
+          "meta": "Parameters.HorizontalList,MedianFilter.MedianQuality.Low,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Mesher": {
+      "line": 11714,
+      "attrs": [
+        "Family(\"Utilities\")",
+        "Toolbox(NodeCategory.Output)",
+        "ShortCode(\"mw\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Format",
+          "meta": "Parameters.HorizontalList,MesherFormats.OBJ,0f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "Parameters.HorizontalList,MeshScale.Normalized,0f,1f"
+        },
+        {
+          "name": "Topology",
+          "meta": "Parameters.HorizontalList,Topology.AdaptiveTris,0f,1f"
+        },
+        {
+          "name": "TopologyWarning",
+          "meta": "Parameters.ComputedString"
+        },
+        {
+          "name": "VerticesPerSide",
+          "meta": "2048f,64f,16384f"
+        },
+        {
+          "name": "ArtifactReduction",
+          "meta": "Parameters.HorizontalList,Generic3.None,0f,1f"
+        },
+        {
+          "name": "CreateNormals",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "CreateUVs",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "UVOrigin",
+          "meta": "Parameters.Enum,UVOrigin.BottomLeft,0f,1f"
+        },
+        {
+          "name": "CreateWalls",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "CenterPivot",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "LevelOfDetail",
+          "meta": "Parameters.Enum,LOD.None,0f,1f"
+        },
+        {
+          "name": "LODInfo",
+          "meta": "Parameters.ComputedString"
+        }
+      ],
+      "imOps": []
+    },
+    "Meshify": {
+      "line": 27977,
+      "attrs": [
+        "Family(\"Effect\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"or\")"
+      ],
+      "params": [
+        {
+          "name": "Vertices",
+          "meta": "10000f,4f,1000000f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "DetailSensitivity",
+          "meta": "0.5f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Mixer": {
+      "line": 40505,
+      "attrs": [
+        "Family(\"Routing\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "BlendLayers",
+          "meta": "Parameters.Custom"
+        },
+        {
+          "name": "AddInput",
+          "meta": "Parameters.Command,\"port-connect\""
+        },
+        {
+          "name": "ShowSimplified",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "PreserveMasks",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Mountain": {
+      "line": 17660,
+      "attrs": [
+        "Family(\"Landscape\")",
+        "ShortCode(\"mr\")",
+        "Toolbox(NodeCategory.Terrain)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.5f,0.0001f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "1.25f,0.0001f,3f"
+        },
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalListNoLabel,MountainStyle.Eroded,0f,1f"
+        },
+        {
+          "name": "Bulk",
+          "meta": "Parameters.HorizontalList,MountainBulk.Medium,0f,1f"
+        },
+        {
+          "name": "ReduceDetails",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "X",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Y",
+          "meta": "0.5f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "MountainRange": {
+      "line": 17841,
+      "attrs": [
+        "Classification(Classification.Generator)",
+        "Toolbox(NodeCategory.Terrain)",
+        "Family(\"Primitive\")",
+        "ShortCode(\"ms\")"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "0.5f,0.25f,3f"
+        },
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalList,MountainRangeStyle.Eroded,0f,1f"
+        },
+        {
+          "name": "Bulk",
+          "meta": "Parameters.HorizontalList,MountainBulk.Low,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "MountainSide": {
+      "line": 17941,
+      "attrs": [
+        "Family(\"Extended\")",
+        "ShortCode(\"mf\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.5f,0.0001f,0.9999f"
+        },
+        {
+          "name": "Detail",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Type",
+          "meta": "Parameters.HorizontalList,MountainSideType.Slope,0f,1f"
+        },
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalListNoLabel,MountainStyle.Eroded,0f,1f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "MultiFractal": {
+      "line": 18134,
+      "attrs": [
+        "Family(\"Basic\")",
+        "ShortCode(\"kn\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "NoiseType",
+          "meta": "Parameters.Enum,MultifractalNoiseType.FBM,0f,1f"
+        },
+        {
+          "name": "Octaves",
+          "meta": "10f,1f,14f"
+        },
+        {
+          "name": "Size",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "FeatureSize",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "FractalGain",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "EdgeSmoothing",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "VariationType",
+          "meta": "Parameters.HorizontalList,VariationType.SecondaryFractal,0f,1f"
+        },
+        {
+          "name": "Variation",
+          "meta": "2f,-5f,5f"
+        },
+        {
+          "name": "Smoothness",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "VariationContrast",
+          "meta": "0.3f,0f,1f"
+        },
+        {
+          "name": "Damping",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Bias",
+          "meta": "0.5f,-1f,1f"
+        },
+        {
+          "name": "Rotation",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Anisotropy",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "OffsetX",
+          "meta": "0f,-5f,5f"
+        },
+        {
+          "name": "OffsetY",
+          "meta": "0f,-5f,5f"
+        },
+        {
+          "name": "Perturb",
+          "meta": "Parameters.HorizontalList,Perturb.None,0f,1f"
+        },
+        {
+          "name": "RelativeWarpSize",
+          "meta": "1f,0.25f,4f"
+        },
+        {
+          "name": "WarpStrength",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "WarpComplexity",
+          "meta": "3f,1f,14f"
+        },
+        {
+          "name": "WarpRoughness",
+          "meta": "0.4f,0f,0.5f"
+        },
+        {
+          "name": "WarpAttenuation",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "WarpIterations",
+          "meta": "3f,1f,20f"
+        },
+        {
+          "name": "RelativeWarpAnisotropy",
+          "meta": "1f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Noise": {
+      "line": 18590,
+      "attrs": [
+        "Family(\"Assets\")",
+        "ShortCode(\"o\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "NoiseType",
+          "meta": "Parameters.HorizontalListNoLabel,ConstantNoiseType.Random,0f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Density",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "RelativeDensity",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "BlendMode",
+          "meta": "Parameters.HorizontalList,PrimitiveBlendMode.Add,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Normals": {
+      "line": 22857,
+      "attrs": [
+        "Family(\"Generative\")",
+        "ShortCode(\"ccl\")",
+        "Toolbox(NodeCategory.Derive)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Type",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Width",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "0.5f,0f,10f"
+        },
+        {
+          "name": "DetailSize",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Handedness",
+          "meta": "Parameters.HorizontalListNoLabel"
+        },
+        {
+          "name": "UpAxis",
+          "meta": "Parameters.HorizontalListNoLabel"
+        }
+      ],
+      "imOps": []
+    },
+    "Object": {
+      "line": 18736,
+      "attrs": [
+        "Family(\"Basic\")",
+        "ShortCode(\"p\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "RelativePath",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "DropToFloor",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "OffsetX",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "OffsetY",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "OffsetZ",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "1f,0.001f,2f"
+        },
+        {
+          "name": "Pitch",
+          "meta": "0f,-180f,180f"
+        },
+        {
+          "name": "Yaw",
+          "meta": "0f,-180f,180f"
+        },
+        {
+          "name": "Roll",
+          "meta": "0f,-180f,180f"
+        },
+        {
+          "name": "Antialiasing",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Occlusion": {
+      "line": 23009,
+      "attrs": [
+        "Family(\"Aspect\")",
+        "Toolbox(NodeCategory.Derive)",
+        "Classification(Classification.Mask)",
+        "ShortCode(\"pk\")"
+      ],
+      "params": [
+        {
+          "name": "Strength",
+          "meta": "2f,0f,10f"
+        },
+        {
+          "name": "Octaves",
+          "meta": "1f,1f,10f"
+        }
+      ],
+      "imOps": []
+    },
+    "Origami": {
+      "line": 28343,
+      "attrs": [
+        "Toolbox(NodeCategory.Surface)",
+        "Family(\"Rocky\")",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"oc\")"
+      ],
+      "params": [
+        {
+          "name": "Amount",
+          "meta": "0.25f,0.0001f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Outcrops": {
+      "line": 28391,
+      "attrs": [
+        "Family(\"Effect\")",
+        "Toolbox(NodeCategory.Modify)",
+        "ShortCode(\"px\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Variations",
+          "meta": "3f,2f,10f"
+        },
+        {
+          "name": "Strata",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "Density",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "Shape",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Chipped",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "Size",
+          "meta": "0.4f,0.8f,0f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "0.45f,0.8f,0f,1f"
+        },
+        {
+          "name": "Rotation",
+          "meta": "0f,0.6f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Pattern": {
+      "line": 43271,
+      "attrs": [
+        "Family(\"Assets\")",
+        "Toolbox(NodeCategory.Output)",
+        "Classification(Classification.Export)",
+        "ShortCode(\"ho\")"
+      ],
+      "params": [
+        {
+          "name": "Size",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "DotSize",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Spacing",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "Steps",
+          "meta": "256f,10f,4096f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,90f"
+        },
+        {
+          "name": "Type",
+          "meta": "Parameters.HorizontalListNoLabel,PatternType.Lines,0f,1f"
+        },
+        {
+          "name": "PixelSize",
+          "meta": "1f,1f,20f"
+        }
+      ],
+      "imOps": []
+    },
+    "Peaks": {
+      "line": 23059,
+      "attrs": [
+        "Family(\"Generative\")",
+        "Toolbox(NodeCategory.Derive)",
+        "Classification(Classification.Mask)",
+        "ShortCode(\"km\")"
+      ],
+      "params": [
+        {
+          "name": "Falloff",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Precise",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Perlin": {
+      "line": 18976,
+      "attrs": [
+        "Family(\"Landscape\")",
+        "ShortCode(\"pl\")",
+        "Toolbox(NodeCategory.Terrain)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Type",
+          "meta": "Parameters.HorizontalList,PerlinNoiseType.FBM,0f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Octaves",
+          "meta": "10f,1f,14f"
+        },
+        {
+          "name": "Gain",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Clamp",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "WarpType",
+          "meta": "Parameters.HorizontalList,NoiseWarpType.Complex,0f,1f"
+        },
+        {
+          "name": "Frequency",
+          "meta": "0.05f,0f,1f"
+        },
+        {
+          "name": "Amplitude",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "WarpOctaves",
+          "meta": "10f,1f,14f"
+        },
+        {
+          "name": "ScaleX",
+          "meta": "1f,0.0001f,100f"
+        },
+        {
+          "name": "ScaleY",
+          "meta": "1f,0.0001f,100f"
+        },
+        {
+          "name": "X",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Y",
+          "meta": "0.5f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Pixelate": {
+      "line": 28546,
+      "attrs": [
+        "Family(\"Scatter\")",
+        "ShortCode(\"pck\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Size",
+          "meta": "0.15f,0f,1f"
+        },
+        {
+          "name": "Autosize",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Antialias",
+          "meta": "true,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Plates": {
+      "line": 19245,
+      "attrs": [
+        "Family(\"Water\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.5f,0.0001f,0.9999f"
+        },
+        {
+          "name": "Range",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Falloff",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Warp",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Angle",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Pockmarks": {
+      "line": 28615,
+      "attrs": [
+        "Family(\"Profile\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"rc\")"
+      ],
+      "params": [
+        {
+          "name": "Size",
+          "meta": "0.4f,0.75f,0f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "0.6f,0f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "1f,0.0001f,3f"
+        },
+        {
+          "name": "Density",
+          "meta": "0.5f,0.0001f,1f"
+        },
+        {
+          "name": "Multiplier",
+          "meta": "0.5f,0.0001f,10f"
+        },
+        {
+          "name": "Invert",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "PointCloud": {
+      "line": 12474,
+      "attrs": [
+        "Family(\"Utilities\")",
+        "Toolbox(NodeCategory.Output)",
+        "ShortCode(\"txb\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Format",
+          "meta": "Parameters.HorizontalList,PointCloudFormats.PLY,0f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "Parameters.HorizontalList,MeshScale.Normalized,0f,1f"
+        },
+        {
+          "name": "CenterPivot",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "IgnoreZeroValues",
+          "meta": "true,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "RGBMerge": {
+      "line": 9693,
+      "attrs": [
+        "Family(\"Utilities\")",
+        "Toolbox(NodeCategory.Colorize)",
+        "ShortCode(\"rsp\")",
+        "Classification(Classification.Colorizer)"
+      ],
+      "params": [
+        {
+          "name": "EnhanceR",
+          "meta": "Parameters.HorizontalList,ProcessInput.None,0f,1f"
+        },
+        {
+          "name": "EnhanceG",
+          "meta": "Parameters.HorizontalList,ProcessInput.None,0f,1f"
+        },
+        {
+          "name": "EnhanceB",
+          "meta": "Parameters.HorizontalList,ProcessInput.None,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "RGBSplit": {
+      "line": 9790,
+      "attrs": [
+        "Family(\"Color\")",
+        "Toolbox(NodeCategory.Colorize)",
+        "ShortCode(\"sa\")",
+        "Classification(Classification.Colorizer)"
+      ],
+      "params": [
+        {
+          "name": "AutolevelChannels",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Method",
+          "meta": "Parameters.Enum,GrayscaleConversion.Average,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "RadialGradient": {
+      "line": 19521,
+      "attrs": [
+        "Family(\"Landscape\")",
+        "ShortCode(\"ri\")",
+        "Toolbox(NodeCategory.Terrain)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "1f,0f,4f"
+        },
+        {
+          "name": "Height",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "X",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Y",
+          "meta": "0.5f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Recurve": {
+      "line": 28740,
+      "attrs": [
+        "Family(\"Structure\")",
+        "ShortCode(\"rp\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Power",
+          "meta": "1f,0.01f,2f"
+        },
+        {
+          "name": "Scale",
+          "meta": "0.1f,0.0001f,1f"
+        },
+        {
+          "name": "Iterations",
+          "meta": "3f,1f,50f"
+        },
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalList,RecurveStyle.Inward,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Repeat": {
+      "line": 28822,
+      "attrs": [
+        "Toolbox(NodeCategory.Simulate)",
+        "Family(\"Water\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Tiles",
+          "meta": "2f,2f,50f"
+        },
+        {
+          "name": "CompensateHeight",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "1f,0.1f,10f"
+        }
+      ],
+      "imOps": []
+    },
+    "Reseed": {
+      "line": 41279,
+      "attrs": [
+        "Family(\"Routing\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"ro\")"
+      ],
+      "params": [
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Ridge": {
+      "line": 19636,
+      "attrs": [
+        "Family(\"Rocky\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Generator)",
+        "ShortCode(\"rn\")"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.75f,0.0001f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "0.6f,0.0001f,2f"
+        },
+        {
+          "name": "Definition",
+          "meta": "0.4f,0.25f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "ScaleX",
+          "meta": "1f,0.0001f,2.5f"
+        },
+        {
+          "name": "ScaleY",
+          "meta": "1f,0.0001f,2.5f"
+        }
+      ],
+      "imOps": []
+    },
+    "Rivers": {
+      "line": 37028,
+      "attrs": [
+        "Family(\"Water\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"sea\")"
+      ],
+      "params": [
+        {
+          "name": "Water",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Width",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "Depth",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "Downcutting",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "RiverValleyWidth",
+          "meta": "Parameters.HorizontalList,RiverValleyWidths.zero,0f,1f"
+        },
+        {
+          "name": "Headwaters",
+          "meta": "200f,1f,4000f"
+        },
+        {
+          "name": "RenderSurface",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "RockMap": {
+      "line": 23108,
+      "attrs": [
+        "Family(\"Aspect\")",
+        "Toolbox(NodeCategory.Derive)",
+        "Classification(Classification.Mask)",
+        "ShortCode(\"sl\")"
+      ],
+      "params": [
+        {
+          "name": "Coverage",
+          "meta": "0.33f,0f,1f"
+        },
+        {
+          "name": "Density",
+          "meta": "0f,-1f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "RockNoise": {
+      "line": 19750,
+      "attrs": [
+        "Family(\"Rocky\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Generator)",
+        "ShortCode(\"rs\")"
+      ],
+      "params": [
+        {
+          "name": "Size",
+          "meta": "0.2f,0.6f,0f,1f"
+        },
+        {
+          "name": "Variety",
+          "meta": "1f,1f,10f"
+        },
+        {
+          "name": "Octaves",
+          "meta": "50f,2f,500f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalList"
+        }
+      ],
+      "imOps": []
+    },
+    "Rockscape": {
+      "line": 19881,
+      "attrs": [
+        "Family(\"Landscape\")",
+        "Toolbox(NodeCategory.Terrain)",
+        "ShortCode(\"gg\")",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Size",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Erosion",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Breakage",
+          "meta": "0.25f,0.01f,1f"
+        },
+        {
+          "name": "Roughness",
+          "meta": "0.7f,0f,1f"
+        },
+        {
+          "name": "Jitter",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Clusters",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Relief",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Roughen": {
+      "line": 28933,
+      "attrs": [
+        "Family(\"Terrace\")",
+        "ShortCode(\"ss\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Width",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "Depth",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "Oriented",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Quality",
+          "meta": "Parameters.Enum,RelativeQuality.Quarter,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Route": {
+      "line": 41327,
+      "attrs": [
+        "Family(\"Utilities\")",
+        "Toolbox(NodeCategory.Colorize)",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"spl\")"
+      ],
+      "params": [
+        {
+          "name": "Choice",
+          "meta": "0f,0f,9f"
+        }
+      ],
+      "imOps": []
+    },
+    "Rugged": {
+      "line": 20029,
+      "attrs": [
+        "Family(\"Superficial\")",
+        "Toolbox(NodeCategory.Surface)",
+        "ShortCode(\"sd\")",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalList,ABCD.A,0f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Sand": {
+      "line": 20110,
+      "attrs": [
+        "Family(\"Basic\")",
+        "ShortCode(\"s\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Chaos",
+          "meta": "0.5f,0.1f,1f"
+        },
+        {
+          "name": "Softness",
+          "meta": "0.5f,0.1f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "0.25f,0.1f,1f"
+        },
+        {
+          "name": "WarpByTerrain",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Sandstone": {
+      "line": 29011,
+      "attrs": [
+        "Family(\"Scatter\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Passes",
+          "meta": "1f,1f,10f"
+        },
+        {
+          "name": "Iterations",
+          "meta": "10f,5f,30f"
+        },
+        {
+          "name": "Spacing",
+          "meta": "0.1,0f,1f"
+        },
+        {
+          "name": "Intensity",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "Convexity",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Tilt",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Chaos",
+          "meta": "0.15f,0.01f,0.4f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "Chipped",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Chipping",
+          "meta": "0.45f,0.1f,0.5f"
+        }
+      ],
+      "imOps": []
+    },
+    "SatMap": {
+      "line": 9861,
+      "attrs": [
+        "Family(\"Render\")",
+        "Toolbox(NodeCategory.Output)",
+        "Classification(Classification.Colorizer)"
+      ],
+      "params": [
+        {
+          "name": "Library",
+          "meta": "Parameters.HorizontalListNoLabel"
+        },
+        {
+          "name": "Randomize",
+          "meta": "Parameters.Command,\"dice-five\""
+        },
+        {
+          "name": "LibraryItem",
+          "meta": "Parameters.Custom"
+        },
+        {
+          "name": "Range",
+          "meta": "Parameters.RangeClipper,0f,1f,0f,1f"
+        },
+        {
+          "name": "Bias",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Enhance",
+          "meta": "Parameters.HorizontalList,ProcessInput.Autolevel,0f,1f"
+        },
+        {
+          "name": "Reverse",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Rough",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Hue",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Saturation",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Lightness",
+          "meta": "0f,-1f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Scree": {
+      "line": 29552,
+      "attrs": [
+        "Family(\"Structure\")",
+        "ShortCode(\"sls\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.6f,0f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "1f,0.0001f,3f"
+        },
+        {
+          "name": "Density",
+          "meta": "1f,1f,5f"
+        },
+        {
+          "name": "Spread",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Edge",
+          "meta": "0.4f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Sea": {
+      "line": 37215,
+      "attrs": [
+        "Family(\"Snow\")",
+        "ShortCode(\"sn\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "SeaArrangement",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Level",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "CoastalErosion",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "ShoreSize",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "ShoreHeight",
+          "meta": "0.2f,0f,1f"
+        },
+        {
+          "name": "Variation",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "UniformVariations",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "ExtraCliffDetails",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "RenderSurface",
+          "meta": "true,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Seamless": {
+      "line": 29679,
+      "attrs": [
+        "Family(\"Erosion\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"sed\")"
+      ],
+      "params": [
+        {
+          "name": "Edge",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "ShiftX",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "ShiftY",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "ToggleTiling",
+          "meta": "Parameters.Command,\"layout-grid\""
+        }
+      ],
+      "imOps": []
+    },
+    "Sediments": {
+      "line": 29773,
+      "attrs": [
+        "Family(\"Profile\")",
+        "ShortCode(\"sp\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Type",
+          "meta": "Parameters.HorizontalList,Sedimentation.Bulky,0f,1f"
+        },
+        {
+          "name": "Passes",
+          "meta": "1f,1f,10f"
+        },
+        {
+          "name": "Scale",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Angle",
+          "meta": "32f,0f,90f"
+        },
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalList,AB.A,0f,1f"
+        },
+        {
+          "name": "GrainyDeposits",
+          "meta": "true,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Shade": {
+      "line": 10222,
+      "attrs": [
+        "Family(\"Color\")",
+        "Toolbox(NodeCategory.Colorize)",
+        "ShortCode(\"sy\")",
+        "Classification(Classification.Colorizer)"
+      ],
+      "params": [
+        {
+          "name": "RenderStyle",
+          "meta": "Parameters.HorizontalListNoLabel,ShadeStyle.TableTop,0f,1f"
+        },
+        {
+          "name": "SunAzimuth",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "SunElevation",
+          "meta": "30f,0f,90f"
+        },
+        {
+          "name": "Sunlight",
+          "meta": "1f,0f,4f"
+        },
+        {
+          "name": "ShadeBias",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "SoftShadows",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "ReflectedLight",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "HighQuality",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Shape": {
+      "line": 20241,
+      "attrs": [
+        "Family(\"Landscape\")",
+        "Toolbox(NodeCategory.Terrain)",
+        "ShortCode(\"um\")",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Geometry",
+          "meta": "Parameters.Enum,Shapes.Circle,0f,1f"
+        },
+        {
+          "name": "Sides",
+          "meta": "3f,3f,256f"
+        },
+        {
+          "name": "Uniform",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "0.5f,0.0001f,2f"
+        },
+        {
+          "name": "ScaleX",
+          "meta": "0.5f,0.0001f,2f"
+        },
+        {
+          "name": "ScaleY",
+          "meta": "0.5f,0.0001f,2f"
+        },
+        {
+          "name": "Thickness",
+          "meta": "0.1f,0.0001f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "1f,0.0001f,1f"
+        },
+        {
+          "name": "X",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Y",
+          "meta": "0.5f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Shaper": {
+      "line": 29917,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "ShortCode(\"sx\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Shape",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "LocalArea",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "DetailSize",
+          "meta": "0.75f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Sharpen": {
+      "line": 30015,
+      "attrs": [
+        "Family(\"Structure\")",
+        "ShortCode(\"tt\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Method",
+          "meta": "Parameters.HorizontalList,SharpenMethod.Frequency,0f,1f"
+        },
+        {
+          "name": "Amount",
+          "meta": "0.5f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Shatter": {
+      "line": 30071,
+      "attrs": [
+        "Family(\"Structure\")",
+        "ShortCode(\"sh\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Shatters",
+          "meta": "6f,4f,50f"
+        },
+        {
+          "name": "Size",
+          "meta": "0.8f,0f,2f"
+        },
+        {
+          "name": "Coverage",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Shear": {
+      "line": 30148,
+      "attrs": [
+        "Toolbox(NodeCategory.Simulate)",
+        "Family(\"Vegetation\")",
+        "ShortCode(\"shr\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Strength",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Shrubs": {
+      "line": 30204,
+      "attrs": [
+        "Family(\"Blur\")",
+        "Classification(Classification.Processor)",
+        "Toolbox(NodeCategory.Modify)",
+        "ShortCode(\"sb\")"
+      ],
+      "params": [
+        {
+          "name": "ShrubCount",
+          "meta": "200f,10f,1000f"
+        },
+        {
+          "name": "IsRelative",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Shape",
+          "meta": "Parameters.HorizontalList,TreeShape.Point,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "WaterAffinity",
+          "meta": "Parameters.HorizontalList,WaterAffinity.Seek,0f,1f"
+        },
+        {
+          "name": "AvoidTrees",
+          "meta": "Parameters.HorizontalList,AvoidTrees.None,0f,1f"
+        },
+        {
+          "name": "Health",
+          "meta": "0.8f,0f,1f"
+        },
+        {
+          "name": "Spread",
+          "meta": "0.8f,0.0001f,1f"
+        },
+        {
+          "name": "Random",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "SimulationBias",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Slope",
+          "meta": "0f,33f,0f,90f"
+        },
+        {
+          "name": "SlopeFalloff",
+          "meta": "10f,0f,90f"
+        },
+        {
+          "name": "Altitude",
+          "meta": "0f,0.8f,0f,1f"
+        },
+        {
+          "name": "AltitudeFalloff",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "DeadFlow",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "ConsolidateFlows",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Bias",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Chaos",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "BlurEdges",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "CustomInfluence",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Trim",
+          "meta": "0.1f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Slope": {
+      "line": 23156,
+      "attrs": [
+        "Family(\"Texture\")",
+        "Classification(Classification.Mask)",
+        "Toolbox(NodeCategory.Derive)",
+        "ShortCode(\"so\")"
+      ],
+      "params": [
+        {
+          "name": "Range",
+          "meta": "0f,30f,0f,90f"
+        },
+        {
+          "name": "Falloff",
+          "meta": "15f,0.0001f,90f"
+        },
+        {
+          "name": "Type",
+          "meta": "Parameters.Enum,SlopeMapType.Accurate,0f,1f"
+        },
+        {
+          "name": "MicroAccent",
+          "meta": "0f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "SlopeBlur": {
+      "line": 30695,
+      "attrs": [
+        "Family(\"Warp\")",
+        "Classification(Classification.Processor)",
+        "Toolbox(NodeCategory.Modify)",
+        "ShortCode(\"sw\")"
+      ],
+      "params": [
+        {
+          "name": "Intensity",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Iterations",
+          "meta": "1f,1f,10f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,-180f,180f"
+        },
+        {
+          "name": "Asymmetry",
+          "meta": "1f,-1f,1f"
+        },
+        {
+          "name": "Normalized",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Window",
+          "meta": "Parameters.Enum"
+        },
+        {
+          "name": "Quality",
+          "meta": "Parameters.Enum"
+        },
+        {
+          "name": "Antialiasing",
+          "meta": "Parameters.Enum"
+        }
+      ],
+      "imOps": []
+    },
+    "SlopeWarp": {
+      "line": 30842,
+      "attrs": [
+        "Family(\"Profile\")",
+        "ShortCode(\"sc\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Intensity",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Iterations",
+          "meta": "1f,1f,10f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,-180f,180f"
+        },
+        {
+          "name": "Quality",
+          "meta": "Parameters.Enum"
+        },
+        {
+          "name": "Antialiasing",
+          "meta": "Parameters.Enum"
+        }
+      ],
+      "imOps": []
+    },
+    "Slump": {
+      "line": 20675,
+      "attrs": [
+        "Family(\"Scatter\")",
+        "ShortCode(\"on\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Style",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Snow": {
+      "line": 37439,
+      "attrs": [
+        "Family(\"Snow\")",
+        "ShortCode(\"sf\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Duration",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Intensity",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "SettleThaw",
+          "meta": "0.25,0f,1f"
+        },
+        {
+          "name": "MeltType",
+          "meta": "Parameters.HorizontalListNoLabel,MeltType.Uniform,0f,1f"
+        },
+        {
+          "name": "Melt",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "MeltRemnants",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "SnowLine",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "SlipOffAngle",
+          "meta": "38f,0f,90f"
+        },
+        {
+          "name": "AdheredSnowMass",
+          "meta": "12f,0f,30f"
+        },
+        {
+          "name": "ModelScale",
+          "meta": "5f,1f,16f"
+        },
+        {
+          "name": "RealScale",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "TerrainScale",
+          "meta": "5000f,500f,20000f"
+        },
+        {
+          "name": "Verticality",
+          "meta": "3200f,50f,20000f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Snowfield": {
+      "line": 37750,
+      "attrs": [
+        "Family(\"Erosion\")",
+        "ShortCode(\"te\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Cascades",
+          "meta": "6f,1f,50f"
+        },
+        {
+          "name": "Duration",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Intensity",
+          "meta": "0.35f,0f,1f"
+        },
+        {
+          "name": "TaperSnowfall",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "TaperAmount",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "SettleThaw",
+          "meta": "0.25,0f,1f"
+        },
+        {
+          "name": "Melt",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "SnowLine",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "SlipOffAngle",
+          "meta": "38f,0f,90f"
+        },
+        {
+          "name": "AdheredSnowMass",
+          "meta": "12f,0f,30f"
+        },
+        {
+          "name": "Flows",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "FlowsDepth",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "SharpBuildup",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "AlternateSnowfall",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "SurfaceDetails",
+          "meta": "0.4f,0f,1f"
+        },
+        {
+          "name": "Direction",
+          "meta": "Parameters.HorizontalList,GradientDirection.X,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "SoftClip": {
+      "line": 30959,
+      "attrs": [
+        "Family(\"Terrace\")",
+        "ShortCode(\"ste\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "ClipMode",
+          "meta": "Parameters.Enum,ClipMode.AboveThreshold,0f,1f"
+        },
+        {
+          "name": "Threshold",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Softness",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "Clipping",
+          "meta": "1f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Soil": {
+      "line": 23254,
+      "attrs": [
+        "Family(\"Render\")",
+        "Toolbox(NodeCategory.Output)",
+        "Classification(Classification.Mask)",
+        "ShortCode(\"si\")"
+      ],
+      "params": [
+        {
+          "name": "Amount",
+          "meta": "0.6f,0f,1f"
+        },
+        {
+          "name": "Bias",
+          "meta": "0f,-1f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Splat": {
+      "line": 41371,
+      "attrs": [
+        "Family(\"Routing\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"swt\")"
+      ],
+      "params": [
+        {
+          "name": "R",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "G",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "B",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "A",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Autolevel",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "ClampProduct",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Steps": {
+      "line": 31038,
+      "attrs": [
+        "Family(\"Terrace\")",
+        "ShortCode(\"ct\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.6f,0f,1f"
+        },
+        {
+          "name": "Density",
+          "meta": "0.5f,0.0001f,2f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Stones": {
+      "line": 20750,
+      "attrs": [
+        "Family(\"Assets\")",
+        "ShortCode(\"til\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.6f,0f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "1f,0.0001f,3f"
+        },
+        {
+          "name": "Density",
+          "meta": "0.5f,0.0001f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Stratify": {
+      "line": 31113,
+      "attrs": [
+        "Family(\"Color\")",
+        "Toolbox(NodeCategory.Colorize)",
+        "Classification(Classification.Colorizer)",
+        "ShortCode(\"spc\")"
+      ],
+      "params": [
+        {
+          "name": "Spacing",
+          "meta": "0.1,0f,1f"
+        },
+        {
+          "name": "Octaves",
+          "meta": "12f,1f,12f"
+        },
+        {
+          "name": "Intensity",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "Shape",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "TiltAmount",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        }
+      ],
+      "imOps": []
+    },
+    "Sunlight": {
+      "line": 23302,
+      "attrs": [
+        "Family(\"Texture\")",
+        "Classification(Classification.Mask)",
+        "Toolbox(NodeCategory.Derive)",
+        "ShortCode(\"tb\")"
+      ],
+      "params": [
+        {
+          "name": "North",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Year",
+          "meta": "0.2f,0.6f,0.0001f,1f"
+        },
+        {
+          "name": "Latitude",
+          "meta": "60f,-90f,90f"
+        }
+      ],
+      "imOps": []
+    },
+    "SuperColor": {
+      "line": 31244,
+      "attrs": [
+        "Family(\"Effect\")",
+        "ShortCode(\"swi\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Texture",
+          "meta": "Parameters.HorizontalListNoLabel,TextureMapType.Peaks,0f,1f"
+        },
+        {
+          "name": "Strength",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Warp",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "Library",
+          "meta": "Parameters.HorizontalListNoLabel"
+        },
+        {
+          "name": "Randomize",
+          "meta": "Parameters.Command,\"dice-five\""
+        },
+        {
+          "name": "LibraryItem",
+          "meta": "Parameters.Custom"
+        },
+        {
+          "name": "Range",
+          "meta": "Parameters.RangeClipper,0f,1f,0f,1f"
+        },
+        {
+          "name": "Bias",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Reverse",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Process",
+          "meta": "Parameters.HorizontalList,TextureProcessType.Erosion,0f,1f"
+        },
+        {
+          "name": "Amount",
+          "meta": "Parameters.HorizontalList,Generic4.Low,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Swirl": {
+      "line": 31695,
+      "attrs": [
+        "Family(\"Terrace\")",
+        "ShortCode(\"st\")",
+        "Toolbox(NodeCategory.Surface)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Size",
+          "meta": "0.15f,0f,1f"
+        },
+        {
+          "name": "X",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "Y",
+          "meta": "0.5,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Switch": {
+      "line": 41631,
+      "attrs": [
+        "Family(\"Routing\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"g8\")"
+      ],
+      "params": [
+        {
+          "name": "SwitchRoute",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "DiscardAlternate",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Synth": {
+      "line": 10471,
+      "attrs": [
+        "Family(\"Color\")",
+        "Toolbox(NodeCategory.Colorize)",
+        "Classification(Classification.Colorizer)",
+        "ShortCode(\"ti\")"
+      ],
+      "params": [
+        {
+          "name": "Data",
+          "meta": "Parameters.GradientEditor"
+        },
+        {
+          "name": "Samples",
+          "meta": "Parameters.OptionGrid"
+        },
+        {
+          "name": "Fuzzy",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Offset",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "SynthColors",
+          "meta": "Parameters.CommandButton,\"color-picker\""
+        },
+        {
+          "name": "ExportJSON",
+          "meta": "Parameters.Command,\"device-floppy\""
+        }
+      ],
+      "imOps": []
+    },
+    "Terraces": {
+      "line": 31786,
+      "attrs": [
+        "Family(\"Profile\")",
+        "ShortCode(\"ts\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "NumTerraces",
+          "meta": "10f,3f,256f"
+        },
+        {
+          "name": "Uniformity",
+          "meta": "0.6,0f,1f"
+        },
+        {
+          "name": "Steepness",
+          "meta": "0.2,0f,1f"
+        },
+        {
+          "name": "Intensity",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "TextureBaker": {
+      "line": 12615,
+      "attrs": [
+        "Family(\"Assets\")",
+        "Toolbox(NodeCategory.Output)",
+        "Classification(Classification.Export)",
+        "ShortCode(\"un\")"
+      ],
+      "params": [
+        {
+          "name": "GenerateNormals",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "AddInput",
+          "meta": "Parameters.Command,\"port-connect\""
+        },
+        {
+          "name": "LODInfo",
+          "meta": "Parameters.ComputedString"
+        }
+      ],
+      "imOps": []
+    },
+    "TextureBase": {
+      "line": 23369,
+      "attrs": [
+        "Family(\"Texture\")",
+        "Classification(Classification.Mask)",
+        "Toolbox(NodeCategory.Derive)",
+        "ShortCode(\"tz\")"
+      ],
+      "params": [
+        {
+          "name": "Slope",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "0.15f,0f,1f"
+        },
+        {
+          "name": "Soil",
+          "meta": "0.6f,0f,1f"
+        },
+        {
+          "name": "Patches",
+          "meta": "0.4f,0f,1f"
+        },
+        {
+          "name": "Chaos",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "Peaks",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Accentuation",
+          "meta": "Parameters.HorizontalList,AccentuateType.Off,0f,1f"
+        },
+        {
+          "name": "Enhance",
+          "meta": "Parameters.HorizontalList,ProcessInput.None,0f,1f"
+        },
+        {
+          "name": "Reverse",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Texturizer": {
+      "line": 23639,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "ShortCode(\"fx\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Style",
+          "meta": "Parameters.OptionGrid"
+        },
+        {
+          "name": "Factor",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Secondary",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "Flows",
+          "meta": "0.33f,0f,1f"
+        },
+        {
+          "name": "Slope",
+          "meta": "0.33f,0f,1f"
+        },
+        {
+          "name": "Soil",
+          "meta": "0.33f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Thermal": {
+      "line": 38124,
+      "attrs": [
+        "Family(\"Erosion\")",
+        "ShortCode(\"t2\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Duration",
+          "meta": "0.04f,0.0001f,1f"
+        },
+        {
+          "name": "Strength",
+          "meta": "0.5f,0.0001f,1f"
+        },
+        {
+          "name": "Anisotropy",
+          "meta": "0.65f,0.05f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "Angle",
+          "meta": "32f,0f,90f"
+        },
+        {
+          "name": "Settling",
+          "meta": "0.15,0f,1f"
+        },
+        {
+          "name": "SedimentRemoval",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "FeatureScale",
+          "meta": "25f,1f,300f"
+        },
+        {
+          "name": "RealScale",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "TerrainScale",
+          "meta": "10000f,500f,20000f"
+        },
+        {
+          "name": "Verticality",
+          "meta": "2000f,5f,20000f"
+        }
+      ],
+      "imOps": []
+    },
+    "Thermal2": {
+      "line": 38339,
+      "attrs": [
+        "Family(\"Routing\")",
+        "Toolbox(NodeCategory.Utility)",
+        "Classification(Classification.Processor)",
+        "ShortCode(\"cp\")"
+      ],
+      "params": [
+        {
+          "name": "Duration",
+          "meta": "0.04f,0.0001f,1f"
+        },
+        {
+          "name": "Strength",
+          "meta": "0.25f,0.0001f,1f"
+        },
+        {
+          "name": "Anisotropy",
+          "meta": "0.25f,0f,1f"
+        },
+        {
+          "name": "Angle",
+          "meta": "32f,0f,90f"
+        },
+        {
+          "name": "SedimentRemoval",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "FeatureScale",
+          "meta": "25f,1f,300f"
+        }
+      ],
+      "imOps": []
+    },
+    "ThermalShaper": {
+      "line": 31880,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "ShortCode(\"th\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Influence",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Shape",
+          "meta": "-0.25f,-1f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "20f,1f,250f"
+        },
+        {
+          "name": "MicrodetailPreservation",
+          "meta": "0.5f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Threshold": {
+      "line": 31984,
+      "attrs": [
+        "Family(\"Transform\")",
+        "Toolbox(NodeCategory.Modify)",
+        "ShortCode(\"t\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Level",
+          "meta": "0.5,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "TileInput": {
+      "line": 20839,
+      "attrs": [
+        "Family(\"Landscape\")",
+        "Toolbox(NodeCategory.Terrain)",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "RelativePath",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "EnforceLinearGamma",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "FlipY",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "PurgeCache",
+          "meta": "Parameters.Command,\"file-shredder\""
+        },
+        {
+          "name": "TileInfo",
+          "meta": "Parameters.ComputedString"
+        }
+      ],
+      "imOps": []
+    },
+    "Tint": {
+      "line": 10744,
+      "attrs": [
+        "Family(\"Color\")",
+        "Toolbox(NodeCategory.Colorize)",
+        "Classification(Classification.Colorizer)",
+        "ShortCode(\"wc\")"
+      ],
+      "params": [
+        {
+          "name": "Hue",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Saturation",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Lightness",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Enhance",
+          "meta": "Parameters.HorizontalList,ProcessInput.Autolevel,0f,1f"
+        },
+        {
+          "name": "Reverse",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Transform": {
+      "line": 32019,
+      "attrs": [
+        "Family(\"Transform\")",
+        "Toolbox(NodeCategory.Modify)",
+        "ShortCode(\"t3\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "OffsetX",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "OffsetY",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "OffsetZ",
+          "meta": "1f,0f,2f"
+        },
+        {
+          "name": "Uniform",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "1f,0.0001f,10f"
+        },
+        {
+          "name": "ScaleX",
+          "meta": "1f,0.0001f,10f"
+        },
+        {
+          "name": "ScaleY",
+          "meta": "1f,0.0001f,10f"
+        },
+        {
+          "name": "Rotate",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "BlendMode",
+          "meta": "Parameters.Enum,Transformer.BlendMode.Blend,0f,1f"
+        },
+        {
+          "name": "Edges",
+          "meta": "Parameters.HorizontalList,EdgeFade.None,0f,1f"
+        },
+        {
+          "name": "Quality",
+          "meta": "Parameters.Enum,ResizeQuality.Medium,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Transform3D": {
+      "line": 32312,
+      "attrs": [
+        "Family(\"Adjust\")",
+        "Toolbox(NodeCategory.Modify)",
+        "ShortCode(\"tx\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "DropToFloor",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "OffsetX",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "OffsetY",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "OffsetZ",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "1f,0.001f,2f"
+        },
+        {
+          "name": "Pitch",
+          "meta": "0f,-180f,180f"
+        },
+        {
+          "name": "Yaw",
+          "meta": "0f,-180f,180f"
+        },
+        {
+          "name": "Roll",
+          "meta": "0f,-180f,180f"
+        },
+        {
+          "name": "Antialiasing",
+          "meta": "false,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Transpose": {
+      "line": 32504,
+      "attrs": [
+        "Toolbox(NodeCategory.Simulate)",
+        "Family(\"Vegetation\")",
+        "ShortCode(\"tr\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Mode",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "Amount",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Extend",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Flatten",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Threshold",
+          "meta": "0.01,0f,1f"
+        },
+        {
+          "name": "Boundary",
+          "meta": "0.3f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Trees": {
+      "line": 32644,
+      "attrs": [
+        "Family(\"Warp\")",
+        "Toolbox(NodeCategory.Modify)",
+        "ShortCode(\"3pd\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Output",
+          "meta": "Parameters.HorizontalList,TreeOutput.Instances,0f,1f"
+        },
+        {
+          "name": "TreeCount",
+          "meta": "20f,10f,1000f"
+        },
+        {
+          "name": "IsRelative",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "LODInfo",
+          "meta": "Parameters.ComputedString"
+        },
+        {
+          "name": "TreeSize",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "TrimUnder",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "Shape",
+          "meta": "Parameters.HorizontalList,TreeShape.Point,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "WaterAffinity",
+          "meta": "Parameters.HorizontalList,WaterAffinity.Seek,0f,1f"
+        },
+        {
+          "name": "AvoidTrees",
+          "meta": "Parameters.HorizontalList,AvoidTrees.None,0f,1f"
+        },
+        {
+          "name": "Health",
+          "meta": "0.8f,0f,1f"
+        },
+        {
+          "name": "Patches",
+          "meta": "0.4f,0.0001f,1f"
+        },
+        {
+          "name": "Spread",
+          "meta": "0f,0.0001f,1f"
+        },
+        {
+          "name": "Random",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Slope",
+          "meta": "0f,33f,0f,90f"
+        },
+        {
+          "name": "SlopeFalloff",
+          "meta": "10f,0f,90f"
+        },
+        {
+          "name": "Altitude",
+          "meta": "0f,0.8f,0f,1f"
+        },
+        {
+          "name": "AltitudeFalloff",
+          "meta": "1f,0f,1f"
+        },
+        {
+          "name": "Peaks",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Strict",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "DeadFlow",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "ConsolidateFlows",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Bias",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Snowline",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "Chaos",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "BlurEdges",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "VisualizeData",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "CustomInfluence",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "Trim",
+          "meta": "0.1f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Unity": {
+      "line": 12983,
+      "attrs": [
+        "Family(\"Assets\")",
+        "Toolbox(NodeCategory.Output)",
+        "Classification(Classification.Export)",
+        "ShortCode(\"ue\")"
+      ],
+      "params": [
+        {
+          "name": "TargetSize",
+          "meta": "Parameters.Enum,UnitySizes.x2049,0f,1f"
+        },
+        {
+          "name": "AddInput",
+          "meta": "Parameters.Command,\"port-connect\""
+        }
+      ],
+      "imOps": []
+    },
+    "Unreal": {
+      "line": 13177,
+      "attrs": [
+        "Family(\"Assets\")",
+        "Toolbox(NodeCategory.Output)",
+        "Classification(Classification.Export)"
+      ],
+      "params": [
+        {
+          "name": "AutomaticSize",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "TargetSize",
+          "meta": "Parameters.Enum,UnrealSizes.x2017,0f,1f"
+        },
+        {
+          "name": "DontResizeTextures",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "LODInfo",
+          "meta": "Parameters.ComputedString"
+        },
+        {
+          "name": "Format",
+          "meta": "Parameters.HorizontalList"
+        },
+        {
+          "name": "UnrealFriendlyNaming",
+          "meta": "true,0f,1f"
+        },
+        {
+          "name": "Map1",
+          "meta": "Parameters.HorizontalList,UEMapType.Height,0f,1f"
+        },
+        {
+          "name": "Map2",
+          "meta": "Parameters.HorizontalList,UEMapType.Color,0f,1f"
+        },
+        {
+          "name": "Map3",
+          "meta": "Parameters.HorizontalList,UEMapType.Color,0f,1f"
+        },
+        {
+          "name": "Map4",
+          "meta": "Parameters.HorizontalList,UEMapType.Color,0f,1f"
+        },
+        {
+          "name": "Map5",
+          "meta": "Parameters.HorizontalList,UEMapType.Mask,0f,1f"
+        },
+        {
+          "name": "Map6",
+          "meta": "Parameters.HorizontalList,UEMapType.Mask,0f,1f"
+        },
+        {
+          "name": "Map7",
+          "meta": "Parameters.HorizontalList,UEMapType.Mask,0f,1f"
+        },
+        {
+          "name": "Map8",
+          "meta": "Parameters.HorizontalList,UEMapType.Mask,0f,1f"
+        },
+        {
+          "name": "Map9",
+          "meta": "Parameters.HorizontalList,UEMapType.Mask,0f,1f"
+        },
+        {
+          "name": "Map10",
+          "meta": "Parameters.HorizontalList,UEMapType.Mask,0f,1f"
+        },
+        {
+          "name": "AddInput",
+          "meta": "Parameters.Command,\"port-connect\""
+        }
+      ],
+      "imOps": []
+    },
+    "Uplift": {
+      "line": 21292,
+      "attrs": [
+        "Family(\"Primitive\")",
+        "Toolbox(NodeCategory.Terrain)",
+        "Classification(Classification.Generator)",
+        "ShortCode(\"vo\")"
+      ],
+      "params": [
+        {
+          "name": "Passes",
+          "meta": "1f,1f,10f"
+        },
+        {
+          "name": "Scale",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Height",
+          "meta": "0.6f,0f,2f"
+        },
+        {
+          "name": "Octaves",
+          "meta": "10f,2f,12f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Jitter",
+          "meta": "0.5,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Var": {
+      "line": 41744,
+      "attrs": [],
+      "params": [
+        {
+          "name": "EditMode",
+          "meta": "Parameters.Enum,VariableEdit.Modify,0f,1f"
+        },
+        {
+          "name": "VariableName",
+          "meta": "Parameters.TextBox"
+        },
+        {
+          "name": "Expression",
+          "meta": "Parameters.TextBox"
+        },
+        {
+          "name": "DefaultValue",
+          "meta": "Parameters.TextBox"
+        }
+      ],
+      "imOps": []
+    },
+    "VariableBlur": {
+      "line": 33608,
+      "attrs": [
+        "Family(\"Warp\")",
+        "ShortCode(\"w\")",
+        "Toolbox(NodeCategory.Modify)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Radius",
+          "meta": "0.01f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Volcano": {
+      "line": 21452,
+      "attrs": [
+        "Family(\"Basic\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "ShortCode(\"v\")",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "1f,0.0001f,4f"
+        },
+        {
+          "name": "Height",
+          "meta": "1f,0.0001f,1f"
+        },
+        {
+          "name": "Mouth",
+          "meta": "0.15f,0f,1f"
+        },
+        {
+          "name": "Bulk",
+          "meta": "-0.2,-1f,1f"
+        },
+        {
+          "name": "Surface",
+          "meta": "Parameters.HorizontalList,HillSurface.Eroded,0f,1f"
+        },
+        {
+          "name": "X",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Y",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Voronoi": {
+      "line": 21611,
+      "attrs": [
+        "Family(\"Extended\")",
+        "Toolbox(NodeCategory.Primitive)",
+        "ShortCode(\"ws\")",
+        "Classification(Classification.Generator)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.5f,0.0001f,1f"
+        },
+        {
+          "name": "Jitter",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Function",
+          "meta": "Parameters.HorizontalList,VoronoiFunction.Euclidean,0f,1f"
+        },
+        {
+          "name": "Form",
+          "meta": "Parameters.HorizontalListNoLabel,VoronoiForm.P,0f,1f"
+        },
+        {
+          "name": "Gain",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Clamp",
+          "meta": "1f,0.0001f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "WarpType",
+          "meta": "Parameters.HorizontalList,NoiseWarpType.Complex,0f,1f"
+        },
+        {
+          "name": "Frequency",
+          "meta": "0.05f,0f,1f"
+        },
+        {
+          "name": "Amplitude",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "WarpOctaves",
+          "meta": "14f,1f,14f"
+        },
+        {
+          "name": "ScaleX",
+          "meta": "1f,0.0001f,100f"
+        },
+        {
+          "name": "ScaleY",
+          "meta": "1f,0.0001f,100f"
+        },
+        {
+          "name": "X",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Y",
+          "meta": "0.5f,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Warp": {
+      "line": 33646,
+      "attrs": [
+        "Family(\"Effect\")",
+        "Toolbox(NodeCategory.Modify)",
+        "ShortCode(\"wh\")",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Size",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Strength",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "ZScale",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "NoiseType",
+          "meta": "Parameters.Enum,WarpNoiseType.PerlinFBM,0f,1f"
+        },
+        {
+          "name": "Perturbation",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Complexity",
+          "meta": "12f,1f,12f"
+        },
+        {
+          "name": "Roughness",
+          "meta": "0.4f,0f,1f"
+        },
+        {
+          "name": "EdgeBehaviour",
+          "meta": "Parameters.Enum,EdgeBehaviour.Mirror,0f,1f"
+        },
+        {
+          "name": "Modulation",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "ModulationDirection",
+          "meta": "45.0,0f,360f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "Iterations",
+          "meta": "1f,1f,50f"
+        },
+        {
+          "name": "Mode",
+          "meta": "Parameters.Enum,WarpMode.VectorField,0f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "WaterColor": {
+      "line": 10888,
+      "attrs": [
+        "Family(\"Surface\")",
+        "Classification(Classification.Mask)",
+        "Toolbox(NodeCategory.Colorize)",
+        "ShortCode(\"we\")"
+      ],
+      "params": [
+        {
+          "name": "Source",
+          "meta": "Parameters.HorizontalList,WaterSource.Accumulation,0f,1f"
+        },
+        {
+          "name": "RestrictToGroup",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Palette",
+          "meta": "Parameters.OptionGrid,WaterColors.Generic,0f,1f"
+        },
+        {
+          "name": "Reverse",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Waves",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Refraction",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "ColorBias",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "MaskBias",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Stillwater",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Rivers",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Hue",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Saturation",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Lightness",
+          "meta": "0f,-1f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "WaveShine": {
+      "line": 21893,
+      "attrs": [
+        "Family(\"Aspect\")",
+        "Toolbox(NodeCategory.Derive)",
+        "ShortCode(\"ang\")",
+        "Classification(Classification.Mask)"
+      ],
+      "params": [
+        {
+          "name": "Frame",
+          "meta": "0f,0f,49f"
+        },
+        {
+          "name": "Octaves",
+          "meta": "4f,1f,5f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        },
+        {
+          "name": "AnimationSpeed",
+          "meta": "1f,0f,2f"
+        },
+        {
+          "name": "Size",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "Amplitude",
+          "meta": "0.5f,0f,1f"
+        },
+        {
+          "name": "Direction",
+          "meta": "0f,0f,360f"
+        },
+        {
+          "name": "Speed",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "WindPatchIntensity",
+          "meta": "0f,0f,1f"
+        },
+        {
+          "name": "WindPatchAnimationSpeed",
+          "meta": "1f,0f,2f"
+        },
+        {
+          "name": "WindPatchSize",
+          "meta": "30f,10f,50f"
+        },
+        {
+          "name": "Contrast",
+          "meta": "2f,0f,6f"
+        },
+        {
+          "name": "Brightness",
+          "meta": "1f,0f,5f"
+        },
+        {
+          "name": "SunAzimuth",
+          "meta": "315f,0f,360f"
+        },
+        {
+          "name": "SunElevation",
+          "meta": "30f,0f,90f"
+        }
+      ],
+      "imOps": []
+    },
+    "Weathering": {
+      "line": 11245,
+      "attrs": [
+        "Family(\"Assets\")",
+        "Toolbox(NodeCategory.Output)",
+        "ShortCode(\"ex\")",
+        "Classification(Classification.Export)"
+      ],
+      "params": [
+        {
+          "name": "Scale",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "Creep",
+          "meta": "0.1f,0f,1f"
+        },
+        {
+          "name": "Amount",
+          "meta": "0.8f,0f,1f"
+        },
+        {
+          "name": "WashedOut",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Inverse",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Dirt",
+          "meta": "0.01f,0f,1f"
+        },
+        {
+          "name": "Darker",
+          "meta": "false,0f,1f"
+        },
+        {
+          "name": "Hue",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Saturation",
+          "meta": "0f,-1f,1f"
+        },
+        {
+          "name": "Lightness",
+          "meta": "0f,-1f,1f"
+        }
+      ],
+      "imOps": []
+    },
+    "Whorl": {
+      "line": 33910,
+      "attrs": [
+        "Family(\"Erosion\")",
+        "ShortCode(\"z1\")",
+        "Classification(Classification.Processor)",
+        "Toolbox(NodeCategory.Simulate)"
+      ],
+      "params": [
+        {
+          "name": "Type",
+          "meta": "Parameters.HorizontalList,WhorlType.Stretch,0f,1f"
+        },
+        {
+          "name": "Whorls",
+          "meta": "10f,3f,150f"
+        },
+        {
+          "name": "Power",
+          "meta": "0.3f,0f,3f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": [
+        "SetArtifact",
+        "Distort"
+      ]
+    },
+    "Wizard": {
+      "line": 34020,
+      "attrs": [
+        "Family(\"Erosion\")",
+        "ShortCode(\"z2\")",
+        "Classification(Classification.Processor)",
+        "Toolbox(NodeCategory.Simulate)"
+      ],
+      "params": [
+        {
+          "name": "Strength",
+          "meta": "Parameters.HorizontalList,Generic4.Low,0f,1f"
+        },
+        {
+          "name": "Density",
+          "meta": "Parameters.HorizontalList,Generic4.Med,0f,1f"
+        },
+        {
+          "name": "Material",
+          "meta": "Parameters.HorizontalList,Generic4.High,0f,1f"
+        },
+        {
+          "name": "ChannelDepth",
+          "meta": "Parameters.HorizontalList,Generic4.Med,0f,1f"
+        },
+        {
+          "name": "ChannelWidth",
+          "meta": "Parameters.HorizontalList,Generic4.Low,0f,1f"
+        },
+        {
+          "name": "Deposits",
+          "meta": "Parameters.HorizontalList,Generic4.Med,0f,1f"
+        },
+        {
+          "name": "Removal",
+          "meta": "Parameters.HorizontalList,Generic4.High,0f,1f"
+        },
+        {
+          "name": "Bulk",
+          "meta": "Parameters.HorizontalList,Generic4.High,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    },
+    "Wizard2": {
+      "line": 34276,
+      "attrs": [
+        "Family(\"Erosion\")",
+        "ShortCode(\"an\")",
+        "Toolbox(NodeCategory.Simulate)",
+        "Classification(Classification.Processor)"
+      ],
+      "params": [
+        {
+          "name": "Power",
+          "meta": "Parameters.HorizontalList,Generic4.Low,0f,1f"
+        },
+        {
+          "name": "Depth",
+          "meta": "Parameters.HorizontalList,Generic4.Med,0f,1f"
+        },
+        {
+          "name": "Scale",
+          "meta": "Parameters.HorizontalList,Generic4.High,0f,1f"
+        },
+        {
+          "name": "Deposits",
+          "meta": "Parameters.HorizontalList,Generic4.Med,0f,1f"
+        },
+        {
+          "name": "Flow",
+          "meta": "Parameters.HorizontalList,Generic4.Low,0f,1f"
+        },
+        {
+          "name": "Shape",
+          "meta": "Parameters.HorizontalList,Generic4.Med,0f,1f"
+        },
+        {
+          "name": "Detail",
+          "meta": "Parameters.HorizontalList,Generic4.High,0f,1f"
+        },
+        {
+          "name": "Seed",
+          "meta": "Parameters.Seed"
+        }
+      ],
+      "imOps": []
+    }
+  }
+}

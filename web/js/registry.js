@@ -41,6 +41,14 @@ import {
   heightSelect, slopeSelect, maskSelect, angleSelect, dataSelect, seaLevel, snow, cracks,
   shift, shear, transformField, recurve,
 } from './kernels/features.js';
+import { gaeaLake } from './kernels/lake.js';
+import { gaeaLichtenberg, gaeaOrigami, gaeaAperture, gaeaAccumulator } from './kernels/ops4.js';
+import { gaeaGraphicEQ, gaeaPockmarks, gaeaOutcrops, gaeaRockMap, gaeaBulbous } from './kernels/ops3.js';
+import { gaeaAngle, gaeaFilter, gaeaEdge, gaeaRoughen, gaeaCraggy } from './kernels/ops2.js';
+import { gaeaCLUTer, CLUT_NAMES } from './clut.js';
+import { gaeaThreshold, gaeaSoftClip, gaeaTerraces, gaeaPixelate, gaeaCurvature } from './kernels/ops.js';
+import { AUTHORITATIVE_PARAMS, authoritativeParam } from './param-authority.js';
+import { gaeaGamma, gaeaBlobRemover } from './kernels/imaging.js';
 import { createField } from './kernel/field.js';
 
 /* ================================================================== passthrough */
@@ -67,6 +75,7 @@ function outputNode(ctx) {
 const H = (name = 'Input', kind = 'height') => ({ name, kind });
 const OUT_H = (name = 'Output') => ({ name, kind: 'height' });
 const MASK = (name = 'Mask') => ({ name, kind: 'mask' });
+const OUT_C = (name = 'Output') => ({ name, kind: 'color' });
 
 /* ================================================================== the registry */
 
@@ -705,6 +714,320 @@ export const NODES = [
       Shore: { d: 0.05, min: 0.001, max: 0.5, step: 0.001 },
     },
   },
+  // CLUTer -- the first node wired to EXTRACTED VENDOR DATA rather than to a formula.
+  //
+  // Its managed Build() maps a grayscale height through `GradientData` and then applies Bias,
+  // Hue, Saturation and Lightness:
+  //
+  //     Migrated.ClutterProcess(input.GrayscaleConversion(2), GradientData, gradient,
+  //                             AutolevelInput, Reverse, Bias, Hue, Saturation, Lightness)
+  //
+  // `GradientData` is the gradient chosen in the UI's GradientEditor, and the eight `.clut`
+  // files in Resources/Color are Gaea's built-in presets for that editor. They are now decoded
+  // from `web/assets/color/*.png` (see tools/extract-assets.py), which is what makes this node
+  // reproduce the vendor's OWN palettes instead of an invented ramp.
+  //
+  // The palettes are PNG textures, so decoding is async while kernels are synchronous. They are
+  // decoded once by `preloadCLUTs()` and cached; a palette that has not loaded falls back to a
+  // grey ramp and `clutStatus()` reports which. Silent fallback would make a missing asset look
+  // like a desaturated image rather than an error.
+  {
+    name: 'CLUTer', algorithm: gaeaCLUTer, category: CAT.IO,
+    summary: 'Maps a grayscale field through one of Gaea\'s eight built-in palette textures, then adjusts hue, saturation and lightness.',
+    inputs: [H()], outputs: [OUT_C()], note: 'approx',
+    params: {
+      GradientData: { d: 'Rock', options: CLUT_NAMES, hint: 'One of Gaea\'s shipped CLUT presets, decoded from Resources/Color.' },
+      Bias: { d: 0, min: -1, max: 1, step: 0.01, hint: 'Shifts the lookup position; distinct from Lightness.' },
+      Hue: { d: 0, min: -1, max: 1, step: 0.01 },
+      Saturation: { d: 0, min: -1, max: 1, step: 0.01 },
+      Lightness: { d: 0, min: -1, max: 1, step: 0.01 },
+    },
+  },
+  // FOUR MORE FROM THE COST-RANKED WORKLIST (round 38).
+  //
+  // Lichtenberg, Origami, Aperture and Accumulator, from Erosions.Lichtenberg,
+  // Migrated.OrigamiProcess, Morphology2.Aperture and Texturize.GetAccumulation. Same
+  // provenance as the three batches before: parameters exact, curves standard forms, all
+  // `approx`.
+  //
+  // ACCUMULATOR IS THE FIRST GENERATOR IN THESE BATCHES. It takes no input at all -- the
+  // managed parameter list contains only a Type, a RestrictToGroup flag and a computed Warning
+  // -- so its `inputs` array is empty and its whole content is the type selector. That is why
+  // the test asserts the TYPES are anti-correlated rather than merely different: two masks that
+  // differed only by a shift would satisfy "different" while meaning nothing.
+  //
+  // One assertion-design note worth recording. The first version of that check COUNTED cells
+  // where snow exceeded rain and demanded more than 60%; it returned exactly 128 of 256,
+  // because for two monotone gradients the split falls on the median. The masks were perfectly
+  // anti-correlated and the test was measuring where the crossover sat, not whether one existed.
+  // The assertion now uses the sign of the correlation.
+  {
+    name: 'Lichtenberg', algorithm: gaeaLichtenberg, category: CAT.EROS,
+    summary: 'Branching discharge channels, deepened by Depth and widened by Expand. Depth 0 is a no-op.',
+    inputs: [H()], outputs: [OUT_H()], note: 'approx',
+    params: {
+      Style: {}, Scale: {}, Complexity: {}, Depth: {}, Expand: {}, Bias: {}, Seed: {},
+    },
+  },
+  {
+    name: 'Origami', algorithm: gaeaOrigami, category: CAT.SHAPE,
+    summary: 'Folds the terrain along creased planes; the fold is piecewise-linear, so both sides rise. Amount 0 is a no-op.',
+    inputs: [H()], outputs: [OUT_H()], note: 'approx',
+    params: { Amount: {}, Seed: {} },
+  },
+  {
+    name: 'Aperture', algorithm: gaeaAperture, category: CAT.ADJ,
+    summary: 'Polygon-shaped morphological opening or closing; every cell is bracketed by the Erode and Dilate results.',
+    inputs: [H()], outputs: [OUT_H()], note: 'approx',
+    params: {
+      Mode: {}, Size: {}, Shape: {}, VerticesCount: {}, CornerAngle: {},
+      Direction: {}, Antialiased: {},
+    },
+  },
+  {
+    name: 'Accumulator', algorithm: gaeaAccumulator, category: CAT.PRIM,
+    summary: 'Generates a material-accumulation mask from its Type alone, taking no input.',
+    inputs: [], outputs: [MASK('Output')], note: 'approx',
+    params: {
+      Type: { hint: 'Snow settles high, rain collects low; the two are anti-correlated.' },
+      RestrictToGroup: { hint: 'A graph-level scope, not a numeric effect; not reproduced.' },
+    },
+  },
+  // FIVE MORE FROM THE COST-RANKED WORKLIST (round 37).
+  //
+  // GraphicEQ, Pockmarks, Outcrops, RockMap and Bulbous. Provenance is unchanged: named Gaea
+  // helpers (Profiles.GraphicEQ, Migrated.PockmarksProces, RockCore.Outcrops,
+  // AspectMaps.RockMap, Migrated.BulbousProcess) whose bodies were not decompiled, so the
+  // parameters and ranges are exact while the curves are standard forms.
+  //
+  // A SIXTH real bug turned up here, and it is the most instructive of the set. `Outcrops` and
+  // `Pockmarks` both initialise their output field and then `continue` past cells that receive
+  // no mark -- which silently left those cells at `createField`'s default of ZERO instead of
+  // the input's value, erasing the terrain wherever nothing landed. The assertion that caught
+  // it was the simplest one available: `Height: 0` should make the node an exact no-op.
+  // A node that erases its input when it has nothing to add is not a no-op, and only a
+  // no-op test says so.
+  {
+    name: 'GraphicEQ', algorithm: gaeaGraphicEQ, category: CAT.ADJ,
+    summary: 'Seven-band equaliser over the height distribution. All bands at 1 is an identity.',
+    inputs: [H()], outputs: [OUT_H()], note: 'approx',
+    params: {
+      Band1: {}, Band2: {}, Band3: {}, Band4: {}, Band5: {}, Band6: {}, Band7: {},
+    },
+  },
+  {
+    name: 'Pockmarks', algorithm: gaeaPockmarks, category: CAT.FX,
+    summary: 'Scatters pits sized by Scale and thinned by Density; Invert turns them into bumps. Density 0 is a no-op.',
+    inputs: [H()], outputs: [OUT_H()], note: 'approx',
+    params: {
+      Size: {}, Scale: {}, Height: {}, Density: {}, Multiplier: {}, Invert: {}, Seed: {},
+    },
+  },
+  {
+    name: 'Outcrops', algorithm: gaeaOutcrops, category: CAT.FX,
+    summary: 'Lays raised rock masses over the terrain, banded by Strata and optionally chipped. Density 0 is a no-op.',
+    inputs: [H()], outputs: [OUT_H()], note: 'approx',
+    params: {
+      Variations: {}, Strata: {}, Density: {}, Shape: {}, Chipped: {},
+      Seed: {}, Size: {}, Height: {}, Rotation: {},
+    },
+  },
+  {
+    name: 'RockMap', algorithm: gaeaRockMap, category: CAT.MASK,
+    summary: 'Masks where rock would sit, from slope against Coverage and Density. A flat field reads zero.',
+    inputs: [H()], outputs: [MASK('Output')], note: 'approx',
+    params: { Coverage: {}, Density: {} },
+  },
+  {
+    name: 'Bulbous', algorithm: gaeaBulbous, category: CAT.SHAPE,
+    summary: 'Inflates or deflates the terrain masses; monotone in the input, with Jitter breaking the smoothness.',
+    inputs: [H()], outputs: [OUT_H()], note: 'approx',
+    params: { Scale: {}, Jitter: {} },
+  },
+  // FIVE MORE NODES FROM THE COST-RANKED WORKLIST (round 36).
+  //
+  // Angle, Filter, Edge, Roughen and Craggy. Same provenance as the batch above: each calls a
+  // named Gaea helper (AspectMaps.GetAngle, FilterCore.FilterProcess, Migrated.EdgeProcess,
+  // Migrated.RoughenProcess, Migrated.CraggyProcess) whose body was not decompiled, so the
+  // parameters and ranges are exact while the curves are standard published forms.
+  //
+  // The test turned up a fifth real bug: the low-pass branch returned `low + detail`, which is
+  // the identity, so `Filter` did nothing at Gain 1 and the variance was unchanged to the
+  // digit. The assertion that caught it was the most obvious one available -- a low-pass must
+  // reduce variance -- which is worth noting, because round 35's four bugs were all caught by
+  // equivalently simple property checks rather than by anything elaborate.
+  {
+    name: 'Angle', algorithm: gaeaAngle, category: CAT.MASK,
+    summary: 'Marks how much the terrain faces an azimuth. A flat cell reads 0, having no aspect.',
+    inputs: [H()], outputs: [MASK('Output')], note: 'approx',
+    params: { Azimuth: {}, Range: {}, Falloff: { hint: 'Widens the cutoff around the range.' } },
+  },
+  {
+    name: 'Filter', algorithm: gaeaFilter, category: CAT.ADJ,
+    summary: 'Low, high or band-passes the field at Frequency, with Gain on the selected band and KeepDC preserving the mean.',
+    inputs: [H()], outputs: [OUT_H()], note: 'approx',
+    params: {
+      Mode: { hint: 'LowPass keeps the base, HighPass keeps the detail.' },
+      Frequency: {}, Gain: {}, Q: {},
+      KeepDC: { hint: 'Restores the input mean, which a band gain would otherwise shift.' },
+    },
+  },
+  {
+    name: 'Edge', algorithm: gaeaEdge, category: CAT.MASK,
+    summary: 'Traces sharp boundaries: a gradient detector at the requested scale, with square or round weighting.',
+    inputs: [H()], outputs: [MASK('Output')], note: 'approx',
+    params: { Style: {}, Size: {}, Pixels: {}, Softness: {} },
+  },
+  {
+    name: 'Roughen', algorithm: gaeaRoughen, category: CAT.FX,
+    summary: 'Adds oriented or isotropic noise displacement. Depth 0 is a strict no-op.',
+    inputs: [H()], outputs: [OUT_H()], note: 'approx',
+    params: { Width: {}, Depth: {}, Oriented: {}, Quality: {} },
+  },
+  {
+    name: 'Craggy', algorithm: gaeaCraggy, category: CAT.FX,
+    summary: 'Adds craggy relief at Size, with Shape trading smooth noise for ridged. Depth 0 is a strict no-op.',
+    inputs: [H()], outputs: [OUT_H()], note: 'approx',
+    params: { Size: {}, Depth: {}, Shape: {}, Seed: {} },
+  },
+  // FIVE SMALL NODES FROM THE COST-RANKED WORKLIST (round 35).
+  //
+  // Each calls a named Gaea helper whose operation is fixed by the node's own parameters:
+  // AspectMaps.GetThreshold, the SoftClip helper, Profiles.Terrace, Others.PixelateHeightfield
+  // and AspectMaps.GetCurvature. The helper bodies live in the managed assembly and were NOT
+  // decompiled, so every one of these is `approx`: the parameter shapes and ranges are exact
+  // (taken from the [Parameter(...)] attributes) but the easing curves are published standard
+  // forms, not transcriptions.
+  //
+  // Three real bugs were found while writing these and are recorded where they were fixed:
+  // Terraces did not quantise at all (the exponent sat on the fractional part, cancelling to
+  // the identity), the Curvature window returned 0.5 on flat ground instead of 0, and Concave
+  // folded the Laplacian through Math.abs so both types returned the same mask. A fourth,
+  // subtler one: the discrete Laplacian `neighbourMean - centre` is NEGATIVE at a peak, so the
+  // convex branch had to be `-lap`, not `+lap` -- the test caught it as a ridge reading 0.
+  {
+    name: 'Threshold', algorithm: gaeaThreshold, category: CAT.MASK,
+    summary: 'Splits the field at Level into a binary mask. The level is inclusive.',
+    inputs: [H()], outputs: [MASK('Output')], note: 'approx',
+    params: { Level: { hint: 'Cells at or above this become 1; a strict test would darken a field sitting exactly on the level.' } },
+  },
+  {
+    name: 'SoftClip', algorithm: gaeaSoftClip, category: CAT.ADJ,
+    summary: 'Pulls values past a threshold back with a smooth knee; Softness 0 degenerates to a hard clip.',
+    inputs: [H()], outputs: [OUT_H()], note: 'approx',
+    params: {
+      ClipMode: { hint: 'AboveThreshold pulls high values down; BelowThreshold pulls low values up.' },
+      Threshold: {}, Softness: {}, Clipping: {},
+    },
+  },
+  {
+    name: 'Terraces', algorithm: gaeaTerraces, category: CAT.SHAPE,
+    summary: 'Quantises the field into NumTerraces bands, with Uniformity trading even spacing for jitter.',
+    inputs: [H()], outputs: [OUT_H()], note: 'approx',
+    params: { NumTerraces: {}, Uniformity: {}, Steepness: {}, Intensity: {}, Seed: {} },
+  },
+  {
+    name: 'Pixelate', algorithm: gaeaPixelate, category: CAT.ADJ,
+    summary: 'Block-averages the field to Size, with Antialias off giving exactly one value per block.',
+    inputs: [H()], outputs: [OUT_H()], note: 'approx',
+    params: {
+      Size: {}, Autosize: { hint: 'Overrides Size with a fixed scale.' }, Antialias: {},
+    },
+  },
+  {
+    name: 'Curvature', algorithm: gaeaCurvature, category: CAT.MASK,
+    summary: 'Marks where the field bends, as a mask in Range. Convex lights peaks, Concave lights pits.',
+    inputs: [H()], outputs: [MASK('Output')], note: 'approx',
+    params: { Range: {}, Type: {}, Falloff: {} },
+  },
+  // THE THREE GENUINE NO-OPS.
+  //
+  // `Chokepoint`, `Gate` and `Route` each have a Build() whose entire body is
+  // `Commit(input.Copy(), true, true)` -- one statement, no locals, no delegation. That is not
+  // a stub standing in for missing work: the vendor descriptions say so outright. Chokepoint
+  // exists to break the evaluation cache, Gate "defines a baking boundary ... by forcing all
+  // ancestors to bake", and Route "chooses the flow of the graph" -- all graph-level effects
+  // that leave the data untouched. Implementing them as a forward is an EXACT reproduction of
+  // what the managed code does, not an approximation of something unread.
+  //
+  // Shaper is deliberately NOT here even though the same detector flagged it. Its description
+  // says it "bulks up or bulks down a terrain" and it carries Shape, Local Effect, Local Area,
+  // Maintain Fine Details and Detail Size parameters, so it must do real work somewhere this
+  // build has not looked. Registering it as a forward would have hidden that.
+  {
+    name: 'Chokepoint', algorithm: passthrough, category: CAT.SHAPE,
+    summary: 'A no-op whose purpose is to break the evaluation cache. Recovered from the managed Build(), which is a bare input copy.',
+    inputs: [H()], outputs: [OUT_H()], note: 'exact',
+    params: {},
+  },
+  {
+    name: 'Gate', algorithm: passthrough, category: CAT.SHAPE,
+    summary: 'Forces all ancestors to bake by defining a graph boundary; the data itself passes through unchanged.',
+    inputs: [H()], outputs: [OUT_H()], note: 'exact',
+    params: {},
+  },
+  {
+    name: 'Route', algorithm: passthrough, category: CAT.SHAPE,
+    summary: 'Selects the graph flow between inputs and outputs; the forwarded map is unchanged.',
+    inputs: [H()], outputs: [OUT_H()], note: 'exact',
+    params: { Choice: { hint: 'Selects which route is taken; the data itself is forwarded as-is.' } },
+  },
+  {
+    name: 'BlobRemover', algorithm: gaeaBlobRemover, category: CAT.ADJ,
+    summary: 'Terraces the field, labels connected regions, and removes those smaller than resolution.X * Range. Recovered from the managed Build() in Gaea.Nodes.',
+    inputs: [H()], outputs: [OUT_H()],
+    // `approx`: the terracing, the labelling, the 4-or-8 connectivity and the threshold
+    // formula are transcribed; the merge rule for a removed component lives inside ImageMagick
+    // and is inferred. See web/js/kernels/imaging.js.
+    note: 'approx',
+    params: {
+      Range: { hint: 'The area threshold is resolution.X * Range, so it scales with the grid.' },
+      Connectivity: { hint: 'Literally 4 or 8; they differ only on a corner-touching diagonal.' },
+      'Enforce Quantization': { hint: 'Without terracing a height field has one component per cell.' },
+      Quantization: {},
+    },
+  },
+  {
+    name: 'Gamma', algorithm: gaeaGamma, category: CAT.ADJ,
+    summary: 'ImageMagick gamma correction: pow(v, 1/g), or AutoGamma, which chooses the gamma that maps the mean to mid-grey.',
+    inputs: [H()], outputs: [OUT_H()],
+    // `exact` on the formula: ImageMagick's operation is `pow(v, 1/gamma)` and `AutoGamma` is
+    // `log(mean)/log(0.5)`, both published and deterministic. Recovered from the managed
+    // source, which is where this node lives — Gaea.Native.dll has no gamma export because
+    // the algorithm is the library's, not Gaea's. See web/js/kernels/imaging.js.
+    note: 'exact',
+    // No invented values: the catalogue's IL metadata (0.44, 0..4) and the managed source's
+    // [Parameter(0.44f, 0f, 4f)] agree exactly, which is a cross-check between two artefacts.
+    params: {
+      Gamma: { hint: 'Raises midtones when above 1, because the exponent is 1/gamma.' },
+      Automatic: { hint: 'Overrides Gamma; the manual value is ignored when set.' },
+    },
+  },
+  {
+    name: 'Lake', algorithm: gaeaLake, category: CAT.EROS,
+    summary: 'Physically-plausible lake filling: a local-minimum descent, then a priority flood whose level is bisected over 9 iterations. Recovered from lake::lake_create in Gaea.Native.dll.',
+    inputs: [H()], outputs: [OUT_H()],
+    // `approx`: the descent, the flood's height ordering, the 9-step bisection and the 0.5
+    // midpoint are all transcribed; the bisection's convergence test sits behind a lambda
+    // vtable and is inferred. See web/js/kernels/lake.js.
+    note: 'approx',
+    // No invented values: the catalogue's IL defaults are what the real UI sends. X and Y are
+    // normalised -1..1 and map to the seed cell; Water Level is the native guard's operand.
+    params: {
+      Type: {},
+      X: {},
+      Y: {},
+      'Water Level': { hint: 'The native guard is `0 < Water Level`, so zero produces no lake.' },
+      'Render Surface': {},
+      Accuracy: {},
+      Precipitation: {},
+      'Small Lakes': {},
+      'Flood Control': {},
+      'Water Floor': {},
+      'Shore Size': {},
+      'Altitude Bias': {},
+    },
+  },
   {
     name: 'Snow', algorithm: snow, category: CAT.MASK,
     summary: 'Snow accumulation by altitude and slope, with melt.',
@@ -727,27 +1050,41 @@ export const NODES = [
     inputs: [H()], outputs: [OUT_H()],
     note: 'model',
     params: {
-      Duration: { d: 0.5, min: 0, max: 1, step: 0.01, hint: 'Scaled to a droplet budget of Duration * 0.8 * N^2.' },
-      Downcutting: { d: 0.5, min: 0, max: 1, step: 0.01 },
-      'Erosion Scale': { d: 0.5, min: 0, max: 1, step: 0.01 },
-      Seed: { d: 0, min: 0, max: 99999, step: 1 },
-      NoErosion: { d: false },
-      'Suspended Load': { d: 0.5, min: 0, max: 1, step: 0.01 },
-      'Discharge Angle': { d: 0.5, min: 0, max: 1, step: 0.01 },
-      'Bed Load': { d: 0.35, min: 0, max: 1, step: 0.01 },
-      'Coarse Sediments': { d: 0.35, min: 0, max: 1, step: 0.01 },
-      DepositionBoost: { d: 0, min: 0, max: 1, step: 0.01 },
-      ExtraDepositionBoost: { d: 0, min: 0, max: 1, step: 0.01 },
-      Shape: { d: 0.4, min: 0, max: 1, step: 0.01 },
-      'Shape Sharpness': { d: 0.4, min: 0, max: 1, step: 0.01 },
-      'Shape Detail Scale': { d: 0.5, min: 0, max: 1, step: 0.01 },
+      // No invented values here. Defaults and ranges come from the vendor catalogue's IL
+      // metadata, which is what the real UI sends — see
+      // docs/erosion2-parameter-correspondence.md. The native PE() signature declares
+      // different fallbacks (SuspendedLoadDischargeAngle 24, BedLoadDischargeAngle 15,
+      // ShapeDetailScale 0.8) but those apply only when the node passes no argument, so the
+      // catalogue values are the effective ones.
+      Duration: { hint: 'Droplet budget = Duration * 0.8 * N^2, scaled from the real 1..200 range.' },
+      Downcutting: {},
+      'Erosion Scale': { hint: 'Mapped onto the erosion brush radius, scaled from the real 1..20000 range.' },
+      Seed: {},
+      NoErosion: {},
+      'Suspended Load': { hint: 'Sediment capacity constant.' },
+      // Three distinct parameters share this label, in catalogue order after each load type.
+      // Storage keys are SuspendedLoadDischargeAngle / BedLoadDischargeAngle /
+      // CoarseSedimentsDischargeAngle; see PARAM_KEY_ALIASES.
+      'Discharge Angle': { hint: 'Slope at which suspended load settles.' },
+      'Bed Load': {},
+      'Coarse Sediments': {},
+      DepositionBoost: {},
+      // ExtraDepositionBoost and Enable carry no IL default in the catalogue, so without
+      // these overrides mergeParam would fall back to the generic per-type default — 0.5
+      // for a Single and FALSE for a toggle. Enable false disables the solver outright,
+      // which is how this was caught: Erosion2 stopped removing any material at all
+      // (mean 0.33467 -> 0.33467).
+      ExtraDepositionBoost: { d: 0 },
       Enable: { d: true },
-      'Directional Precipitation': { d: false },
-      Direction: { d: 0, min: 0, max: 32, step: 1 },
-      'Rain Shadow': { d: 0.5, min: 0, max: 1, step: 0.01 },
-      Slope: { d: [0, 1], min: 0, max: 1, step: 0.01, kind: 'vector2' },
-      Altitude: { d: [0, 1], min: 0, max: 1, step: 0.01, kind: 'vector2' },
-      Reverse: { d: false },
+      Shape: {},
+      'Shape Sharpness': {},
+      'Shape Detail Scale': {},
+      'Directional Precipitation': {},
+      Direction: {},
+      'Rain Shadow': {},
+      Slope: { kind: 'vector2' },
+      Altitude: { kind: 'vector2' },
+      Reverse: {},
     },
   },
   {
@@ -857,25 +1194,67 @@ export const KIND_COLOR = {
 };
 
 /**
+ * Vendor parameter names that repeat within one node, and the stable key each occurrence
+ * should get. Keyed by node, then display name, then occurrence index.
+ *
+ * WHY THIS EXISTS
+ * Gaea's own catalogue lists three distinct parameters all named "Discharge Angle" for
+ * Erosion2 — one after each load type — and its `description` for all three is the same
+ * sentence, so only POSITION distinguishes them. A name-keyed object cannot hold them, and
+ * the previous `buildSchema` dropped the 2nd and 3rd on the floor
+ * (`if (seen.has(cp.name)) continue`), silently removing two real parameters.
+ *
+ * The mapping is declared explicitly rather than inferred from "the parameter preceding
+ * it", because deriving a key from a neighbour would put one node's vocabulary inside a
+ * generic function and would quietly mis-key any other node that has duplicates.
+ */
+const PARAM_KEY_ALIASES = {
+  Erosion2: {
+    'Discharge Angle': [
+      'SuspendedLoadDischargeAngle',
+      'BedLoadDischargeAngle',
+      'CoarseSedimentsDischargeAngle',
+    ],
+  },
+};
+
+/**
  * Build a per-node parameter schema by merging the vendor catalog with registry overrides.
  * Unknown parameters are never dropped: they receive a generic default and control kind
  * derived purely from their declared type, which is what makes arbitrary nodes usable.
+ *
+ * Every entry gets a unique `key` for storage, separate from `name`, which is the label
+ * shown to the user. For almost every node the two are identical, so `key` only becomes
+ * load-bearing where the vendor catalogue repeats a name.
  */
 export function buildSchema(catalogNode, registryNode) {
   const overrides = (registryNode && registryNode.params) || {};
+  const aliases = (catalogNode && PARAM_KEY_ALIASES[catalogNode.name]) || {};
   const seen = new Map();
   const params = [];
   for (const cp of (catalogNode ? catalogNode.params : [])) {
-    if (seen.has(cp.name)) continue; // vendor dump contains duplicate labels; keep the first
-    seen.set(cp.name, true);
-    const ov = overrides[cp.name] || {};
-    params.push(mergeParam(cp, ov));
+    const nth = seen.get(cp.name) || 0;
+    seen.set(cp.name, nth + 1);
+    // A duplicated label gets an alias key for EVERY occurrence, the first included: once a
+    // name is ambiguous the plain name is not a usable key, so "keep the first as-is" would
+    // leave one entry addressable only by a label that three entries share.
+    const aliasList = aliases[cp.name];
+    const key = aliasList
+      ? (aliasList[nth] || `${cp.name} #${nth + 1}`)
+      : cp.name;
+    const nodeName = catalogNode ? catalogNode.name : '';
+    const auth = (AUTHORITATIVE_PARAMS[nodeName] || {})[cp.name] || null;
+    const ov = authoritativeParam(nodeName, cp.name, overrides[cp.name] || {});
+    params.push(mergeParam(cp, ov, key, auth));
   }
   // Registry-only params (e.g. for nodes whose catalog entry is missing a control)
   for (const [name, ov] of Object.entries(overrides)) {
     if (seen.has(name)) continue;
     seen.set(name, true);
-    params.push(mergeParam({ name, type: null, control: null, description: '' }, ov));
+    const nodeName = catalogNode ? catalogNode.name : '';
+    params.push(mergeParam({ name, type: null, control: null, description: '' },
+      authoritativeParam(nodeName, name, ov), name,
+      (AUTHORITATIVE_PARAMS[nodeName] || {})[name] || null));
   }
   return params;
 }
@@ -910,21 +1289,41 @@ function resolveControl(cp, ov) {
   return 'slider';
 }
 
-function mergeParam(cp, ov) {
+/**
+ * @param {object} cp  the catalog parameter record
+ * @param {object} ov  the registry override
+ * @param {string} key the unique storage key; equals `cp.name` unless the name repeats
+ */
+function mergeParam(cp, ov, key, auth) {
   const control = resolveControl(cp, ov);
   const generated = genericDefault(cp, control);
 
   // Provenance of every number, so the UI and the docs can state where it came from:
-  //   'registry' – hand-authored here; authoritative because it is in this kernel's units
-  //   'il'       – the [Parameter(default,min,max)] attribute recovered from the Gaea assembly
-  //   'type'     – a conservative per-type fallback
+  //   'authority' – the [Parameter(default,min,max)] attribute read out of the managed
+  //                 assembly. This is what the runtime actually uses, so it outranks a
+  //                 hand-authored value: an audit found 113 of 224 registry parameters
+  //                 disagreeing with it, some wildly (Blur.Radius was 4.0 / 0..128 where the
+  //                 attribute says 0.1 / 0..2).
+  //   'registry'  – hand-authored here, and only consulted when the table is silent
+  //   'il'        – the vendor catalogue's ilDefault/ilMin/ilMax
+  //   'type'      – a conservative per-type fallback
   let value, defSrc;
-  if (ov.d !== undefined) { value = ov.d; defSrc = 'registry'; }
+  // `auth.d` may be absent even when `auth` exists: an attribute whose default is an enum
+  // member or a Boolean carries only a numeric RANGE, which the extractor records without a
+  // default. Testing `if (auth)` alone set the value to undefined for every such parameter —
+  // which read as `Enable = undefined`, and `Enable` is Erosion2's master gate, so the solver
+  // silently stopped running. The default must fall through to the next source instead.
+  if (auth && auth.d !== undefined) { value = auth.d; defSrc = 'authority'; }
+  else if (ov.d !== undefined) { value = ov.d; defSrc = 'registry'; }
   else if (cp.ilDefault !== undefined) { value = cp.ilDefault; defSrc = 'il'; }
   else { value = generated.d; defSrc = 'type'; }
 
   let min, max, rangeSrc;
-  if (ov.min !== undefined || ov.max !== undefined) {
+  if (auth && auth.min !== undefined && auth.max !== undefined) {
+    min = auth.min;
+    max = auth.max;
+    rangeSrc = 'authority';
+  } else if (ov.min !== undefined || ov.max !== undefined) {
     min = ov.min !== undefined ? ov.min : generated.min;
     max = ov.max !== undefined ? ov.max : generated.max;
     rangeSrc = 'registry';
@@ -940,6 +1339,9 @@ function mergeParam(cp, ov) {
 
   const p = {
     name: cp.name,
+    // Storage identity. Equal to `name` unless the vendor catalogue repeats the label, in
+    // which case the duplicates carry the keys declared in PARAM_KEY_ALIASES.
+    key: key || cp.name,
     type: cp.type ?? null,
     control,
     description: cp.description || '',
@@ -977,9 +1379,17 @@ function genericDefault(cp, control) {
   return { d: 0.5, min: 0, max: 1, step: 0.005 };
 }
 
-/** Default parameter object for a new node instance. */
+/**
+ * Default parameter object for a new node instance.
+ *
+ * Keyed by `p.key`, not `p.name`. For nearly every parameter the two are the same string;
+ * they differ only where the vendor catalogue repeats a label, and there the key is what
+ * keeps the entries from overwriting each other.
+ */
 export function defaultParams(schema) {
   const out = {};
-  for (const p of schema) out[p.name] = Array.isArray(p.value) ? p.value.slice() : p.value;
+  for (const p of schema) {
+    out[p.key || p.name] = Array.isArray(p.value) ? p.value.slice() : p.value;
+  }
   return out;
 }

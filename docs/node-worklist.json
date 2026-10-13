@@ -1,0 +1,941 @@
+[
+  {
+    "name": "Chokepoint",
+    "line": 38481,
+    "lines": 4,
+    "stmts": 1,
+    "opaque": []
+  },
+  {
+    "name": "Gate",
+    "line": 41727,
+    "lines": 4,
+    "stmts": 1,
+    "opaque": []
+  },
+  {
+    "name": "Route",
+    "line": 41327,
+    "lines": 4,
+    "stmts": 1,
+    "opaque": []
+  },
+  {
+    "name": "Shaper",
+    "line": 29917,
+    "lines": 4,
+    "stmts": 1,
+    "opaque": []
+  },
+  {
+    "name": "Shatter",
+    "line": 30071,
+    "lines": 4,
+    "stmts": 1,
+    "opaque": []
+  },
+  {
+    "name": "VariableBlur",
+    "line": 33608,
+    "lines": 4,
+    "stmts": 1,
+    "opaque": []
+  },
+  {
+    "name": "Craggy",
+    "line": 15128,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "Edge",
+    "line": 26193,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "Filter",
+    "line": 26346,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "GraphicEQ",
+    "line": 26923,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "Lichtenberg",
+    "line": 27640,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "Origami",
+    "line": 28343,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "Outcrops",
+    "line": 28391,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "Pixelate",
+    "line": 28546,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "Pockmarks",
+    "line": 28615,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "RockMap",
+    "line": 23108,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "Roughen",
+    "line": 28933,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "SoftClip",
+    "line": 30959,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "Soil",
+    "line": 23254,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "Terraces",
+    "line": 31786,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "Threshold",
+    "line": 31984,
+    "lines": 5,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "Accumulator",
+    "line": 14040,
+    "lines": 6,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "Angle",
+    "line": 22150,
+    "lines": 6,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "Aperture",
+    "line": 23999,
+    "lines": 6,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "Bulbous",
+    "line": 24695,
+    "lines": 6,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "Curvature",
+    "line": 24906,
+    "lines": 6,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "Grid",
+    "line": 9084,
+    "lines": 6,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "Halftone",
+    "line": 27138,
+    "lines": 6,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "Hillify",
+    "line": 27287,
+    "lines": 6,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "Peaks",
+    "line": 23059,
+    "lines": 6,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "Stratify",
+    "line": 31113,
+    "lines": 6,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "HSL",
+    "line": 9163,
+    "lines": 7,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "Island",
+    "line": 17388,
+    "lines": 7,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "Shape",
+    "line": 20241,
+    "lines": 7,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "Contours",
+    "line": 8899,
+    "lines": 8,
+    "stmts": 5,
+    "opaque": []
+  },
+  {
+    "name": "CLUTer",
+    "line": 8760,
+    "lines": 9,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "Hemisphere",
+    "line": 17260,
+    "lines": 9,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "MountainRange",
+    "line": 17841,
+    "lines": 9,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "Plates",
+    "line": 19245,
+    "lines": 9,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "Sandstone",
+    "line": 29011,
+    "lines": 9,
+    "stmts": 6,
+    "opaque": []
+  },
+  {
+    "name": "SlopeBlur",
+    "line": 30695,
+    "lines": 9,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "SlopeWarp",
+    "line": 30842,
+    "lines": 9,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "Sunlight",
+    "line": 23302,
+    "lines": 9,
+    "stmts": 6,
+    "opaque": []
+  },
+  {
+    "name": "Cone",
+    "line": 14730,
+    "lines": 10,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "DuneSea",
+    "line": 16573,
+    "lines": 10,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "Fold",
+    "line": 26487,
+    "lines": 10,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "LinearGradient",
+    "line": 17455,
+    "lines": 10,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "RadialGradient",
+    "line": 19521,
+    "lines": 10,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "Sand",
+    "line": 20110,
+    "lines": 10,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "Swirl",
+    "line": 31695,
+    "lines": 10,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "WaveShine",
+    "line": 21893,
+    "lines": 10,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "Seamless",
+    "line": 29679,
+    "lines": 11,
+    "stmts": 5,
+    "opaque": []
+  },
+  {
+    "name": "Stones",
+    "line": 20750,
+    "lines": 11,
+    "stmts": 5,
+    "opaque": []
+  },
+  {
+    "name": "HydroFix",
+    "line": 27371,
+    "lines": 12,
+    "stmts": 2,
+    "opaque": []
+  },
+  {
+    "name": "Sharpen",
+    "line": 30015,
+    "lines": 12,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "SuperColor",
+    "line": 31244,
+    "lines": 12,
+    "stmts": 9,
+    "opaque": []
+  },
+  {
+    "name": "DriftNoise",
+    "line": 16396,
+    "lines": 13,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "GroundTexture",
+    "line": 27047,
+    "lines": 13,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "PointCloud",
+    "line": 12474,
+    "lines": 13,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "Repeat",
+    "line": 28822,
+    "lines": 13,
+    "stmts": 7,
+    "opaque": []
+  },
+  {
+    "name": "Trees",
+    "line": 32644,
+    "lines": 13,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "CraterField",
+    "line": 15417,
+    "lines": 14,
+    "stmts": 8,
+    "opaque": []
+  },
+  {
+    "name": "Rockscape",
+    "line": 19881,
+    "lines": 14,
+    "stmts": 5,
+    "opaque": []
+  },
+  {
+    "name": "Gabor",
+    "line": 17132,
+    "lines": 15,
+    "stmts": 6,
+    "opaque": []
+  },
+  {
+    "name": "Mesher",
+    "line": 11714,
+    "lines": 16,
+    "stmts": 7,
+    "opaque": []
+  },
+  {
+    "name": "Slump",
+    "line": 20675,
+    "lines": 16,
+    "stmts": 3,
+    "opaque": []
+  },
+  {
+    "name": "Thermal2",
+    "line": 38339,
+    "lines": 16,
+    "stmts": 7,
+    "opaque": []
+  },
+  {
+    "name": "ThermalShaper",
+    "line": 31880,
+    "lines": 16,
+    "stmts": 4,
+    "opaque": []
+  },
+  {
+    "name": "MathX",
+    "line": 40397,
+    "lines": 17,
+    "stmts": 7,
+    "opaque": []
+  },
+  {
+    "name": "Scree",
+    "line": 29552,
+    "lines": 18,
+    "stmts": 9,
+    "opaque": []
+  },
+  {
+    "name": "Match",
+    "line": 27762,
+    "lines": 19,
+    "stmts": 7,
+    "opaque": []
+  },
+  {
+    "name": "Normals",
+    "line": 22857,
+    "lines": 19,
+    "stmts": 7,
+    "opaque": []
+  },
+  {
+    "name": "Reseed",
+    "line": 41279,
+    "lines": 19,
+    "stmts": 6,
+    "opaque": []
+  },
+  {
+    "name": "Unity",
+    "line": 12983,
+    "lines": 20,
+    "stmts": 8,
+    "opaque": []
+  },
+  {
+    "name": "Pattern",
+    "line": 43271,
+    "lines": 21,
+    "stmts": 5,
+    "opaque": []
+  },
+  {
+    "name": "Transform3D",
+    "line": 32312,
+    "lines": 21,
+    "stmts": 6,
+    "opaque": []
+  },
+  {
+    "name": "Rugged",
+    "line": 20029,
+    "lines": 22,
+    "stmts": 5,
+    "opaque": []
+  },
+  {
+    "name": "Tint",
+    "line": 10744,
+    "lines": 23,
+    "stmts": 8,
+    "opaque": []
+  },
+  {
+    "name": "Var",
+    "line": 41744,
+    "lines": 23,
+    "stmts": 17,
+    "opaque": []
+  },
+  {
+    "name": "RGBSplit",
+    "line": 9790,
+    "lines": 24,
+    "stmts": 12,
+    "opaque": []
+  },
+  {
+    "name": "Transpose",
+    "line": 32504,
+    "lines": 24,
+    "stmts": 14,
+    "opaque": []
+  },
+  {
+    "name": "Volcano",
+    "line": 21452,
+    "lines": 24,
+    "stmts": 9,
+    "opaque": []
+  },
+  {
+    "name": "Crumble",
+    "line": 34862,
+    "lines": 26,
+    "stmts": 11,
+    "opaque": []
+  },
+  {
+    "name": "TextureBaker",
+    "line": 12615,
+    "lines": 26,
+    "stmts": 8,
+    "opaque": []
+  },
+  {
+    "name": "Texturizer",
+    "line": 23639,
+    "lines": 26,
+    "stmts": 5,
+    "opaque": []
+  },
+  {
+    "name": "Meshify",
+    "line": 27977,
+    "lines": 27,
+    "stmts": 12,
+    "opaque": []
+  },
+  {
+    "name": "Synth",
+    "line": 10471,
+    "lines": 28,
+    "stmts": 16,
+    "opaque": []
+  },
+  {
+    "name": "Uplift",
+    "line": 21292,
+    "lines": 28,
+    "stmts": 11,
+    "opaque": []
+  },
+  {
+    "name": "MacroPort",
+    "line": 40222,
+    "lines": 29,
+    "stmts": 7,
+    "opaque": []
+  },
+  {
+    "name": "RGBMerge",
+    "line": 9693,
+    "lines": 29,
+    "stmts": 14,
+    "opaque": []
+  },
+  {
+    "name": "Wizard",
+    "line": 34020,
+    "lines": 29,
+    "stmts": 17,
+    "opaque": []
+  },
+  {
+    "name": "Noise",
+    "line": 18590,
+    "lines": 30,
+    "stmts": 10,
+    "opaque": []
+  },
+  {
+    "name": "Sediments",
+    "line": 29773,
+    "lines": 30,
+    "stmts": 15,
+    "opaque": []
+  },
+  {
+    "name": "Switch",
+    "line": 41631,
+    "lines": 32,
+    "stmts": 11,
+    "opaque": []
+  },
+  {
+    "name": "FlowMapClassic",
+    "line": 22520,
+    "lines": 34,
+    "stmts": 19,
+    "opaque": []
+  },
+  {
+    "name": "ColorErosion",
+    "line": 34678,
+    "lines": 36,
+    "stmts": 11,
+    "opaque": []
+  },
+  {
+    "name": "RockNoise",
+    "line": 19750,
+    "lines": 36,
+    "stmts": 15,
+    "opaque": []
+  },
+  {
+    "name": "LoopBegin",
+    "line": 39413,
+    "lines": 37,
+    "stmts": 10,
+    "opaque": []
+  },
+  {
+    "name": "Bomber",
+    "line": 24333,
+    "lines": 38,
+    "stmts": 14,
+    "opaque": []
+  },
+  {
+    "name": "Distress",
+    "line": 15588,
+    "lines": 39,
+    "stmts": 22,
+    "opaque": []
+  },
+  {
+    "name": "Layers",
+    "line": 39186,
+    "lines": 39,
+    "stmts": 18,
+    "opaque": []
+  },
+  {
+    "name": "AO",
+    "line": 22214,
+    "lines": 41,
+    "stmts": 18,
+    "opaque": []
+  },
+  {
+    "name": "Compare",
+    "line": 38707,
+    "lines": 41,
+    "stmts": 16,
+    "opaque": []
+  },
+  {
+    "name": "Draw",
+    "line": 15944,
+    "lines": 42,
+    "stmts": 15,
+    "opaque": []
+  },
+  {
+    "name": "Median",
+    "line": 27810,
+    "lines": 42,
+    "stmts": 7,
+    "opaque": []
+  },
+  {
+    "name": "Object",
+    "line": 18736,
+    "lines": 42,
+    "stmts": 12,
+    "opaque": []
+  },
+  {
+    "name": "LineNoise",
+    "line": 17526,
+    "lines": 43,
+    "stmts": 18,
+    "opaque": []
+  },
+  {
+    "name": "Debris",
+    "line": 25062,
+    "lines": 45,
+    "stmts": 19,
+    "opaque": []
+  },
+  {
+    "name": "Unreal",
+    "line": 13177,
+    "lines": 45,
+    "stmts": 15,
+    "opaque": []
+  },
+  {
+    "name": "TileInput",
+    "line": 20839,
+    "lines": 50,
+    "stmts": 23,
+    "opaque": []
+  },
+  {
+    "name": "Mixer",
+    "line": 40505,
+    "lines": 53,
+    "stmts": 32,
+    "opaque": []
+  },
+  {
+    "name": "TextureBase",
+    "line": 23369,
+    "lines": 56,
+    "stmts": 26,
+    "opaque": []
+  },
+  {
+    "name": "IceFloe",
+    "line": 27412,
+    "lines": 57,
+    "stmts": 21,
+    "opaque": []
+  },
+  {
+    "name": "WaterColor",
+    "line": 10888,
+    "lines": 58,
+    "stmts": 28,
+    "opaque": []
+  },
+  {
+    "name": "Shrubs",
+    "line": 30204,
+    "lines": 60,
+    "stmts": 24,
+    "opaque": []
+  },
+  {
+    "name": "LightX",
+    "line": 9228,
+    "lines": 64,
+    "stmts": 26,
+    "opaque": []
+  },
+  {
+    "name": "Wizard2",
+    "line": 34276,
+    "lines": 73,
+    "stmts": 70,
+    "opaque": []
+  },
+  {
+    "name": "Anastomosis",
+    "line": 34500,
+    "lines": 74,
+    "stmts": 41,
+    "opaque": []
+  },
+  {
+    "name": "Dusting",
+    "line": 35057,
+    "lines": 76,
+    "stmts": 35,
+    "opaque": []
+  },
+  {
+    "name": "SatMap",
+    "line": 9861,
+    "lines": 77,
+    "stmts": 40,
+    "opaque": []
+  },
+  {
+    "name": "DataExtractor",
+    "line": 22357,
+    "lines": 79,
+    "stmts": 35,
+    "opaque": []
+  },
+  {
+    "name": "Weathering",
+    "line": 11245,
+    "lines": 79,
+    "stmts": 42,
+    "opaque": []
+  },
+  {
+    "name": "Snowfield",
+    "line": 37750,
+    "lines": 80,
+    "stmts": 49,
+    "opaque": []
+  },
+  {
+    "name": "MountainSide",
+    "line": 17941,
+    "lines": 82,
+    "stmts": 51,
+    "opaque": []
+  },
+  {
+    "name": "EasyErosion",
+    "line": 25976,
+    "lines": 91,
+    "stmts": 58,
+    "opaque": []
+  },
+  {
+    "name": "LoopEnd",
+    "line": 39481,
+    "lines": 95,
+    "stmts": 35,
+    "opaque": []
+  },
+  {
+    "name": "Shade",
+    "line": 10222,
+    "lines": 95,
+    "stmts": 28,
+    "opaque": []
+  },
+  {
+    "name": "Splat",
+    "line": 41371,
+    "lines": 98,
+    "stmts": 49,
+    "opaque": []
+  },
+  {
+    "name": "Cartography",
+    "line": 8272,
+    "lines": 122,
+    "stmts": 57,
+    "opaque": []
+  },
+  {
+    "name": "Heal",
+    "line": 27234,
+    "lines": 10,
+    "stmts": 4,
+    "opaque": [
+      "MagickImage"
+    ]
+  },
+  {
+    "name": "Rivers",
+    "line": 37028,
+    "lines": 13,
+    "stmts": 10,
+    "opaque": [
+      "Rivers("
+    ]
+  },
+  {
+    "name": "ColorThreshold",
+    "line": 22298,
+    "lines": 16,
+    "stmts": 13,
+    "opaque": [
+      "MagickImage"
+    ]
+  },
+  {
+    "name": "Whorl",
+    "line": 33910,
+    "lines": 37,
+    "stmts": 17,
+    "opaque": [
+      "MagickImage"
+    ]
+  }
+]

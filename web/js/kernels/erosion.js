@@ -12,6 +12,7 @@
  */
 
 import { createField, clamp01, clamp, gaussianBlur, cloneField, stats } from '../kernel/field.js';
+import { pyramidDownsample, pyramidUpsample } from './pyramid.js';
 import { makeRng } from '../kernel/hash.js';
 
 function P(params, name, dflt) {
@@ -90,6 +91,523 @@ export function flowAccumulation(h, size) {
   return { acc, recv };
 }
 
+import { gaeaFlowReceiverMax } from './relaxation.js';
+
+/* ---------------------------------------------------- Gaea's droplet step (FUN_1801f0440) */
+
+/**
+ * Constants from the droplet step. Every one was read out of the image, not chosen.
+ *
+ * `K_DIR_INERTIA`  `0x180356210` = 0.5    weight on the previous direction
+ * `K_DIR_TABLE`    `0x1803561ec` = 0.25   weight on the precomputed random direction table
+ * `K_DIR_DEPOSIT`  `0x180356374` = 30.0   multiplier on the inertia term right after a deposit
+ * `K_BORDER`       `0x1803562c0` = 1.5    cell margin the droplet must stay inside
+ * `DROPLET_STEPS`  the loop bound is the literal `0xb`
+ */
+export const K_DIR_INERTIA = 0.5;
+export const K_DIR_TABLE = 0.25;
+export const K_DIR_DEPOSIT = 30.0;
+export const K_BORDER = 1.5;
+export const DROPLET_STEPS = 11;
+
+/**
+ * One droplet direction update, transcribed from `FUN_1801f0440`.
+ *
+ *     blend = justDeposited ? 30.0 : 1.0
+ *     dir   = 0.5 * prevDir * blend  +  0.25 * table[i]  -  gradient / |gradient|
+ *     dir  /= |dir|
+ *
+ * THREE THINGS THIS CORRECTS IN THIS BUILD'S OWN MODEL
+ *
+ * 1. The downhill pull is the UNIT gradient, not the raw gradient. `erodeLevel` used
+ *    `dir -= grad * (1 - inertia)`, which lets a steep cell dominate in proportion to its
+ *    steepness; Gaea normalises first, so every cell pulls equally and only the DEFLECTION
+ *    differs.
+ * 2. The inertia term is `prevDir * blend`, not `prevDir * inertia`, and `blend` is 1 or 30
+ *    — not a fractional weight. Inertia is either full-strength or thirty times
+ *    full-strength, the latter immediately after the droplet deposited. A fractional 0.05
+ *    has no counterpart here.
+ * 3. A quarter of the direction comes from a PRECOMPUTED RANDOM TABLE, not from a fresh
+ *    random draw. `FUN_1801f2100`'s SPIR-V sibling `create_random_directions` builds it, and
+ *    each particle walks it by its own index, so the jitter is deterministic per particle
+ *    and identical across parallel workers. A per-step `Math.random()`-style draw cannot
+ *    reproduce that, and it would also break the cross-worker determinism.
+ *
+ * AXIS ASSIGNMENT IS UNCERTAIN. The decompiler feeds the two gradient components into the
+ * two output lanes in an order that depends on how it named the bilinear samples, and I could
+ * not pin which is x and which is y from the decompilation alone. The two components are
+ * symmetric in every other respect, so this affects orientation only, not magnitude.
+ *
+ * @param {object} o
+ * @param {number} o.gx,o.gy   gradient at the droplet's new cell
+ * @param {number} o.prevX,o.prevY  the direction it was travelling
+ * @param {number} o.tableX,o.tableY the precomputed random unit direction for this step
+ * @param {boolean} o.justDeposited  whether the previous step deposited
+ * @returns {{x: number, y: number}|null} a unit vector, or null on a flat cell
+ */
+export function gaeaDropletDirection({ gx, gy, prevX, prevY, tableX, tableY, justDeposited }) {
+  const mag = Math.sqrt(gx * gx + gy * gy);
+  // A flat cell has no downhill direction. The binary takes the `mag <= 0` branch and
+  // terminates the droplet, which is what the null return signals here.
+  if (!(mag > 0)) return null;
+
+  const blend = justDeposited ? K_DIR_DEPOSIT : 1.0;
+  let dx = K_DIR_INERTIA * prevX * blend + K_DIR_TABLE * tableX - gx / mag;
+  let dy = K_DIR_INERTIA * prevY * blend + K_DIR_TABLE * tableY - gy / mag;
+
+  const m = Math.sqrt(dx * dx + dy * dy);
+  if (!(m > 0)) return null;
+  return { x: dx / m, y: dy / m };
+}
+
+/**
+ * The precomputed random-direction table, standing in for Gaea's
+ * `resampling::create_random_directions` / `parallel_erosion::create_random_directions`.
+ *
+ * Gaea builds a table of unit vectors once and every droplet walks it by its own index
+ * (`param_2[0x130] = (param_2[0x130] + 1) & param_1[0x94]`), which is why the jitter is
+ * deterministic and repeatable across workers. The table is a fixed-size array of float
+ * pairs; the mask `param_1[0x94]` is its power-of-two length minus one.
+ *
+ * @param {number} count must be a power of two, matching the mask Gaea uses
+ * @param {number} seed
+ * @returns {Float32Array} `count * 2` floats: unit x, unit y, unit x, unit y, ...
+ */
+export function gaeaDirectionTable(count, seed) {
+  const n = Math.max(1, count | 0);
+  const out = new Float32Array(n * 2);
+  const rng = makeRng(seed);
+  for (let i = 0; i < n; i++) {
+    const a = rng.unit() * Math.PI * 2;
+    out[i * 2] = Math.cos(a);
+    out[i * 2 + 1] = Math.sin(a);
+  }
+  return out;
+}
+
+/* ---------------------------------------------------- Gaea's droplet step (end) */
+
+/* ------------------------------------- the per-step contribution (FUN_1801f0c60, inner) */
+
+/**
+ * The per-step contribution, transcribed from the inner loop of `FUN_1801f0c60`.
+ *
+ * FIDELITY: `approx`, and deliberately NOT wired into the solver.
+ *
+ * The chain of nested `min`/`max` over six mutable particle fields was read off a dense
+ * decompilation. The sequence, the constants and the parameter names are all established, but
+ * several individual branches — which operand wins where, and the precise order of the two
+ * `p128` writes — have NOT been validated against reference output, because no reference
+ * output is available for this build. A transcription in that state is exactly the kind that
+ * looks correct, so it is exported for testing and isolated from `erodeLevel` until the
+ * branches can be pinned.
+ *
+ * WHAT IS ASSERTED, AND WHY IT IS ENOUGH TO BE WORTH KEEPING
+ * Three structural properties follow from the binary's shape rather than from the arithmetic,
+ * so they hold regardless of the branch details:
+ *
+ *   * `p124` is written as `x - x`, i.e. exactly zero. A store, not a dead expression.
+ *   * `p118` advances by `max(zero, ...)` with `zero` in {0.3, 0.5}, so it STRICTLY increases
+ *     every step. This is checkable and a sign error anywhere upstream breaks it.
+ *   * the hardness term is `min(..., ctx12c * 0.02 * inertFactor * hardness)` where
+ *     `inertFactor` is the parameter the orchestrator zeroes, so hardness can never be
+ *     positive.
+ *
+ * The particle carries six mutable float fields that this function reads and writes. They are
+ * passed as an explicit state object rather than hidden, so each write is visible.
+ *
+ * @param {object} o
+ * @param {number} o.dirPrev,o.dirNext,o.dirCur       direction history around the step
+ * @param {number} o.dirPrev2,o.dirNext2              the wider window
+ * @param {number} o.dirLast                          the step's own recorded value
+ * @param {number} o.scale                            the running path scale
+ * @param {number} o.zero                             0.3 or 0.5, from the dispatch mode
+ * @param {number} o.gain                             from gaeaIterationGain
+ * @param {number} o.ctx12c                           context + 0x12c, a per-droplet accumulator
+ * @param {number} o.perCell                          the per-cell physical size
+ * @param {number} o.hardness                         the per-cell erodibility sample
+ * @param {object} o.params                           the node parameters, by storage key
+ * @param {Float32Array|object} o.state               {p118, p11c, p124, p128, p12c}
+ * @returns {{contribution: number, base: number, capacity: number, p118: number}}
+ */
+export function gaeaStepContribution(o) {
+  const {
+    dirPrev, dirNext, dirCur, dirPrev2, dirNext2, scale, zero, gain, params, state,
+  } = o;
+  const num = (v, d) => (Number.isFinite(v) ? v : d);
+  const downcutting = num(params?.Downcutting, 0.25);
+  const downcuttingType = num(params?.DowncuttingType, 0);
+  const extraBoost = num(params?.ExtraDepositionBoost, 0);
+  const suspendedAmount = num(params?.SuspendedLoadDischargeAmount, 1);
+  const bedAmount = num(params?.BedLoadDischargeAmount, 0);
+  const coarseAmount = num(params?.CoarseSedimentsDischargeAmount, 0);
+  const suspendedTh = gaeaDischargeThreshold(num(params?.SuspendedLoadDischargeAngle, 10));
+  const bedTh = gaeaDischargeThreshold(num(params?.BedLoadDischargeAngle, 10));
+  const coarseTh = gaeaDischargeThreshold(num(params?.CoarseSedimentsDischargeAngle, 10));
+
+  // 1. path asymmetry, floored
+  const slopeDiff = Math.max(zero, (dirPrev - dirNext) / (scale || 1));
+
+  // 2. a soft saturation, armed only past the suspended threshold
+  let recip = 1;
+  if (!(suspendedTh <= slopeDiff * suspendedAmount)) {
+    recip = 1 / (slopeDiff * 5 + 1);          // 0x180356340 = 5
+  }
+
+  // 3. curvature and the capacity base
+  const smooth3 = (dirPrev + dirCur + dirNext) / 3;
+  const smooth5 = (dirPrev2 + dirPrev + dirCur + dirNext + dirNext2) / 5;
+  const a = smooth3 - dirCur;
+  const b = smooth5 - dirCur;
+  const capacity = gaeaCapacity({ a, b }, zero) * recip;
+
+  // 4. the base term. The reference is smooth3 when either curvature is non-negative.
+  const reference = (0 <= a || 0 <= b) ? smooth3 : smooth5;
+  const refMin = Math.min(dirCur, reference);
+  // The third factor is the never-set parameter the orchestrator zeroes, so that product is
+  // identically zero for Erosion2 — transcribed as-is rather than dropped, so the reason
+  // stays visible.
+  const inertFactor = num(params?.__neverSetIndex9, 0);
+  const base = (refMin - (dirNext2 * 0.95 + o.dirLast)) * o.ctx12c * (1 - downcuttingType)
+             + downcuttingType * downcutting * (o.perCell || 0) * 0.15;
+
+  // 5. the gated additions
+  let value = capacity;
+  if (base + capacity < state.p128) {
+    if (state.p128 * 0.8 < slopeDiff && slopeDiff < state.p128 * 1.25) {
+      value = capacity + Math.min(state.p128 * coarseAmount, base);
+    }
+    if (slopeDiff < bedTh) {
+      const scale100 = slopeDiff < bedTh * 0.1 ? 100 : 1;
+      value += Math.min(refMin * 0.3 * bedAmount * scale100, base);
+    }
+    void coarseTh;
+  }
+
+  // 6. advance the running height: strictly positive, so p118 rises every step
+  const p118Prev = state.p118;
+  let applied = Math.min((p118Prev - refMin) * 0.9, value);
+  applied = Math.min(applied, state.p128);
+  const hardness = Math.min((state.p11c - (applied + refMin)) * 0.95,
+    o.ctx12c * 0.02 * inertFactor * (o.hardness || 0));
+  state.p11c = p118Prev;
+  const sum = hardness + applied;
+  const lifted = Math.max(zero, sum * gain);
+  const p118 = lifted + refMin;
+
+  // 7. the two writes that look like no-ops
+  state.p124 = p118Prev - p118Prev;            // exactly zero
+  state.p12c = state.p12c - (1 - extraBoost) * hardness;
+  state.p118 = p118;
+
+  // 8. the contribution
+  const raw = p118 - dirCur;
+  const scaled = raw >= 0 ? raw * 1.05 : raw;
+  const p128 = Math.max(zero, (lifted - sum) * extraBoost + (state.p128 - scaled));
+  state.p128 = p128;
+
+  return { contribution: raw, base, capacity, applied, hardness, value, p118, p128, refMin, lifted };
+}
+
+/* ------------------------------------- the per-step contribution (end) */
+
+/* ----------------------------------- the apply's two clean sub-expressions (FUN_1801f0c60) */
+
+/**
+ * `FUN_1801f0c60` selects its "zero" reference from the dispatch mode, and that choice
+ * propagates through every clamp in the function:
+ *
+ *     zero = (dispatchMode == 0) ? 0.3 : 0.5      // 0x1803561f0 : 0x180356210
+ *
+ * It is not a rounding epsilon. It is the floor of the capacity term, so it sets how much
+ * material a droplet moves even where the path is locally straight.
+ */
+export const K_APPLY_ZERO_A = 0.3;
+export const K_APPLY_ZERO_B = 0.5;
+
+/** The 3-term and 5-term path averages are plain means: divisors 3.0 and 5.0. */
+export const K_PATH_WINDOW_3 = 3;
+export const K_PATH_WINDOW_5 = 5;
+
+/** `0x3fb33333` at `0x1803562b0`. */
+export const K_GAIN_SCALE = 1.4;
+
+/**
+ * The iteration-dependent gain.
+ *
+ *     fVar19 = expf(zero * -iteration);
+ *     gain   = (1 - fVar19) * DepositionBoost * 1.4 + 1;
+ *
+ * A saturating ramp: exactly 1 at iteration 0, rising towards `1 + 1.4 * DepositionBoost` as
+ * the simulation proceeds. So `DepositionBoost` is not a constant offset — it is the DEPTH of
+ * a ramp whose time constant is `1 / zero`, and the two mode values 0.3 and 0.5 make that
+ * ramp reach its plateau about 1.67x faster in the second mode.
+ *
+ * The `iteration` here is `context + 0x110`, the counter the orchestrator increments once per
+ * level pass.
+ *
+ * @param {object} o
+ * @param {number} o.iteration
+ * @param {number} o.depositionBoost
+ * @param {number} [o.mode=0] 0 selects 0.3, anything else selects 0.5
+ * @returns {number} the gain, >= 1
+ */
+export function gaeaIterationGain({ iteration, depositionBoost, mode = 0 }) {
+  const zero = mode === 0 ? K_APPLY_ZERO_A : K_APPLY_ZERO_B;
+  const n = Number.isFinite(iteration) && iteration > 0 ? iteration : 0;
+  const boost = Number.isFinite(depositionBoost) ? depositionBoost : 0;
+  const decay = Math.exp(-zero * n);
+  return (1 - decay) * boost * K_GAIN_SCALE + 1;
+}
+
+/**
+ * The two smoothed path samples and their differences from the current step.
+ *
+ *     smooth3 = (dir[step-1] + dir[step] + dir[step+1]) / 3       // 0x180356330 = 3.0
+ *     smooth5 = (dir[step-2] + dir[step-1] + dir[step] + dir[step+1] + dir[step+2]) / 5
+ *
+ * Indices clamp to the ends rather than wrapping or shrinking the window, matching the
+ * binary's `if (i < 0) i = 0; if (count-1 < i) i = count-1;` guards.
+ *
+ * The two differences `a` and `b` are the curvature of the droplet's own path: how far the
+ * local direction departs from its 3- and 5-step means. The capacity term takes the larger
+ * of the two and floors it at `zero`, so a path that is locally straight still carries the
+ * floor amount.
+ *
+ * @param {Float32Array} dir  the per-step direction values at `particle + 0`
+ * @param {number} step
+ * @param {number} count      number of valid steps
+ * @returns {{smooth3: number, smooth5: number, a: number, b: number}}
+ */
+export function gaeaPathCurvature(dir, step, count) {
+  const at = (i) => dir[i < 0 ? 0 : i > count - 1 ? count - 1 : i];
+  const cur = at(step);
+  const prev = at(step - 1);
+  const next = at(step + 1);
+  const prev2 = at(step - 2);
+  const next2 = at(step + 2);
+
+  const smooth3 = (prev + cur + next) / K_PATH_WINDOW_3;
+  const smooth5 = (prev2 + prev + cur + next + next2) / K_PATH_WINDOW_5;
+  return { smooth3, smooth5, a: smooth3 - cur, b: smooth5 - cur };
+}
+
+/**
+ * The capacity term: the larger of the two curvature differences, floored at `zero`.
+ *
+ *     auVar6 = max(fVar4, fVar3);  auVar6 = max(zero, auVar6);
+ *
+ * @param {{a: number, b: number}} curvature
+ * @param {number} zero
+ * @returns {number}
+ */
+export function gaeaCapacity(curvature, zero) {
+  const m = Math.max(curvature.b, curvature.a);
+  return m > zero ? m : zero;
+}
+
+/* ----------------------------------- the apply's clean parts (end) */
+
+/* --------------------------------------- Parameters layout and its context offsets */
+
+/**
+ * `ParallelErosion_Erode` copies the caller's `Parameters` verbatim into a 0x140-byte context
+ * struct, as twelve 8-byte moves starting at `context + 0x98`. Twelve qwords is 96 bytes,
+ * exactly the size of `Parameters`, so:
+ *
+ *     context + 0x98 + parametersOffset  ==  the context offset the algorithm reads
+ *
+ * This layout is derived INDEPENDENTLY of the native offsets, from the field order recovered
+ * from the managed assembly's call site. Asserting that the two agree is therefore a real
+ * cross-check between two different artefacts rather than a restatement of one.
+ *
+ * NATURAL ALIGNMENT
+ * `Resolution` is 8 bytes (two int32), then twenty `Single` fields, one `Int32`, and one
+ * `Boolean`. The `Int32` falls at a 4-byte boundary naturally; the `Boolean` is last, so the
+ * struct pads from 93 to 96 bytes with no interior padding. That is what makes the offsets
+ * predictable without reading a compiler's layout decision.
+ */
+const PARAMETER_FIELDS = [
+  ['Resolution', 'Resolution'],
+  ['TerrainWidth', 'Single'],
+  ['TerrainHeight', 'Single'],
+  ['ErosionScale', 'Single'],
+  [null, 'Single'],                          // never set by PE()
+  ['Duration', 'Single'],
+  [null, 'Single'],                          // never set by PE()
+  ['Seed', 'Int32'],
+  ['Downcutting', 'Single'],
+  [null, 'Single'],                          // never set by PE()
+  ['Shape', 'Single'],
+  ['ShapeSharpness', 'Single'],
+  ['ShapeDetailScale', 'Single'],
+  ['SuspendedLoadDischargeAmount', 'Single'],
+  ['SuspendedLoadDischargeAngle', 'Single'],
+  ['BedLoadDischargeAmount', 'Single'],
+  ['BedLoadDischargeAngle', 'Single'],
+  ['CoarseSedimentsDischargeAmount', 'Single'],
+  ['CoarseSedimentsDischargeAngle', 'Single'],
+  ['DowncuttingType', 'Single'],
+  ['DepositionBoost', 'Single'],
+  ['ExtraDepositionBoost', 'Single'],
+  ['NoErosion', 'Boolean'],
+];
+
+const TYPE_SIZE = { Resolution: 8, Single: 4, Int32: 4, Boolean: 1 };
+const TYPE_ALIGN = { Resolution: 4, Single: 4, Int32: 4, Boolean: 1 };
+
+/** Byte offset of each parameter within `Parameters`, computed from the field list. */
+export const PARAMETER_OFFSETS = (() => {
+  const out = {};
+  let at = 0;
+  for (const [name, type] of PARAMETER_FIELDS) {
+    const align = TYPE_ALIGN[type];
+    at = Math.ceil(at / align) * align;
+    if (name) out[name] = at;
+    at += TYPE_SIZE[type];
+  }
+  out.__size = Math.ceil(at / 4) * 4;
+  return out;
+})();
+
+/** Where the verbatim `Parameters` copy begins inside the erosion context. */
+export const CONTEXT_PARAMETERS_BASE = 0x98;
+
+/**
+ * The context offset the native code reads for a given parameter.
+ * @param {string} name
+ * @returns {number|undefined}
+ */
+export function contextOffsetFor(name) {
+  const p = PARAMETER_OFFSETS[name];
+  return p === undefined ? undefined : CONTEXT_PARAMETERS_BASE + p;
+}
+
+/* --------------------------------------- Parameters layout (end) */
+
+/* ---------------------------------------------------- discharge angles (FUN_1801f24f0) */
+
+/**
+ * Gaea converts each sediment's discharge ANGLE into a slope tangent and uses it as a
+ * deposition threshold:
+ *
+ *     threshold = tan(angle_degrees / 180 * PI)
+ *
+ * transcribed from three `tanf` calls in `FUN_1801f24f0`:
+ *
+ *     param_1[0x124] = tanf((param_1[0xdc] / 180.0) * PI);   // one load type
+ *     param_1[0x128] = tanf((param_1[0xe4] / 180.0) * PI);   // another
+ *     param_1[0x120] = tanf((param_1[0xd4] / 180.0) * PI);   // the third
+ *
+ * The two constants are `0x43340000` = 180.0 at `0x180356398` and `0x40490fdb` = PI at
+ * `0x180356334`, so this is the plain degrees-to-radians conversion.
+ *
+ * WHY THIS MATTERS FOR FIDELITY
+ * This build's `Erosion2` accepted the three discharge angles as parameters and did nothing
+ * with them — the UI matched Gaea while the algorithm ignored them. The offsets above show
+ * exactly what they feed: `FUN_1801f0c60` reads `param_1[0x120]`, `[0x124]` and `[0x128]` as
+ * thresholds gating an additional deposition term. So the angles are a PHYSICAL PARAMETER of
+ * the deposition rule, not decoration.
+ *
+ * A tangent rather than the raw angle is the right form: a threshold on the terrain's local
+ * gradient is a slope, and `tan` converts the angle at which material settles into the slope
+ * that corresponds to it.
+ *
+ * @param {number} degrees
+ * @returns {number} the slope tangent, or 0 for a non-finite input
+ */
+/** Gaea's declared range for all three discharge angles: 0..45 degrees. */
+export const DISCHARGE_ANGLE_RANGE = [0, 45];
+
+export function gaeaDischargeThreshold(degrees) {
+  const d = Number.isFinite(degrees) ? degrees : 0;
+  /*
+   * Clamped to the DECLARED range, not to 90 degrees.
+   *
+   * Clamping at 90 looks like the natural choice — a vertical slope — but `tan(PI/2)` is not
+   * infinity in floating point: PI/2 is not exactly representable, so it returns about
+   * 1.6e16. A threshold that large is never crossed, which silently disables the deposition
+   * term instead of saturating it. Clamping at the top of Gaea's own range gives the
+   * well-defined value 1 and keeps the ordering monotone.
+   */
+  const [lo, hi] = DISCHARGE_ANGLE_RANGE;
+  const clamped = d < lo ? lo : d > hi ? hi : d;
+  return Math.tan((clamped / 180) * Math.PI);
+}
+
+/**
+ * The three deposition thresholds, in the order the catalogue lists them.
+ *
+ * The catalogue's defaults are 10 / 10 / 10 (what the node actually sends). The native
+ * `PE()` signature declares 24 / 15 / 10, but those apply only when no argument is passed, so
+ * they are fallbacks rather than the effective values.
+ *
+ * @param {object} params the node's parameter object
+ * @returns {{suspended: number, bed: number, coarse: number}} slope tangents
+ */
+export function gaeaDepositionThresholds(params) {
+  const q = (name, dflt) => {
+    const v = P(params, name, dflt);
+    return Number.isFinite(v) ? v : dflt;
+  };
+  return {
+    suspended: gaeaDischargeThreshold(q('SuspendedLoadDischargeAngle', 10)),
+    bed: gaeaDischargeThreshold(q('BedLoadDischargeAngle', 10)),
+    coarse: gaeaDischargeThreshold(q('CoarseSedimentsDischargeAngle', 10)),
+  };
+}
+
+/* ---------------------------------------------------- discharge angles (end) */
+
+/* ------------------------------------------- Gaea's real parameter ranges and scaling */
+
+/**
+ * The ranges Gaea's UI actually declares for Erosion2, taken from the vendor catalogue's IL
+ * metadata (`Nodes.json`). Exported so a test can assert them against the catalogue rather
+ * than trusting this transcription.
+ */
+export const GAEA_EROSION_RANGES = {
+  Duration: [1, 200],
+  Downcutting: [0, 1],
+  'Erosion Scale': [1, 20000],
+  'Suspended Load': [0, 1],
+  'Bed Load': [0, 1],
+  'Coarse Sediments': [0, 1],
+  Shape: [0, 1],
+  'Shape Sharpness': [0, 1],
+  'Shape Detail Scale': [0, 1],
+};
+
+/**
+ * How values arriving in Gaea's units become the 0..1 dials this solver works in.
+ *
+ * THESE ARE MODEL CHOICES, NOT GAEA'S FORMULAS. Gaea's own mapping from `Duration` to a
+ * droplet count lives in the native kernel and has not been recovered, so what follows is
+ * calibrated to reproduce this build's previous behaviour at the catalogue defaults while
+ * opening up Gaea's full input range:
+ *
+ *   Duration      linear by 1/20. The catalogue default 10 then yields the same droplet
+ *                 budget the old 0..1 dial gave at 0.5. Gaea's ceiling of 200 reaches 10x.
+ *   Erosion Scale logarithmic over three decades. 1..20000 is too wide for a linear map to
+ *                 be usable; log puts the default 1000 at 0.697, which rounds to the same
+ *                 brush radius (3 cells) the old 0..1 dial gave at 0.5.
+ *   everything else, including the three discharge angles, passes through clamped to 0..1.
+ */
+export function gaeaDial(name, value) {
+  const v = Number.isFinite(value) ? value : 0;
+  switch (name) {
+    case 'Duration':
+      return Math.max(0, v) / 20;
+    case 'Erosion Scale': {
+      const lo = GAEA_EROSION_RANGES['Erosion Scale'][0];
+      const hi = GAEA_EROSION_RANGES['Erosion Scale'][1];
+      return clamp01(Math.log(Math.max(lo, v) / lo) / Math.log(hi / lo));
+    }
+    default:
+      return clamp01(v);
+  }
+}
+
 /* ------------------------------------------------------------------ hydraulic droplet erosion */
 
 /**
@@ -158,12 +676,50 @@ function erodeLevel(h, size, cfg, rng) {
     erodeRate, depositRate, evaporate, gravity, maxDepositPerStep,
     brushOffsets, brushSum, depositRadius, depBoost, extraBoost,
   } = cfg;
+  // Height-weighted seeding is Gaea's behaviour (FUN_1801f2100). It can be switched off so
+  // the difference is measurable rather than asserted.
+  const heightWeightedSpawn = cfg.heightWeightedSpawn !== false;
 
   let posX = 0, posY = 0, dirX = 0, dirY = 0, speed = 0, water = 0, sediment = 0;
 
-  for (let n = 0; n < droplets; n++) {
+  /*
+   * Height-weighted droplet seeding — transcribed from FUN_1801f2100.
+   *
+   * Gaea draws a uniformly random position and keeps the droplet only when a SECOND,
+   * independent random draw falls below the normalised height at that position:
+   *
+   *     if (rand01 < height/HEIGHT_MAX)  accept
+   *
+   * so the seeding density is proportional to elevation rather than uniform. The second
+   * stream uses its own seed multiplier (seed * 111251), separate from the position stream
+   * (seed * 111143) — the two are not interchangeable, and reusing one for both would
+   * correlate a droplet's position with whether it survives.
+   *
+   * BUDGET CONSEQUENCE, which is easy to get wrong: rejection sampling accepts only a
+   * fraction of candidates, that fraction being the terrain's mean normalised height. Feeding
+   * the same `droplets` count as before would silently erode with a small fraction of the
+   * intended droplet count and look like "the erosion got weaker". So the candidate count is
+   * the target divided by the mean height, keeping the ACCEPTED count on target.
+   */
+  let meanNormHeight = 0;
+  {
+    let sum = 0;
+    for (let i = 0; i < h.length; i++) sum += h[i];
+    meanNormHeight = sum / h.length / TERRAIN_HEIGHT_M;
+  }
+  const candidates = heightWeightedSpawn && meanNormHeight > 1e-6
+    ? Math.min(50_000_000, Math.round(droplets / meanNormHeight))
+    : droplets;
+
+  for (let n = 0; n < candidates; n++) {
     posX = rng.unit() * (size - 1);
     posY = rng.unit() * (size - 1);
+
+    if (heightWeightedSpawn) {
+      const hv = hAt(h, size, posX, posY) / TERRAIN_HEIGHT_M;
+      if (rng.unit() >= hv) continue;   // rejected: this candidate does not become a droplet
+    }
+
     dirX = 0; dirY = 0; speed = 1; water = 1; sediment = 0;
 
     for (let step = 0; step < maxSteps; step++) {
@@ -269,19 +825,28 @@ export function hydraulicDroplet(ctx) {
   const src = input(0);
   if (!src) return createField(size, 'height', 0.5);
 
-  const duration = Math.max(0, P(params, 'Duration', 0.5));
-  const downcutting = clamp01(P(params, 'Downcutting', 0.5));
-  const erosionScale = clamp01(P(params, 'Erosion Scale', 0.5));
+  // Parameters arrive in GAEA'S UNITS (Duration 1..200, Erosion Scale 1..20000, ...), not
+  // as 0..1 dials. gaeaDial converts them; see its doc comment for what is calibration and
+  // what is measured. The single-scale solver is kept on the same convention so the two
+  // remain comparable.
+  const duration = gaeaDial('Duration', P(params, 'Duration', 10));
+  const downcutting = gaeaDial('Downcutting', P(params, 'Downcutting', 0.25));
+  const erosionScale = gaeaDial('Erosion Scale', P(params, 'Erosion Scale', 1000));
   const noErosion = !!P(params, 'NoErosion', false);
-  const suspended = clamp01(P(params, 'Suspended Load', 0.5));
-  const bedLoad = clamp01(P(params, 'Bed Load', 0.35));
-  const coarse = clamp01(P(params, 'Coarse Sediments', 0.35));
+  const suspended = gaeaDial('Suspended Load', P(params, 'Suspended Load', 1));
+  const bedLoad = gaeaDial('Bed Load', P(params, 'Bed Load', 0));
+  const coarse = gaeaDial('Coarse Sediments', P(params, 'Coarse Sediments', 0));
   const depBoost = P(params, 'DepositionBoost', 0);
   const extraBoost = P(params, 'ExtraDepositionBoost', 0);
-  const shape = clamp01(P(params, 'Shape', 0.4));
-  const shapeSharp = clamp01(P(params, 'Shape Sharpness', 0.4));
-  const shapeDetail = clamp01(P(params, 'Shape Detail Scale', 0.5));
+  const shape = gaeaDial('Shape', P(params, 'Shape', 0.2));
+  const shapeSharp = gaeaDial('Shape Sharpness', P(params, 'Shape Sharpness', 0.6));
+  const shapeDetail = gaeaDial('Shape Detail Scale', P(params, 'Shape Detail Scale', 0.25));
   const enable = P(params, 'Enable', true);
+  // Strength of the FUN_1801f2f30 flow gate: 1 is Gaea's full coupling, 0 disables it.
+  // Taken from ctx so a test can isolate the gate's effect rather than infer it from output.
+  const flowGateStrength = ctx.flowGate === undefined ? 1 : ctx.flowGate;
+  // Height-weighted droplet seeding — Gaea's behaviour. Exposed so a test can isolate it.
+  const heightWeightedSpawn = ctx.heightWeighted === undefined ? true : ctx.heightWeighted;
 
   // Work in metres.
   const h = new Float32Array(size * size);
@@ -323,11 +888,16 @@ export function hydraulicDroplet(ctx) {
   const depositRadius = coarse < 0.34 ? 0 : coarse < 0.67 ? 1 : 2;
 
   const brush = makeBrush(erosionRadius);
+  const singleBefore = Float32Array.from(h);
   erodeLevel(h, size, {
     droplets, maxSteps, inertia, capacityFactor, minCapacity,
     erodeRate, depositRate, evaporate, gravity, maxDepositPerStep,
     brushOffsets: brush.offsets, brushSum: brush.sum, depositRadius, depBoost, extraBoost,
+    heightWeightedSpawn,
   }, rng);
+  // The same flow coupling the multiscale solver applies, so the two remain comparable:
+  // gating only one side would make the pyramid comparison measure the gate, not the pyramid.
+  applyFlowGate(h, singleBefore, size, flowGateStrength);
 
 
   // ---- shaping: valley sharpening / detail, driven by Shape + Shape Sharpness.
@@ -358,45 +928,47 @@ export function hydraulicDroplet(ctx) {
 /* ------------------------------------------------- Laplacian pyramid (multiscale) */
 
 /**
- * 2x2 box reduction. Averaging rather than decimation is what makes the pyramid
- * invertible: it removes exactly the high-frequency content the Laplacian stores.
+ * The pyramid's reduction, now Gaea's own filter.
+ *
+ * REPLACES a 2x2 box average. That was a cruder low-pass: averaging four cells removes far
+ * less of the high-frequency content than a 5x5 Gaussian, so the Laplacian levels carried
+ * detail the original sends to the coarse base. The kernel here is the one recovered from
+ * `FUN_18003f250` — a separable 5x5 Gaussian at stride 2, normalised by 0.999998.
+ *
+ * The `>> 1` geometry is Gaea's: a plain floor halving, so an odd size truncates rather than
+ * rounding up.
+ *
+ * @param {Float32Array} a
+ * @param {number} n
+ * @returns {Float32Array} the coarse level, `n >> 1` per side
  */
 export function downsample2(a, n) {
-  const m = n >> 1;
-  const out = new Float32Array(m * m);
-  for (let y = 0; y < m; y++) {
-    const r0 = (y * 2) * n;
-    const r1 = r0 + n;
-    const ro = y * m;
-    for (let x = 0; x < m; x++) {
-      const x0 = x * 2;
-      out[ro + x] = (a[r0 + x0] + a[r0 + x0 + 1] + a[r1 + x0] + a[r1 + x0 + 1]) * 0.25;
-    }
-  }
-  return out;
+  const { data } = pyramidDownsample(a, n, n);
+  return data;
 }
 
-/** Bilinear expansion of an m x m level to n x n. */
+/**
+ * The pyramid's expansion, now Gaea's own interpolator.
+ *
+ * REPLACES a bilinear expansion scaled by `(m - 1) / (n - 1)`. That scaling aligns the coarse
+ * grid's EDGES with the fine grid's edges, which is a different resampling convention from
+ * Gaea's: the original keeps the grids' CELL CENTRES aligned and picks its taps from the
+ * parity of the fine coordinate (`[v0, v2, v0]` at even, `[v1, v1]` at odd). Edge-aligned
+ * bilinear and centre-aligned parity agree in the interior of a large level and diverge
+ * everywhere near a boundary, which is exactly where a pyramid's error accumulates.
+ *
+ * @param {Float32Array} a the coarse level
+ * @param {number} m its size
+ * @param {number} n the fine size, expected to be `2 * m`
+ * @returns {Float32Array}
+ */
 export function upsample2(a, m, n) {
   const out = new Float32Array(n * n);
+  if (m <= 0) return out;
   if (m === 1) { out.fill(a[0]); return out; }
-  const sc = (m - 1) / (n - 1);
   for (let y = 0; y < n; y++) {
-    const fy = y * sc;
-    const y0 = Math.min(m - 1, Math.floor(fy));
-    const y1 = Math.min(m - 1, y0 + 1);
-    const ty = fy - y0;
-    const r0 = y0 * m;
-    const r1 = y1 * m;
-    const ro = y * n;
     for (let x = 0; x < n; x++) {
-      const fx = x * sc;
-      const x0 = Math.min(m - 1, Math.floor(fx));
-      const x1 = Math.min(m - 1, x0 + 1);
-      const tx = fx - x0;
-      const top = a[r0 + x0] + (a[r0 + x1] - a[r0 + x0]) * tx;
-      const bot = a[r1 + x0] + (a[r1 + x1] - a[r1 + x0]) * tx;
-      out[ro + x] = top + (bot - top) * ty;
+      out[y * n + x] = pyramidUpsample(a, m, m, x, y);
     }
   }
   return out;
@@ -475,15 +1047,34 @@ function applyShaping(h, size, shape, shapeSharp, shapeDetail) {
       Math.max(1, shapeDetail * size * 0.02),
     );
     const d = 1 + (0.5 - shapeDetail) * 0.8;
+    // NOTE, round 32: an envelope clamp was added here to stop this mask pushing values past
+    // the field's own range, on the theory that `metresToField`'s clamp was destroying them and
+    // causing the 10% range loss. IT WAS MEASURED AND THE THEORY IS WRONG: the multiscale span
+    // moved from 0.8952 to 0.8917, i.e. not at all, because this envelope is itself already
+    // outside the normalised 0..1 bound that `metresToField` applies -- two different limits.
+    // The change was reverted rather than kept, since a comment claiming a refuted cause is
+    // worse than no change at all. See tools/diagnose-multiscale.mjs for the standing numbers.
     for (let i = 0; i < out.length; i++) out[i] += (out[i] - blurred.data[i]) * d;
   }
   return out;
 }
 
-/** metres -> normalized height field */
+/**
+ * metres -> normalized height field.
+ *
+ * Clamped, because a height field's contract with the rest of the app is 0..1 and the
+ * shaping stage can overshoot. The clamp was absent until the flow gate perturbed the field
+ * enough to make `applyShaping` push a cell to 1.016, which surfaced as "Erosion2 output in
+ * [0,1]" failing. The overflow was not caused by the gate — the gate only moves a value
+ * between its pre- and post-erosion bounds — so the missing guarantee was here all along and
+ * was simply never exercised.
+ */
 function metresToField(h, size) {
   const final = createField(size, 'height');
-  for (let i = 0; i < h.length; i++) final.data[i] = h[i] / TERRAIN_HEIGHT_M;
+  for (let i = 0; i < h.length; i++) {
+    const v = h[i] / TERRAIN_HEIGHT_M;
+    final.data[i] = v < 0 ? 0 : v > 1 ? 1 : v;
+  }
   return final;
 }
 
@@ -528,19 +1119,28 @@ export function hydraulicDropletMultiscale(ctx) {
   const src = input(0);
   if (!src) return createField(size, 'height', 0.5);
 
-  const duration = Math.max(0, P(params, 'Duration', 0.5));
-  const downcutting = clamp01(P(params, 'Downcutting', 0.5));
-  const erosionScale = clamp01(P(params, 'Erosion Scale', 0.5));
+  // Parameters arrive in GAEA'S UNITS (Duration 1..200, Erosion Scale 1..20000, ...), not
+  // as 0..1 dials. gaeaDial converts them; see its doc comment for what is calibration and
+  // what is measured. The single-scale solver is kept on the same convention so the two
+  // remain comparable.
+  const duration = gaeaDial('Duration', P(params, 'Duration', 10));
+  const downcutting = gaeaDial('Downcutting', P(params, 'Downcutting', 0.25));
+  const erosionScale = gaeaDial('Erosion Scale', P(params, 'Erosion Scale', 1000));
   const noErosion = !!P(params, 'NoErosion', false);
-  const suspended = clamp01(P(params, 'Suspended Load', 0.5));
-  const bedLoad = clamp01(P(params, 'Bed Load', 0.35));
-  const coarse = clamp01(P(params, 'Coarse Sediments', 0.35));
+  const suspended = gaeaDial('Suspended Load', P(params, 'Suspended Load', 1));
+  const bedLoad = gaeaDial('Bed Load', P(params, 'Bed Load', 0));
+  const coarse = gaeaDial('Coarse Sediments', P(params, 'Coarse Sediments', 0));
   const depBoost = P(params, 'DepositionBoost', 0);
   const extraBoost = P(params, 'ExtraDepositionBoost', 0);
-  const shape = clamp01(P(params, 'Shape', 0.4));
-  const shapeSharp = clamp01(P(params, 'Shape Sharpness', 0.4));
-  const shapeDetail = clamp01(P(params, 'Shape Detail Scale', 0.5));
+  const shape = gaeaDial('Shape', P(params, 'Shape', 0.2));
+  const shapeSharp = gaeaDial('Shape Sharpness', P(params, 'Shape Sharpness', 0.6));
+  const shapeDetail = gaeaDial('Shape Detail Scale', P(params, 'Shape Detail Scale', 0.25));
   const enable = P(params, 'Enable', true);
+  // Strength of the FUN_1801f2f30 flow gate: 1 is Gaea's full coupling, 0 disables it.
+  // Taken from ctx so a test can isolate the gate's effect rather than infer it from output.
+  const flowGateStrength = ctx.flowGate === undefined ? 1 : ctx.flowGate;
+  // Height-weighted droplet seeding — Gaea's behaviour. Exposed so a test can isolate it.
+  const heightWeightedSpawn = ctx.heightWeighted === undefined ? true : ctx.heightWeighted;
 
   const h = fieldToMetres(src, size);
   if (!enable || noErosion || duration <= 0) return metresToField(h, size);
@@ -580,11 +1180,31 @@ export function hydraulicDropletMultiscale(ctx) {
     // deliberately short to keep channels crisp; here it would forbid long valleys.
     const maxSteps = Math.max(20, Math.min(220, Math.round(n * 0.7)));
 
+    const before = Float32Array.from(fine[k]);
+
     erodeLevel(fine[k], n, {
       droplets, maxSteps, inertia, capacityFactor, minCapacity,
       erodeRate, depositRate, evaporate, gravity, maxDepositPerStep,
       brushOffsets: brush.offsets, brushSum: brush.sum, depositRadius, depBoost, extraBoost,
+      heightWeightedSpawn,
     }, rng);
+
+    // Optional instrumentation, off unless the caller asks. The multiscale run was found to
+    // lose about 10% of the field's dynamic range (see tools/diagnose-multiscale.mjs), and the
+    // first hypothesis — that the fixed deposition cap overwhelms the coarse levels' smaller
+    // relief — was measured and REFUTED (tools/diagnose-levels.mjs: the coarsest level keeps
+    // 96.9% of the finest level's standard deviation). Locating the loss needs a per-stage
+    // reading, which is what this hook provides without changing any arithmetic.
+    if (typeof ctx.trace === 'function') {
+      ctx.trace('eroded', k, n, before, fine[k]);
+    }
+
+    // Couple the erosion to drainage, as FUN_1801f2f30 does: a cell can only export the
+    // material its flow can carry away. Without this every cell erodes independently.
+    applyFlowGate(fine[k], before, n, flowGateStrength);
+    if (typeof ctx.trace === 'function') {
+      ctx.trace('gated', k, n, before, fine[k]);
+    }
 
     if (k > 0) {
       // Reconstruct the next finer level from the ERODED coarser one plus its stored
@@ -593,11 +1213,83 @@ export function hydraulicDropletMultiscale(ctx) {
       const up = upsample2(fine[k], n, sizes[k - 1]);
       const band = lap[k - 1];
       for (let i = 0; i < dst.length; i++) dst[i] = up[i] + band[i];
+      if (typeof ctx.trace === 'function') {
+        ctx.trace('reconstructed', k - 1, sizes[k - 1], before, dst);
+      }
     }
   }
 
   const shaped = applyShaping(fine[0], size, shape, shapeSharp, shapeDetail);
+  if (typeof ctx.trace === 'function') ctx.trace('shaped', 0, size, null, shaped);
   return metresToField(shaped, size);
+}
+
+/**
+ * The flow gate from `FUN_1801f2f30`: scale each cell's erosion by the flow value it can
+ * route to a lower neighbour.
+ *
+ * TRANSCRIBED FROM THE BINARY
+ *   cutAxial = centre - scale * 0.357736
+ *   cutDiag  = centre - scale * 0.357736 * sqrt(2)
+ *   weight   = max( flow[centre], max over lower neighbours of flow[k] )
+ *   delta   *= weight
+ *
+ * THE SCALE IS THE WHOLE PROBLEM
+ * `scale` in the binary is a height quantum in terrain units, and it sets the drop a
+ * neighbour must have to count as a drainage direction. This solver works in metres, where
+ * terrain relief runs to hundreds of metres, so the binary's own scale is not transferable:
+ * passing `scale = 1` makes the cut 0.36 m, nearly every lower neighbour qualifies, the
+ * weight saturates near its maximum everywhere and the gate becomes an identity — a silent
+ * no-op that would look like a successful implementation.
+ *
+ * So `scale` is derived per level as the MEAN ABSOLUTE PER-CELL DROP. That makes the
+ * threshold a fixed fraction of the terrain's own roughness: on smooth ground a small drop
+ * already counts, on rough ground it takes more. This is a model choice, not a recovered
+ * formula, and it is the single largest assumption in this function.
+ *
+ * The flow buffer is normalised to 0..1 by its own maximum before use, because Gaea's `B3`
+ * is a normalised flow buffer and raw D8 accumulation here reaches N^2.
+ *
+ * @param {Float32Array} level   height field, modified in place
+ * @param {Float32Array} before  the pre-erosion copy of `level`
+ * @param {number} size
+ * @param {number} strength      0 disables the gate, 1 is full Gaea weighting
+ * @returns {number} the mean per-cell drop used as `scale`, for reporting
+ */
+function applyFlowGate(level, before, size, strength) {
+  if (strength <= 0) return 0;
+
+  // Mean absolute per-cell drop — the height quantum the threshold is expressed in.
+  let dropSum = 0;
+  let samples = 0;
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const i = y * size + x;
+      if (x + 1 < size) { dropSum += Math.abs(before[i + 1] - before[i]); samples++; }
+      if (y + 1 < size) { dropSum += Math.abs(before[i + size] - before[i]); samples++; }
+    }
+  }
+  const scale = samples > 0 ? dropSum / samples : 0;
+  // A perfectly flat level has no drainable direction; gating it would zero the erosion.
+  if (!(scale > 0)) return 0;
+
+  const { acc } = flowAccumulation(before, size);
+  let maxAcc = 0;
+  for (let i = 0; i < acc.length; i++) if (acc[i] > maxAcc) maxAcc = acc[i];
+  const norm = new Float32Array(acc.length);
+  if (maxAcc > 0) {
+    const inv = 1 / maxAcc;
+    for (let i = 0; i < acc.length; i++) norm[i] = acc[i] * inv;
+  }
+
+  const weight = gaeaFlowReceiverMax({ height: before, flow: norm, size, scale });
+
+  for (let i = 0; i < level.length; i++) {
+    // strength blends between no gating (1) and the binary's full weighting.
+    const g = 1 + strength * (weight[i] - 1);
+    level[i] = before[i] + (level[i] - before[i]) * g;
+  }
+  return scale;
 }
 
 /** Deposit with an optional wider footprint ("Coarse Sediments"). */

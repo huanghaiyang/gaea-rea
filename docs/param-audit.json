@@ -1,0 +1,1544 @@
+{
+  "checked": 693,
+  "bySource": {
+    "authority": 483,
+    "registry": 39,
+    "il": 171
+  },
+  "divergences": [
+    {
+      "node": "Adjust",
+      "param": "Clamp",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        null,
+        -1,
+        2
+      ],
+      "source": "registry",
+      "issues": [
+        "min -1 != 0.0",
+        "max 2 != 1.0"
+      ]
+    },
+    {
+      "node": "Adjust",
+      "param": "Clip",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        null,
+        -1,
+        2
+      ],
+      "source": "registry",
+      "issues": [
+        "min -1 != 0.0",
+        "max 2 != 1.0"
+      ]
+    },
+    {
+      "node": "Angle",
+      "param": "Range",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 1.0",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Bomber",
+      "param": "Size",
+      "authoritative": [
+        0.6,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0.2,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0.2 != 0.6",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Bomber",
+      "param": "Rotation",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 1.0",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Bomber",
+      "param": "Height",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0.8,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0.8 != 1.0",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Canyon",
+      "param": "StructualWarp",
+      "authoritative": [
+        0.5,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0.35,
+        0,
+        1
+      ],
+      "source": "registry",
+      "issues": [
+        "default 0.35 != 0.5"
+      ]
+    },
+    {
+      "node": "Canyon",
+      "param": "DetailWarp",
+      "authoritative": [
+        0.5,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0.35,
+        0,
+        1
+      ],
+      "source": "registry",
+      "issues": [
+        "default 0.35 != 0.5"
+      ]
+    },
+    {
+      "node": "Cartography",
+      "param": "LandContourIntenstity",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0.4,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0.4 != 1.0",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Cartography",
+      "param": "WaterContourIntenstity",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0.4,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0.4 != 1.0",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Cartography",
+      "param": "GridIntenstity",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0.5,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0.5 != 1.0",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Cellular",
+      "param": "MetricMorph",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0,
+        0,
+        1
+      ],
+      "source": "registry",
+      "issues": [
+        "default 0 != 1.0"
+      ]
+    },
+    {
+      "node": "Cellular",
+      "param": "CoordinateAxesJitter",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0,
+        0,
+        1
+      ],
+      "source": "registry",
+      "issues": [
+        "default 0 != 1.0"
+      ]
+    },
+    {
+      "node": "Cellular",
+      "param": "CAJClustering",
+      "authoritative": [
+        1.0,
+        1.0,
+        5.0
+      ],
+      "effective": [
+        0,
+        0,
+        1
+      ],
+      "source": "registry",
+      "issues": [
+        "default 0 != 1.0",
+        "min 0 != 1.0",
+        "max 1 != 5.0"
+      ]
+    },
+    {
+      "node": "Cellular3D",
+      "param": "ScaleX",
+      "authoritative": [
+        1.0,
+        0.1,
+        10.0
+      ],
+      "effective": [
+        1,
+        0.1,
+        4
+      ],
+      "source": "registry",
+      "issues": [
+        "max 4 != 10.0"
+      ]
+    },
+    {
+      "node": "Cellular3D",
+      "param": "ScaleY",
+      "authoritative": [
+        1.0,
+        0.1,
+        10.0
+      ],
+      "effective": [
+        1,
+        0.1,
+        4
+      ],
+      "source": "registry",
+      "issues": [
+        "max 4 != 10.0"
+      ]
+    },
+    {
+      "node": "Cellular3D",
+      "param": "ScaleZ",
+      "authoritative": [
+        1.0,
+        0.1,
+        10.0
+      ],
+      "effective": [
+        1,
+        0.1,
+        4
+      ],
+      "source": "registry",
+      "issues": [
+        "max 4 != 10.0"
+      ]
+    },
+    {
+      "node": "Clamp",
+      "param": "Value",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        null,
+        -1,
+        2
+      ],
+      "source": "registry",
+      "issues": [
+        "min -1 != 0.0",
+        "max 2 != 1.0"
+      ]
+    },
+    {
+      "node": "Curvature",
+      "param": "Range",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 1.0",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Debris",
+      "param": "Size",
+      "authoritative": [
+        6.0,
+        0.1,
+        20.0
+      ],
+      "effective": [
+        1,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 1 != 6.0",
+        "min -1 != 0.1",
+        "max 1 != 20.0"
+      ]
+    },
+    {
+      "node": "DotNoise",
+      "param": "Size",
+      "authoritative": [
+        0.6,
+        0.0001,
+        1.0
+      ],
+      "effective": [
+        null,
+        0.05,
+        4
+      ],
+      "source": "registry",
+      "issues": [
+        "min 0.05 != 0.0001",
+        "max 4 != 1.0"
+      ]
+    },
+    {
+      "node": "Dusting",
+      "param": "SlopeCoverage",
+      "authoritative": [
+        0.5,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 0.5",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Erosion",
+      "param": "RockSoftness",
+      "authoritative": [
+        0.65,
+        0.05,
+        1.0
+      ],
+      "effective": [
+        0.5,
+        0,
+        1
+      ],
+      "source": "registry",
+      "issues": [
+        "default 0.5 != 0.65",
+        "min 0 != 0.05"
+      ]
+    },
+    {
+      "node": "Erosion",
+      "param": "BaseLevel",
+      "authoritative": [
+        0.0,
+        0.0,
+        5.0
+      ],
+      "effective": [
+        0,
+        0,
+        1
+      ],
+      "source": "registry",
+      "issues": [
+        "max 1 != 5.0"
+      ]
+    },
+    {
+      "node": "Erosion2",
+      "param": "SuspendedLoadDischargeAngle",
+      "authoritative": [
+        24.0,
+        0.0,
+        45.0
+      ],
+      "effective": [
+        10,
+        0,
+        45
+      ],
+      "source": "il",
+      "issues": [
+        "default 10 != 24.0"
+      ]
+    },
+    {
+      "node": "Erosion2",
+      "param": "BedLoadDischargeAngle",
+      "authoritative": [
+        15.0,
+        0.0,
+        45.0
+      ],
+      "effective": [
+        10,
+        0,
+        45
+      ],
+      "source": "il",
+      "issues": [
+        "default 10 != 15.0"
+      ]
+    },
+    {
+      "node": "Erosion2",
+      "param": "Slope",
+      "authoritative": [
+        90.0,
+        0.0,
+        90.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 90.0",
+        "min -1 != 0.0",
+        "max 1 != 90.0"
+      ]
+    },
+    {
+      "node": "Erosion2",
+      "param": "Altitude",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 1.0",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Extend",
+      "param": "Value",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        null,
+        -1,
+        2
+      ],
+      "source": "registry",
+      "issues": [
+        "min -1 != 0.0",
+        "max 2 != 1.0"
+      ]
+    },
+    {
+      "node": "FlowMap",
+      "param": "FlowLength",
+      "authoritative": [
+        0.1,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0.5,
+        0,
+        1
+      ],
+      "source": "registry",
+      "issues": [
+        "default 0.5 != 0.1"
+      ]
+    },
+    {
+      "node": "Glacier",
+      "param": "BreakageCount",
+      "authoritative": [
+        2.0,
+        2.0,
+        10.0
+      ],
+      "effective": [
+        6,
+        1,
+        48
+      ],
+      "source": "registry",
+      "issues": [
+        "default 6 != 2.0",
+        "min 1 != 2.0",
+        "max 48 != 10.0"
+      ]
+    },
+    {
+      "node": "Glacier",
+      "param": "FlowBreakageDepth",
+      "authoritative": [
+        0.25,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0.4,
+        0,
+        1
+      ],
+      "source": "registry",
+      "issues": [
+        "default 0.4 != 0.25"
+      ]
+    },
+    {
+      "node": "Height",
+      "param": "Range",
+      "authoritative": [
+        0.5,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 0.5",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "MultiFractal",
+      "param": "EdgeSmoothing",
+      "authoritative": [
+        0.1,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0,
+        0,
+        1
+      ],
+      "source": "registry",
+      "issues": [
+        "default 0 != 0.1"
+      ]
+    },
+    {
+      "node": "MultiFractal",
+      "param": "OffsetX",
+      "authoritative": [
+        0.0,
+        -5.0,
+        5.0
+      ],
+      "effective": [
+        0,
+        -100,
+        100
+      ],
+      "source": "registry",
+      "issues": [
+        "min -100 != -5.0",
+        "max 100 != 5.0"
+      ]
+    },
+    {
+      "node": "MultiFractal",
+      "param": "OffsetY",
+      "authoritative": [
+        0.0,
+        -5.0,
+        5.0
+      ],
+      "effective": [
+        0,
+        -100,
+        100
+      ],
+      "source": "registry",
+      "issues": [
+        "min -100 != -5.0",
+        "max 100 != 5.0"
+      ]
+    },
+    {
+      "node": "Outcrops",
+      "param": "Size",
+      "authoritative": [
+        0.8,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0.4,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0.4 != 0.8",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Outcrops",
+      "param": "Height",
+      "authoritative": [
+        0.8,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0.45,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0.45 != 0.8",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Outcrops",
+      "param": "Rotation",
+      "authoritative": [
+        0.6,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 0.6",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Perlin",
+      "param": "ScaleX",
+      "authoritative": [
+        1.0,
+        0.0001,
+        100.0
+      ],
+      "effective": [
+        1,
+        0.1,
+        4
+      ],
+      "source": "registry",
+      "issues": [
+        "min 0.1 != 0.0001",
+        "max 4 != 100.0"
+      ]
+    },
+    {
+      "node": "Perlin",
+      "param": "ScaleY",
+      "authoritative": [
+        1.0,
+        0.0001,
+        100.0
+      ],
+      "effective": [
+        1,
+        0.1,
+        4
+      ],
+      "source": "registry",
+      "issues": [
+        "min 0.1 != 0.0001",
+        "max 4 != 100.0"
+      ]
+    },
+    {
+      "node": "Pockmarks",
+      "param": "Size",
+      "authoritative": [
+        0.75,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0.4,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0.4 != 0.75",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Ridge",
+      "param": "ScaleX",
+      "authoritative": [
+        1.0,
+        0.0001,
+        2.5
+      ],
+      "effective": [
+        1,
+        0.1,
+        4
+      ],
+      "source": "registry",
+      "issues": [
+        "min 0.1 != 0.0001",
+        "max 4 != 2.5"
+      ]
+    },
+    {
+      "node": "Ridge",
+      "param": "ScaleY",
+      "authoritative": [
+        1.0,
+        0.0001,
+        2.5
+      ],
+      "effective": [
+        1,
+        0.1,
+        4
+      ],
+      "source": "registry",
+      "issues": [
+        "min 0.1 != 0.0001",
+        "max 4 != 2.5"
+      ]
+    },
+    {
+      "node": "RockNoise",
+      "param": "Size",
+      "authoritative": [
+        0.6,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0.2,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0.2 != 0.6",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "SatMap",
+      "param": "Range",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 1.0",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Shrubs",
+      "param": "Slope",
+      "authoritative": [
+        33.0,
+        0.0,
+        90.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 33.0",
+        "min -1 != 0.0",
+        "max 1 != 90.0"
+      ]
+    },
+    {
+      "node": "Shrubs",
+      "param": "Altitude",
+      "authoritative": [
+        0.8,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 0.8",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Slope",
+      "param": "Range",
+      "authoritative": [
+        30.0,
+        0.0,
+        90.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 30.0",
+        "min -1 != 0.0",
+        "max 1 != 90.0"
+      ]
+    },
+    {
+      "node": "Sunlight",
+      "param": "Year",
+      "authoritative": [
+        0.6,
+        0.0001,
+        1.0
+      ],
+      "effective": [
+        0.2,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0.2 != 0.6",
+        "min -1 != 0.0001"
+      ]
+    },
+    {
+      "node": "SuperColor",
+      "param": "Range",
+      "authoritative": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 1.0",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Transform",
+      "param": "ScaleX",
+      "authoritative": [
+        1.0,
+        0.0001,
+        10.0
+      ],
+      "effective": [
+        1,
+        0.1,
+        4
+      ],
+      "source": "registry",
+      "issues": [
+        "min 0.1 != 0.0001",
+        "max 4 != 10.0"
+      ]
+    },
+    {
+      "node": "Transform",
+      "param": "ScaleY",
+      "authoritative": [
+        1.0,
+        0.0001,
+        10.0
+      ],
+      "effective": [
+        1,
+        0.1,
+        4
+      ],
+      "source": "registry",
+      "issues": [
+        "min 0.1 != 0.0001",
+        "max 4 != 10.0"
+      ]
+    },
+    {
+      "node": "Trees",
+      "param": "Spread",
+      "authoritative": [
+        0.0,
+        0.0001,
+        1.0
+      ],
+      "effective": [
+        0.0001,
+        0.0001,
+        1
+      ],
+      "source": "authority",
+      "issues": [
+        "default 0.0001 != 0.0"
+      ]
+    },
+    {
+      "node": "Trees",
+      "param": "Slope",
+      "authoritative": [
+        33.0,
+        0.0,
+        90.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 33.0",
+        "min -1 != 0.0",
+        "max 1 != 90.0"
+      ]
+    },
+    {
+      "node": "Trees",
+      "param": "Altitude",
+      "authoritative": [
+        0.8,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0,
+        -1,
+        1
+      ],
+      "source": "il",
+      "issues": [
+        "default 0 != 0.8",
+        "min -1 != 0.0"
+      ]
+    },
+    {
+      "node": "Voronoi",
+      "param": "ScaleX",
+      "authoritative": [
+        1.0,
+        0.0001,
+        100.0
+      ],
+      "effective": [
+        1,
+        0.1,
+        4
+      ],
+      "source": "registry",
+      "issues": [
+        "min 0.1 != 0.0001",
+        "max 4 != 100.0"
+      ]
+    },
+    {
+      "node": "Voronoi",
+      "param": "ScaleY",
+      "authoritative": [
+        1.0,
+        0.0001,
+        100.0
+      ],
+      "effective": [
+        1,
+        0.1,
+        4
+      ],
+      "source": "registry",
+      "issues": [
+        "min 0.1 != 0.0001",
+        "max 4 != 100.0"
+      ]
+    },
+    {
+      "node": "Warp",
+      "param": "ZScale",
+      "authoritative": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "effective": [
+        0.5,
+        0,
+        1
+      ],
+      "source": "registry",
+      "issues": [
+        "default 0.5 != 0.0"
+      ]
+    },
+    {
+      "node": "Warp",
+      "param": "ModulationDirection",
+      "authoritative": [
+        45.0,
+        0.0,
+        360.0
+      ],
+      "effective": [
+        0,
+        0,
+        360
+      ],
+      "source": "registry",
+      "issues": [
+        "default 0 != 45.0"
+      ]
+    }
+  ],
+  "notInSchema": [
+    {
+      "node": "Compare",
+      "param": "Comparison",
+      "auth": [
+        0.5,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Erosion2",
+      "param": "SuspendedLoadDischargeAmount",
+      "auth": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Erosion2",
+      "param": "BedLoadDischargeAmount",
+      "auth": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Erosion2",
+      "param": "CoarseSedimentsDischargeAmount",
+      "auth": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Gabor",
+      "param": "AnisotropyAzimuth",
+      "auth": [
+        0.0,
+        0.0,
+        360.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Gamma",
+      "param": "GammaValue",
+      "auth": [
+        0.44,
+        0.0,
+        4.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Layers",
+      "param": "Blend2",
+      "auth": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Layers",
+      "param": "Blend3",
+      "auth": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Layers",
+      "param": "Blend4",
+      "auth": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Layers",
+      "param": "Blend5",
+      "auth": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Layers",
+      "param": "Blend6",
+      "auth": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Layers",
+      "param": "Blend7",
+      "auth": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Layers",
+      "param": "Blend8",
+      "auth": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "MultiFractal",
+      "param": "Size",
+      "auth": [
+        0.5,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "MultiFractal",
+      "param": "FeatureSize",
+      "auth": [
+        0.5,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "MultiFractal",
+      "param": "FractalGain",
+      "auth": [
+        0.5,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "MultiFractal",
+      "param": "VariationContrast",
+      "auth": [
+        0.3,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "MultiFractal",
+      "param": "RelativeWarpSize",
+      "auth": [
+        1.0,
+        0.25,
+        4.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "MultiFractal",
+      "param": "WarpStrength",
+      "auth": [
+        0.5,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "MultiFractal",
+      "param": "WarpComplexity",
+      "auth": [
+        3.0,
+        1.0,
+        14.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "MultiFractal",
+      "param": "WarpRoughness",
+      "auth": [
+        0.4,
+        0.0,
+        0.5
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "MultiFractal",
+      "param": "WarpAttenuation",
+      "auth": [
+        0.5,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "MultiFractal",
+      "param": "WarpIterations",
+      "auth": [
+        3.0,
+        1.0,
+        20.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "MultiFractal",
+      "param": "RelativeWarpAnisotropy",
+      "auth": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Perlin",
+      "param": "Clamp",
+      "auth": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Perlin",
+      "param": "WarpOctaves",
+      "auth": [
+        10.0,
+        1.0,
+        14.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Pockmarks",
+      "param": "Height",
+      "auth": [
+        1.0,
+        0.0001,
+        3.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Shrubs",
+      "param": "ShrubCount",
+      "auth": [
+        200.0,
+        10.0,
+        1000.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Snow",
+      "param": "SettleThaw",
+      "auth": [
+        0.25,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Snow",
+      "param": "SlipOffAngle",
+      "auth": [
+        38.0,
+        0.0,
+        90.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Snowfield",
+      "param": "SettleThaw",
+      "auth": [
+        0.25,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Snowfield",
+      "param": "SlipOffAngle",
+      "auth": [
+        38.0,
+        0.0,
+        90.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Terraces",
+      "param": "NumTerraces",
+      "auth": [
+        10.0,
+        3.0,
+        256.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "TextureBase",
+      "param": "Scale",
+      "auth": [
+        0.15,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Transform",
+      "param": "Rotate",
+      "auth": [
+        0.0,
+        0.0,
+        360.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Trees",
+      "param": "TreeCount",
+      "auth": [
+        20.0,
+        10.0,
+        1000.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "Voronoi",
+      "param": "WarpOctaves",
+      "auth": [
+        14.0,
+        1.0,
+        14.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "WaveShine",
+      "param": "WindPatchIntensity",
+      "auth": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "WaveShine",
+      "param": "WindPatchAnimationSpeed",
+      "auth": [
+        1.0,
+        0.0,
+        2.0
+      ],
+      "reason": "not in the effective schema"
+    },
+    {
+      "node": "WaveShine",
+      "param": "WindPatchSize",
+      "auth": [
+        30.0,
+        10.0,
+        50.0
+      ],
+      "reason": "not in the effective schema"
+    }
+  ],
+  "caveat": "A parameter the extractor could not name is reported as absent rather than as divergent; 220 such attributes exist, which is a gap in tools/node-routing.py."
+}
