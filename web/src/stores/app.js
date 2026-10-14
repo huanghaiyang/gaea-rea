@@ -24,6 +24,7 @@ import {
   isImplemented as rawIsImplemented, categoryOf as rawCategoryOf,
   nodeDescription as rawNodeDescription, algorithmOf as rawAlgorithmOf,
   historyDepth as rawHistoryDepth, undo as rawUndo, redo as rawRedo, bus,
+  snapshot as rawSnapshot,
 } from '@js/state.js';
 import { NODES } from '@js/registry.js';
 
@@ -191,6 +192,13 @@ export const duplicate = (nodeId) => rawDuplicateNode(nodeId);
 export const undo = () => rawUndo();
 export const redo = () => rawRedo();
 export const historyDepth = () => rawHistoryDepth();
+/**
+ * Re-exported so a panel can take ONE history snapshot per continuous interaction.
+ *
+ * `ParamPanel` needs it: a range input fires an input event per pixel, and without a snapshot per
+ * interaction every pixel would become its own undo step.
+ */
+export const snapshot = () => rawSnapshot();
 export const schemaFor = (name) => rawSchemaFor(name);
 export const isImplemented = (name) => rawIsImplemented(name);
 export const algorithmOf = (name) => rawAlgorithmOf(name);

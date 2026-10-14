@@ -18,8 +18,9 @@
  */
 import { computed } from 'vue';
 import {
-  schemaFor, setParam, resetParams, state, algorithmOf, version,
+  schemaFor, setParam, resetParams, state, algorithmOf, version, snapshot, bus,
 } from '../stores/app.js';
+import { evaluator } from '../stores/session.js';
 import { t, term, paramLabel, option as i18nOption } from '@js/i18n.js';
 
 /*
@@ -143,6 +144,42 @@ function controlKind(spec, value) {
   return 'text';
 }
 
+/**
+ * Persist a parameter change and make the rest of the app notice.
+ *
+ * A VALUE WRITE IS NOT A CHANGE. `setParam` only assigns; the old panel's `commit` did three more
+ * things, and `app.js`'s `onParamChange` did a fourth, and without them nothing downstream moves:
+ *
+ *   snapshotOnce(...)                 one history step per continuous drag
+ *   setParam(...)                     the write
+ *   evaluator.request('param')        re-run the graph -- the preview refresh
+ *   bus.emit('node:changed', ...)     recompute the panels
+ *
+ * All four live here rather than in `setParam`, because `setParam` is a plain store mutator shared
+ * with other callers and the coalescing timer is inherently a UI concern.
+ */
+
+/** One snapshot per continuous interaction, cleared after 600ms of quiet. */
+let pendingSnapshot = null;
+let snapTimer = 0;
+
+function snapshotOnce(nodeId, key) {
+  const id = `${nodeId}:${key}`;
+  if (pendingSnapshot === id) return;
+  pendingSnapshot = id;
+  snapshot();
+  clearTimeout(snapTimer);
+  // A slider fires an input event per pixel; without this every pixel would be its own undo step.
+  snapTimer = setTimeout(() => { pendingSnapshot = null; }, 600);
+}
+
+/** The trigger `app.js` used: re-evaluate, then tell the panels. */
+function afterParamChange(node) {
+  // `request` (not `requestNow`) so a drag coalesces instead of queueing a run per event.
+  evaluator?.request?.('param');
+  bus.emit('node:changed', { id: node.id });
+}
+
 function onInput(key, ev, kind) {
   const node = currentNode();
   if (!node) return;
@@ -150,7 +187,9 @@ function onInput(key, ev, kind) {
   if (kind === 'check') v = ev.target.checked;
   else if (kind === 'range' || kind === 'number') v = Number(ev.target.value);
   else v = ev.target.value;
+  snapshotOnce(node.id, key);
   setParam(node.id, key, v);
+  afterParamChange(node);
 }
 
 function onVector(key, index, spec, ev) {
@@ -160,7 +199,9 @@ function onVector(key, index, spec, ev) {
     ? [...node.params[key]]
     : [...(spec.value || [])];
   current[index] = Number(ev.target.value);
+  snapshotOnce(node.id, key);
   setParam(node.id, key, current);
+  afterParamChange(node);
 }
 
 /** Labels for the vector components, so a 2-vector reads as X/Y rather than 0/1. */
