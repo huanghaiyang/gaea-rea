@@ -82,6 +82,58 @@ function onDice() {
 
 function onMode(m) { setViewMode(m); }
 
+/* ---------------------------------------------------------------- the split */
+/*
+ * `--graph-h` on #layout is the ONLY piece of split state. A drag writes it and CSS derives both
+ * rows from it, so the graph and the preview can never sum to something other than the available
+ * height -- which is what happens when each row is sized independently.
+ */
+const dragging = ref(false);
+const graphPercent = ref(58);
+
+const layoutEl = () => document.getElementById('layout');
+
+/** Clamped so neither panel can be dragged away entirely. */
+function applySplit(pct) {
+  const clamped = Math.max(20, Math.min(85, pct));
+  graphPercent.value = clamped;
+  const el = layoutEl();
+  if (el) el.style.setProperty('--graph-h', `${clamped}%`);
+}
+
+function splitFromEvent(ev) {
+  const el = layoutEl();
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  applySplit(((ev.clientY - r.top) / r.height) * 100);
+}
+
+function onSplitDown(ev) {
+  ev.preventDefault();
+  dragging.value = true;
+  const move = (e) => splitFromEvent(e);
+  const up = () => {
+    dragging.value = false;
+    window.removeEventListener('pointermove', move);
+    window.removeEventListener('pointerup', up);
+    window.removeEventListener('pointercancel', up);
+  };
+  // Bound on the window, not the handle: the pointer leaves a six-pixel strip immediately, and a
+  // handler on the element would stop tracking the moment it did.
+  window.addEventListener('pointermove', move);
+  window.addEventListener('pointerup', up);
+  window.addEventListener('pointercancel', up);
+}
+
+/** Keyboard access, since it is a focusable separator. */
+function onSplitKey(ev) {
+  const step = ev.shiftKey ? 10 : 2;
+  if (ev.key === 'ArrowUp') { applySplit(graphPercent.value - step); ev.preventDefault(); }
+  else if (ev.key === 'ArrowDown') { applySplit(graphPercent.value + step); ev.preventDefault(); }
+  else if (ev.key === 'Home') { applySplit(20); ev.preventDefault(); }
+  else if (ev.key === 'End') { applySplit(85); ev.preventDefault(); }
+}
+
 function onKey(ev) {
   const mod = ev.ctrlKey || ev.metaKey;
   if (mod && ev.key === 'z' && !ev.shiftKey) { ev.preventDefault(); undo(); refreshHistory(); }
@@ -195,6 +247,21 @@ const warnings = computed(() => (window.__gaea && window.__gaea.warnings) || [])
       <NodePalette />
       <GraphStage />
       <ParamPanel />
+      <!-- A real grid row, so it can be hit. `style.css` places it at `grid-area: splitter`. -->
+      <div
+        v-if="showViewport"
+        id="splitter"
+        role="separator"
+        aria-orientation="horizontal"
+        :aria-valuenow="Math.round(graphPercent)"
+        aria-valuemin="20"
+        aria-valuemax="85"
+        :aria-label="`${t('graph.title')} / ${t('preview.title')}`"
+        tabindex="0"
+        :class="{ dragging }"
+        @pointerdown="onSplitDown"
+        @keydown="onSplitKey"
+      />
       <Viewport3D v-if="showViewport" />
     </main>
 
@@ -207,7 +274,7 @@ const warnings = computed(() => (window.__gaea && window.__gaea.warnings) || [])
    There is deliberately NO footer -- the original shell is two bands, and the evaluation status
    and coverage count live in the topbar's .tb-right. */
 .shell { display: flex; flex-direction: column; height: 100vh; }
-/* The viewport is the only area that disappears, so its row collapses with it. */
-#layout.no-viewport { grid-template-areas: "library graph inspector" "library graph inspector"; }
+/* The `no-viewport` collapse lives in style.css, next to the grid it modifies. Repeating the areas
+   here is how they drifted apart before -- the splitter row had no counterpart in this copy. */
 
 </style>

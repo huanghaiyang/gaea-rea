@@ -45,6 +45,27 @@ export class Viewport {
     this.camera = { yaw: 0.62, pitch: 0.72, dist: 2.45, target: [0, 0.18, 0] };
     this._schedule = rafThrottle(() => this.draw());
 
+    /*
+     * Redraw when the LAYOUT BOX changes, not only when the window does.
+     *
+     * `resize()` assigns `canvas.width`/`canvas.height`, and doing that CLEARS the canvas --
+     * assigning either property resets the bitmap. `draw()` is safe because it resizes and then
+     * paints, but anything that changes the box without going through `draw()` leaves the canvas
+     * at its old pixel size, clipped by the smaller box, showing nothing. Dragging the graph /
+     * preview splitter was exactly that: the grid row changed, `window` did not resize, and the 2D
+     * view disappeared.
+     *
+     * A ResizeObserver on the host covers every cause -- the splitter, a window resize, the
+     * preview being hidden and shown again -- instead of the one that happened to be reported.
+     */
+    if (typeof ResizeObserver !== 'undefined') {
+      this._ro = new ResizeObserver(() => {
+        this.resize();
+        this._schedule();
+      });
+      this._ro.observe(this.host);
+    }
+
     this.ctx = this.c2d.getContext('2d', { alpha: false });
     this._initGL();
     this._bindControls();
@@ -223,6 +244,22 @@ export class Viewport {
       if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
     }
     if (this.renderer3d && this.renderer3d.available) this.renderer3d.resize(w, h);
+  }
+
+  /**
+   * Release what the host resize observer holds.
+   *
+   * `detachViewport` already called `dispose?.()` -- the optional call is why its absence was
+   * invisible: it did nothing, and every `view` toggle would have left another observer watching a
+   * detached node.
+   */
+  dispose() {
+    this._ro?.disconnect?.();
+    this._ro = null;
+    this.renderer3d?.dispose?.();
+    this.renderer3d = null;
+    this.field = null;
+    this.pendingFull = null;
   }
 
   draw() {

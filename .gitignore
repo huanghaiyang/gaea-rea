@@ -75,8 +75,8 @@ id_rsa*
 .credentials*
 secrets.*
 
-# Vite build output. 
-ode_modules/ and .npm-cache/ are already above.
+# Vite build output.
+# node_modules/ and .npm-cache/ are already above.
 web/dist/
 
 # Browser profiles created by the headless verification scripts (tools/verify-*.mjs, shot.mjs,

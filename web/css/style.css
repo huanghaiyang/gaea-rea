@@ -102,9 +102,13 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 #layout {
   display: grid;
   grid-template-columns: 236px minmax(320px, 1fr) 322px;
-  grid-template-rows: minmax(180px, 58%) minmax(160px, 42%);
+  /* The middle row is a REAL splitter, not the 1px grid gap that used to separate the panels and
+     could not be grabbed. `--graph-h` is the entire split state: the graph row takes it and the
+     viewport row takes the remainder, so the two can never disagree about the total. */
+  grid-template-rows: var(--graph-h, minmax(180px, 58%)) 6px minmax(160px, 1fr);
   grid-template-areas:
-    "library graph inspector"
+    "library graph    inspector"
+    "library splitter inspector"
     "library viewport inspector";
   height: calc(100% - 44px);
   gap: 1px;
@@ -115,6 +119,32 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 #graphwrap { grid-area: graph; }
 #inspector { grid-area: inspector; }
 #viewport  { grid-area: viewport; }
+
+#splitter {
+  grid-area: splitter;
+  cursor: row-resize;
+  background: var(--bg-1);
+  /* A hairline drawn inside a taller hit area, so the grab target is six pixels while the divider
+     still reads as a one-pixel rule. */
+  display: flex; align-items: center; justify-content: center;
+  touch-action: none; user-select: none;
+}
+#splitter::after {
+  content: ''; display: block; width: 100%; height: 1px; background: var(--line-soft);
+}
+#splitter:hover::after,
+#splitter.dragging::after { background: var(--accent, #4c9aff); height: 2px; }
+#splitter:focus-visible { outline: 1px solid var(--accent, #4c9aff); outline-offset: -1px; }
+
+/* With the viewport hidden there is nothing to split, so the row and its handle collapse. */
+#layout.no-viewport {
+  grid-template-rows: 1fr 0 0;
+  grid-template-areas:
+    "library graph inspector"
+    "library graph inspector"
+    "library graph inspector";
+}
+#layout.no-viewport #splitter { display: none; }
 
 .panel { background: var(--bg-1); display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
 
