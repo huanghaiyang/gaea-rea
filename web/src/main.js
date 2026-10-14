@@ -12,8 +12,8 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import { initI18n } from '@js/i18n.js';
-import { loadCatalog, state, selectedNode, viewNodes } from './stores/app.js';
-import { startEvalReporting, loadDemo } from './stores/session.js';
+import { loadCatalog, state, selectedNode, viewNodes, bus } from './stores/app.js';
+import { startEvalReporting, loadDemo, evaluator } from './stores/session.js';
 import { preloadCLUTs, clutStatus } from '@js/clut.js';
 import { preloadThresholds, thresholdStatus } from '@kernels/halftone.js';
 
@@ -76,6 +76,11 @@ async function boot() {
   app.mount('#app');
   // Exposed for the headless probe: the diagnostic needs the store's values, not just the DOM.
   window.__store = { state, selectedNode, viewNodes };
+  // The bus and the evaluator, so a probe can COUNT evaluations instead of inferring them from a
+  // repaint. "The picture did not change" and "the evaluator never ran" are different faults, and
+  // without this the only evidence available is the picture -- which cannot tell them apart.
+  window.__bus = bus;
+  window.__evaluator = evaluator;
 
   // AFTER mount: the demo is rendered by components that must already exist. Loading it before
   // `mount` would set the graph with no canvas to draw it on, which is how the first version came
