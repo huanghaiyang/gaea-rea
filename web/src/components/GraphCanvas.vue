@@ -183,8 +183,17 @@ function frameAll() {
 
 let offBus = [];
 
-/** Adding a node: centred on the visible area, so it lands where the user is looking. */
-function onAdd({ name }) {
+/**
+ * Adding a node: centred on the visible area, so it lands where the user is looking.
+ *
+ * `ev.detail.name`, NOT `{ name }` on the event itself. The listener is attached to `window`, so it
+ * receives the CustomEvent -- and `event.name` is undefined, which created nodes whose `name` field
+ * was missing and whose label rendered blank. The node count still went up by one, so a test that
+ * only counted nodes passed while every added node was broken.
+ */
+function onAdd(ev) {
+  const name = ev && ev.detail ? ev.detail.name : undefined;
+  if (!name) return;
   const el = svg.value;
   const w = el ? el.clientWidth : 800;
   const h = el ? el.clientHeight : 500;

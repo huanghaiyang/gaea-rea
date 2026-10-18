@@ -179,6 +179,25 @@ void main() {
   vec3 lit = base * (diff * 1.02 + hemi + fill) * ao;
   lit += uSky * diff * 0.10 * ao;
 
+  /*
+   * TWO-SIDED LIGHTING, which Gaea has and this did not.
+   *
+   * Its pixel shader reads a front-face flag and selects a separate colour for back faces:
+   *     dcl_input_ps_sgv v5.x, is_front_face
+   *     movc r2.xyz, v5.xxxx, r2.xyzx, cb0[7].xyzx
+   * so a surface seen from behind is not shaded as though its normal pointed at the viewer.
+   * Without this the inward faces of ridges and the walls of gullies take the key light as if they
+   * faced it, which is where the two renderers diverge most.
+   *
+   * The normal is blended toward up rather than negated: negating it would make every interior
+   * surface read as a lit slope, which is a different error, not a fix.
+   */
+  if (!gl_FrontFacing) {
+    vec3 bn = normalize(mix(n, vec3(0.0, 1.0, 0.0), 0.65));
+    vec3 back = base * 0.42 * (max(dot(bn, l), 0.0) * 0.55 + hemi * 0.8) * ao;
+    lit = mix(lit, back, 0.85);
+  }
+
   vec3 v = normalize(uEye - vWorld);
   float spec = pow(max(dot(n, normalize(l + v)), 0.0), uSpec.y) * uSpec.x;
   lit += vec3(spec) * ao;

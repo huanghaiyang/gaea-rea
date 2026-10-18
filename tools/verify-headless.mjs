@@ -236,11 +236,28 @@ try {
   // separates "the shell renders" from "the graph editor works".
   await s.eval(`window.dispatchEvent(new CustomEvent('gaea:add-node', {detail:{name:'Erosion2'}}))`);
   await sleep(600);
-  const added = JSON.parse(await s.eval(`JSON.stringify({
-    nodes: document.querySelectorAll('#graphwrap g.node').length,
-    stateNodes: window.__gaea ? undefined : undefined,
-  })`));
-  check('a node added through the palette path draws in SVG', added.nodes > 0, `${added.nodes} node(s)`);
+  // THE NAME, NOT THE COUNT. This assertion used to check only that a node appeared, which stayed
+  // true while every added node was created without a `name` field and drew a blank label: the
+  // `gaea:add-node` handler destructured the CustomEvent instead of its `detail`. Counting is not
+  // evidence that the thing counted is correct.
+  const added = JSON.parse(await s.eval(`JSON.stringify((function () {
+    const nodes = (window.__store && window.__store.state.graph.nodes) || [];
+    const last = nodes[nodes.length - 1];
+    const texts = [...document.querySelectorAll('#graphwrap g.node text')]
+      .map(function (t) { return (t.textContent || '').trim(); });
+    return {
+      drawn: document.querySelectorAll('#graphwrap g.node').length,
+      last: last ? { id: last.id, name: last.name } : null,
+      nameless: nodes.filter(function (n) { return !n.name; }).length,
+      blankLabels: texts.filter(function (t) { return t === ''; }).length,
+    };
+  })())`));
+  check('a node added through the palette path draws in SVG', added.drawn > 0, `${added.drawn} node(s)`);
+  check('the added node carries the requested name',
+    !!(added.last && added.last.name === 'Erosion2'),
+    added.last ? `last=${JSON.stringify(added.last)}` : 'no nodes');
+  check('no graph node is missing a name', added.nameless === 0, `${added.nameless} nameless`);
+  check('no node label rendered blank', added.blankLabels === 0, `${added.blankLabels} blank`);
 
   // Select it and confirm the inspector fills, which proves the store wiring.
   //

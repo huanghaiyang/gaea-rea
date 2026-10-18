@@ -83,3 +83,15 @@ web/dist/
 # measure-*.mjs). Each holds hundreds of files, and a run interrupted before its cleanup leaves one
 # behind -- which showed up as 245 spurious untracked files in git status.
 .chrome-*/
+
+# Oracle verification artifacts. `tools/verify-exact.mjs` rewrites both sides on every run: the spec
+# is just the generated input cases (10+ MB of float arrays) and the output is the shipped program's
+# answer for them. Regenerate with `node tools/verify-exact.mjs`; do not commit the deltas.
+tools/oracle-spec-*.json
+
+# Oracle verification artifacts. `tools/verify-exact.mjs` rewrites both sides on every run: the spec
+# is just the generated input cases (10+ MB of float arrays) and the output is the shipped program's
+# answer for them. Regenerate with the matching tools/*.mjs and do not commit the deltas.
+tools/oracle-spec-*.json
+evidence/oracle-*.json
+evidence/oracle-blurgrid.json

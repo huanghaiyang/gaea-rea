@@ -48,6 +48,7 @@ import { gaeaAngle, gaeaFilter, gaeaEdge, gaeaRoughen, gaeaCraggy } from './kern
 import { gaeaHalftone, HALFTONE_PATTERN_NAMES } from './kernels/halftone.js';
 import { gaeaCLUTer, CLUT_NAMES } from './clut.js';
 import { gaeaThreshold, gaeaSoftClip, gaeaTerraces, gaeaPixelate, gaeaCurvature } from './kernels/ops.js';
+import { gaeaShaper, gaeaLinearGradient, gaeaRadialGradient, gaeaCone, gaeaHemisphere, gaeaHSL, gaeaFold, gaeaSwirl, gaeaShape, gaeaMedian, gaeaCompare, gaeaRGBMerge, gaeaRGBSplit, gaeaSeamless, gaeaRepeat, gaeaSoil, gaeaPeaks, gaeaTranspose, gaeaSharpen } from './kernels/profiles.js';
 import { AUTHORITATIVE_PARAMS, authoritativeParam } from './param-authority.js';
 import { gaeaGamma, gaeaBlobRemover } from './kernels/imaging.js';
 import { createField } from './kernel/field.js';
@@ -555,6 +556,214 @@ export const NODES = [
       'Tilt Angle': { d: 0, min: 0, max: 360, step: 1 },
       Fractal: { d: 0.35, min: 0, max: 1, step: 0.01 },
       Seed: { d: 0, min: 0, max: 99999, step: 1 },
+    },
+  },
+  {
+    name: 'Shaper',
+    note: 'exact', algorithm: gaeaShaper, category: CAT.SHAPE,
+    summary: 'Bulks a terrain up or down with an exponential shape curve; can act on local regions only and preserve fine detail.',
+    inputs: [H()], outputs: [OUT_H()],
+    params: {
+      Shape: { d: 0, min: -1, max: 1, step: 0.01, hint: 'Negative bulks down, positive bulks up.' },
+      'Local Effect': { d: false },
+      'Local Area': { d: 0.5, min: 0, max: 1, step: 0.01 },
+      'Maintain Fine Details': { d: false },
+      'Detail Size': { d: 0.75, min: 0, max: 1, step: 0.01 },
+    },
+  },
+  {
+    name: 'Shape',
+    note: 'exact', algorithm: gaeaShape, category: CAT.SHAPE,
+    summary: 'Circle or rectangle outline (ring) of a chosen thickness, scaled by Height.',
+    inputs: [], outputs: [OUT_H()],
+    params: {
+      Geometry: { d: 'Circle' },
+      Sides: { d: 3, min: 3, max: 256, step: 1, hint: 'Only Circle and Rectangle are produced by this build.' },
+      Uniform: { d: true },
+      Scale: { d: 0.5, min: 0.0001, max: 2, step: 0.01 },
+      'Scale X': { d: 0.5, min: 0.0001, max: 2, step: 0.01 },
+      'Scale Y': { d: 0.5, min: 0.0001, max: 2, step: 0.01 },
+      Thickness: { d: 0.1, min: 0.0001, max: 1, step: 0.01 },
+      Height: { d: 1, min: 0.0001, max: 1, step: 0.01 },
+      X: { d: 0.5, min: 0, max: 1, step: 0.005 },
+      Y: { d: 0.5, min: 0, max: 1, step: 0.005 },
+    },
+  },
+  {
+    name: 'LinearGradient', note: 'exact', algorithm: gaeaLinearGradient, category: CAT.SHAPE,
+    summary: 'Directional linear ramp; multiplies the optional input.',
+    inputs: [H()], outputs: [OUT_H()],
+    params: {
+      Scale: { d: 1, min: 0, max: 4, step: 0.01 },
+      Direction: { d: 0, min: 0, max: 360, step: 1 },
+      'Edge Behavior': { d: 'Clip' },
+    },
+  },
+  {
+    name: 'RadialGradient', note: 'exact', algorithm: gaeaRadialGradient, category: CAT.SHAPE,
+    summary: 'Smooth radial falloff (smoothstepped), positioned by X/Y.',
+    inputs: [H()], outputs: [OUT_H()],
+    params: {
+      Scale: { d: 1, min: 0, max: 4, step: 0.01 },
+      Height: { d: 1, min: 0, max: 1, step: 0.01 },
+      X: { d: 0.5, min: 0, max: 1, step: 0.005 },
+      Y: { d: 0.5, min: 0, max: 1, step: 0.005 },
+    },
+  },
+  {
+    name: 'Cone', note: 'exact', algorithm: gaeaCone, category: CAT.SHAPE,
+    summary: 'Linear (non-smoothstepped) radial cone.',
+    inputs: [H()], outputs: [OUT_H()],
+    params: {
+      Scale: { d: 1, min: 0, max: 4, step: 0.01 },
+      Height: { d: 1, min: 0, max: 1, step: 0.01 },
+      X: { d: 0.5, min: 0, max: 1, step: 0.005 },
+      Y: { d: 0.5, min: 0, max: 1, step: 0.005 },
+    },
+  },
+  {
+    name: 'Hemisphere', note: 'exact', algorithm: gaeaHemisphere, category: CAT.SHAPE,
+    summary: 'Spherical dome; Flatten gives the squarer hemisphere variant.',
+    inputs: [H()], outputs: [OUT_H()],
+    params: {
+      Scale: { d: 1, min: 0, max: 4, step: 0.01 },
+      Height: { d: 1, min: 0, max: 1, step: 0.01 },
+      X: { d: 0.5, min: 0, max: 1, step: 0.005 },
+      Y: { d: 0.5, min: 0, max: 1, step: 0.005 },
+      Flatten: { d: false },
+    },
+  },
+  {
+    name: 'HSL', note: 'exact', algorithm: gaeaHSL, category: CAT.FX,
+    summary: 'Hue shift and absolute saturation/lightness scaling on a colour field.',
+    inputs: [{ name: 'Input', kind: 'color' }], outputs: [OUT_C()],
+    params: {
+      Hue: { d: 0, min: -1, max: 1, step: 0.005 },
+      Saturation: { d: 0, min: -1, max: 1, step: 0.005 },
+      Lightness: { d: 0, min: -1, max: 1, step: 0.005 },
+    },
+  },
+  {
+    name: 'Fold', note: 'exact', algorithm: gaeaFold, category: CAT.WARP,
+    summary: 'Sine / Triangle / Sawtooth folding of the heightfield; the mask scales the fold count.',
+    inputs: [H(), MASK('Folds Mask')], outputs: [OUT_H()],
+    params: {
+      Waveform: { d: 'Sine' },
+      Folds: { d: 2, min: 0, max: 10, step: 0.05 },
+      Symmetric: { d: true },
+    },
+  },
+  {
+    name: 'Swirl', note: 'exact', algorithm: gaeaSwirl, category: CAT.WARP,
+    summary: 'Rotational twist around X/Y with the rotation proportional to radius.',
+    inputs: [H()], outputs: [OUT_H()],
+    params: {
+      Size: { d: 0.15, min: 0, max: 1, step: 0.005 },
+      X: { d: 0.5, min: 0, max: 1, step: 0.005 },
+      Y: { d: 0.5, min: 0, max: 1, step: 0.005 },
+    },
+  },
+  {
+    name: 'Seamless', note: 'exact', algorithm: gaeaSeamless, category: CAT.COMB,
+    summary: 'Makes the field tileable by cross-fading shifted copies along X and Y.',
+    inputs: [H()], outputs: [OUT_H()],
+    params: {
+      Edge: { d: 0.5, min: 0, max: 1, step: 0.005 },
+      'Shift X': { d: 0.5, min: 0, max: 1, step: 0.005 },
+      'Shift Y': { d: 0.5, min: 0, max: 1, step: 0.005 },
+    },
+  },
+  {
+    name: 'Repeat', note: 'model', algorithm: gaeaRepeat, category: CAT.COMB,
+    summary: 'Tiles the field; the shipped tile shrink uses a Lanczos resampler that is not ported yet, so tile-edge pixels differ slightly.',
+    inputs: [H()], outputs: [OUT_H()],
+    params: {
+      Tiles: { d: 2, min: 2, max: 50, step: 1 },
+      'Compensate Height': { d: false },
+      Height: { d: 1, min: 0.1, max: 10, step: 0.05 },
+    },
+  },
+  {
+    name: 'Soil', note: 'model', algorithm: gaeaSoil, category: CAT.SHAPE,
+    summary: 'Granular soil relief from five stacked blur differences; blur borders are modelled (interior exact).',
+    inputs: [H()], outputs: [OUT_H()],
+    params: {
+      Amount: { d: 0.6, min: 0, max: 1, step: 0.01 },
+      Bias: { d: 0, min: -1, max: 1, step: 0.01 },
+    },
+  },
+  {
+    name: 'Peaks', note: 'model', algorithm: gaeaPeaks, category: CAT.MASK,
+    summary: 'High-frequency spectral peaks via graphic EQ; blur borders are modelled (interior exact).',
+    inputs: [H()], outputs: [OUT_H()],
+    params: {
+      Falloff: { d: 0, min: -1, max: 1, step: 0.01 },
+      Precise: { d: false },
+    },
+  },
+  {
+    name: 'Transpose', note: 'model', algorithm: gaeaTranspose, category: CAT.COMB,
+    summary: 'Transposes, embeds or inserts a reference relief into the terrain; all three modes are oracle-verified.',
+    inputs: [H(), H('Reference')], outputs: [OUT_H()],
+    params: {
+      Mode: { d: 'Transpose' },
+      Amount: { d: 1, min: 0, max: 1, step: 0.01 },
+      Extend: { d: 0, min: 0, max: 1, step: 0.01 },
+      Flatten: { d: 0, min: 0, max: 1, step: 0.01 },
+      Threshold: { d: 0.01, min: 0, max: 1, step: 0.005 },
+      Boundary: { d: 0.3, min: 0, max: 1, step: 0.01 },
+    },
+  },
+  {
+    name: 'Sharpen', note: 'model', algorithm: gaeaSharpen, category: CAT.ADJ,
+    summary: 'Edge mode adds scaled vertical curvature (exact); Frequency mode boosts the top GraphicEQ band.',
+    inputs: [H()], outputs: [OUT_H()],
+    params: {
+      Method: { d: 'Edge' },
+      Amount: { d: 0.5, min: 0, max: 5, step: 0.01 },
+    },
+  },
+  {
+    name: 'Median', note: 'exact', algorithm: gaeaMedian, category: CAT.ADJ,
+    summary: 'Smoothed median blur; Classic and Advanced differ only in the filter window.',
+    inputs: [H()], outputs: [OUT_H()],
+    params: {
+      Mode: { d: 'Classic' },
+      Strength: { d: 'X1' },
+      Horizontal: { d: 2, min: 2, max: 50, step: 1 },
+      Vertical: { d: 2, min: 2, max: 50, step: 1 },
+      Iterations: { d: 1, min: 1, max: 50, step: 1 },
+      Quality: { d: 'Medium', hint: 'ResolutionIndependent mode is modelled, not ported.' },
+    },
+  },
+  {
+    name: 'Compare', note: 'exact', algorithm: gaeaCompare, category: CAT.COMB,
+    summary: 'A/B split comparison between two fields (hard threshold at A/B).',
+    inputs: [H('A'), H('B')], outputs: [OUT_H()],
+    params: {
+      'A/B': { d: 0.5, min: 0, max: 1, step: 0.005 },
+      Colorized: { d: true },
+      Perpendicular: { d: false },
+      Swap: { d: false },
+    },
+  },
+  {
+    name: 'RGBMerge', note: 'exact', algorithm: gaeaRGBMerge, category: CAT.FX,
+    summary: 'Combine three height fields into one RGB colour field.',
+    inputs: [H('R'), H('G'), H('B')], outputs: [OUT_C()],
+    params: {
+      'Enhance R': { d: 'None' },
+      'Enhance G': { d: 'None' },
+      'Enhance B': { d: 'None' },
+    },
+  },
+  {
+    name: 'RGBSplit', note: 'model', algorithm: gaeaRGBSplit, category: CAT.FX,
+    summary: 'Colour field to grayscale; Gaea also exposes separate R/G/B outputs, which this single-output graph model cannot carry.',
+    inputs: [{ name: 'Input', kind: 'color' }], outputs: [OUT_H()],
+    params: {
+      'Autolevel Channels': { d: false },
+      Method: { d: 'BT601' },
     },
   },
   {
@@ -1422,3 +1631,6 @@ export function defaultParams(schema) {
   }
   return out;
 }
+
+
+

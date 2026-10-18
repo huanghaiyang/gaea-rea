@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    A console probe over the installed Gaea assemblies.
+
+    WHY THIS EXISTS
+    The remaining nodes are thin `Build()` wrappers over `Profiles.*` static methods whose numeric
+    constants are all `\ue0003.\ue002(N)` — Eazfuscator's encrypted constant pool. Statically that
+    is a wall: the arrays are decrypted only when the static initializer runs. Loading the assembly
+    and reading the decrypted array turns the wall into a table of numbers.
+
+    It also exposes the node catalogue and their [Parameter] metadata through reflection, which is
+    the authoritative description of what each node offers.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <AssemblyName>gaea-probe</AssemblyName>
+    <RootNamespace>GaeaProbe</RootNamespace>
+    <!-- 2026-08-24 04:00 -->
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+  </PropertyGroup>
+</Project>

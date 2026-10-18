@@ -1,0 +1,1354 @@
+{
+ "generatedFrom": "docs/node-pending.json + evidence/decompiled/Gaea.Nodes.resolved.cs",
+ "pendingCount": 91,
+ "matchedCount": 89,
+ "missing": [
+  "MathX",
+  "FlowMapClassic"
+ ],
+ "helpers": [
+  {
+   "helper": "AspectMaps.GetThreshold",
+   "nodeCount": 7,
+   "nodes": [
+    "LineNoise",
+    "IceFloe",
+    "WaterColor",
+    "Shrubs",
+    "DataExtractor",
+    "Snowfield",
+    "Cartography"
+   ]
+  },
+  {
+   "helper": "Warps.FractalWarp",
+   "nodeCount": 7,
+   "nodes": [
+    "Volcano",
+    "Noise",
+    "WaterColor",
+    "SatMap",
+    "DataExtractor",
+    "Snowfield",
+    "MountainSide"
+   ]
+  },
+  {
+   "helper": "Combiner.Max",
+   "nodeCount": 6,
+   "nodes": [
+    "Uplift",
+    "Sediments",
+    "WaterColor",
+    "Dusting",
+    "Snowfield",
+    "EasyErosion"
+   ]
+  },
+  {
+   "helper": "Profiles.GraphicEQ",
+   "nodeCount": 6,
+   "nodes": [
+    "Sharpen",
+    "Mesher",
+    "Distress",
+    "TextureBase",
+    "Dusting",
+    "Snowfield"
+   ]
+  },
+  {
+   "helper": "Erosions.PE",
+   "nodeCount": 4,
+   "nodes": [
+    "Volcano",
+    "Wizard2",
+    "MountainSide",
+    "EasyErosion"
+   ]
+  },
+  {
+   "helper": "Gradients.LinearGradient",
+   "nodeCount": 4,
+   "nodes": [
+    "Crumble",
+    "Snowfield",
+    "MountainSide",
+    "EasyErosion"
+   ]
+  },
+  {
+   "helper": "ColorCore.HSL",
+   "nodeCount": 3,
+   "nodes": [
+    "WaterColor",
+    "SatMap",
+    "Weathering"
+   ]
+  },
+  {
+   "helper": "Combiner.Embed",
+   "nodeCount": 3,
+   "nodes": [
+    "Sand",
+    "Rockscape",
+    "Rugged"
+   ]
+  },
+  {
+   "helper": "Combiner.Min",
+   "nodeCount": 3,
+   "nodes": [
+    "Volcano",
+    "MountainSide",
+    "EasyErosion"
+   ]
+  },
+  {
+   "helper": "Combiner.Screen",
+   "nodeCount": 3,
+   "nodes": [
+    "IceFloe",
+    "Dusting",
+    "Weathering"
+   ]
+  },
+  {
+   "helper": "Landscapes.Craterfield",
+   "nodeCount": 3,
+   "nodes": [
+    "Stones",
+    "CraterField",
+    "Scree"
+   ]
+  },
+  {
+   "helper": "Profiles.ComplexTerraces",
+   "nodeCount": 3,
+   "nodes": [
+    "Stratify",
+    "MountainSide",
+    "EasyErosion"
+   ]
+  },
+  {
+   "helper": "Profiles.Recurve",
+   "nodeCount": 3,
+   "nodes": [
+    "Distress",
+    "IceFloe",
+    "Snowfield"
+   ]
+  },
+  {
+   "helper": "AspectMaps.GetCurvature",
+   "nodeCount": 2,
+   "nodes": [
+    "Sharpen",
+    "TextureBase"
+   ]
+  },
+  {
+   "helper": "AspectMaps.GetHeightNormalized",
+   "nodeCount": 2,
+   "nodes": [
+    "Dusting",
+    "DataExtractor"
+   ]
+  },
+  {
+   "helper": "AspectMaps.GetSlope",
+   "nodeCount": 2,
+   "nodes": [
+    "Dusting",
+    "DataExtractor"
+   ]
+  },
+  {
+   "helper": "Cartographer.Contours",
+   "nodeCount": 2,
+   "nodes": [
+    "Contours",
+    "Cartography"
+   ]
+  },
+  {
+   "helper": "Cartographer.Grid",
+   "nodeCount": 2,
+   "nodes": [
+    "Grid",
+    "Cartography"
+   ]
+  },
+  {
+   "helper": "Combiner.Blend",
+   "nodeCount": 2,
+   "nodes": [
+    "Noise",
+    "MountainSide"
+   ]
+  },
+  {
+   "helper": "Combiner.Difference",
+   "nodeCount": 2,
+   "nodes": [
+    "Stones",
+    "Scree"
+   ]
+  },
+  {
+   "helper": "Combiner.Mix",
+   "nodeCount": 2,
+   "nodes": [
+    "Dusting",
+    "Shade"
+   ]
+  },
+  {
+   "helper": "Combiner.Subtract",
+   "nodeCount": 2,
+   "nodes": [
+    "Distress",
+    "Anastomosis"
+   ]
+  },
+  {
+   "helper": "Erosions.Classic",
+   "nodeCount": 2,
+   "nodes": [
+    "Wizard",
+    "Snowfield"
+   ]
+  },
+  {
+   "helper": "Erosions.Thermal2",
+   "nodeCount": 2,
+   "nodes": [
+    "Thermal2",
+    "Sediments"
+   ]
+  },
+  {
+   "helper": "Landscapes.MountainRange",
+   "nodeCount": 2,
+   "nodes": [
+    "MountainRange",
+    "Texturizer"
+   ]
+  },
+  {
+   "helper": "Landscapes.Slump",
+   "nodeCount": 2,
+   "nodes": [
+    "Slump",
+    "Texturizer"
+   ]
+  },
+  {
+   "helper": "Migrated.GroundTextureProcess",
+   "nodeCount": 2,
+   "nodes": [
+    "GroundTexture",
+    "Snowfield"
+   ]
+  },
+  {
+   "helper": "Noises.Perlin",
+   "nodeCount": 2,
+   "nodes": [
+    "GroundTexture",
+    "MountainSide"
+   ]
+  },
+  {
+   "helper": "Noises.WaveShine",
+   "nodeCount": 2,
+   "nodes": [
+    "WaveShine",
+    "WaterColor"
+   ]
+  },
+  {
+   "helper": "RandomNoises.Fixed",
+   "nodeCount": 2,
+   "nodes": [
+    "Noise",
+    "ColorErosion"
+   ]
+  },
+  {
+   "helper": "RandomNoises.Perlin",
+   "nodeCount": 2,
+   "nodes": [
+    "Noise",
+    "Dusting"
+   ]
+  },
+  {
+   "helper": "Simulations.Flow2",
+   "nodeCount": 2,
+   "nodes": [
+    "Scree",
+    "Dusting"
+   ]
+  },
+  {
+   "helper": "Surfaces.M2",
+   "nodeCount": 2,
+   "nodes": [
+    "Rugged",
+    "Texturizer"
+   ]
+  },
+  {
+   "helper": "Surfaces.M3",
+   "nodeCount": 2,
+   "nodes": [
+    "Rugged",
+    "Texturizer"
+   ]
+  },
+  {
+   "helper": "Surfaces.M4",
+   "nodeCount": 2,
+   "nodes": [
+    "Rugged",
+    "Texturizer"
+   ]
+  },
+  {
+   "helper": "Surfaces.M5",
+   "nodeCount": 2,
+   "nodes": [
+    "Rugged",
+    "Texturizer"
+   ]
+  },
+  {
+   "helper": "Surfaces.M6",
+   "nodeCount": 2,
+   "nodes": [
+    "Rugged",
+    "Texturizer"
+   ]
+  },
+  {
+   "helper": "Texturize.GetAccumulation",
+   "nodeCount": 2,
+   "nodes": [
+    "WaterColor",
+    "Shrubs"
+   ]
+  },
+  {
+   "helper": "Texturize.Soil2",
+   "nodeCount": 2,
+   "nodes": [
+    "TextureBase",
+    "Weathering"
+   ]
+  },
+  {
+   "helper": "Texturize.TextureBase",
+   "nodeCount": 2,
+   "nodes": [
+    "Texturizer",
+    "TextureBase"
+   ]
+  },
+  {
+   "helper": "AspectMaps.GetAngle",
+   "nodeCount": 1,
+   "nodes": [
+    "Dusting"
+   ]
+  },
+  {
+   "helper": "AspectMaps.GetNormalMap",
+   "nodeCount": 1,
+   "nodes": [
+    "Normals"
+   ]
+  },
+  {
+   "helper": "Cartographer.Outline",
+   "nodeCount": 1,
+   "nodes": [
+    "Cartography"
+   ]
+  },
+  {
+   "helper": "ColorCore.Clut",
+   "nodeCount": 1,
+   "nodes": [
+    "Cartography"
+   ]
+  },
+  {
+   "helper": "Combiner.Add",
+   "nodeCount": 1,
+   "nodes": [
+    "Dusting"
+   ]
+  },
+  {
+   "helper": "Combiner.Multiply",
+   "nodeCount": 1,
+   "nodes": [
+    "Cartography"
+   ]
+  },
+  {
+   "helper": "Erosions.Hillify",
+   "nodeCount": 1,
+   "nodes": [
+    "Hillify"
+   ]
+  },
+  {
+   "helper": "Erosions.Sediments",
+   "nodeCount": 1,
+   "nodes": [
+    "Sediments"
+   ]
+  },
+  {
+   "helper": "Erosions.SedimentsOld",
+   "nodeCount": 1,
+   "nodes": [
+    "Sediments"
+   ]
+  },
+  {
+   "helper": "Gradients.RadialGradient",
+   "nodeCount": 1,
+   "nodes": [
+    "Volcano"
+   ]
+  },
+  {
+   "helper": "Landscapes.DuneSea",
+   "nodeCount": 1,
+   "nodes": [
+    "DuneSea"
+   ]
+  },
+  {
+   "helper": "Landscapes.Plates",
+   "nodeCount": 1,
+   "nodes": [
+    "Plates"
+   ]
+  },
+  {
+   "helper": "Landscapes.Ridge",
+   "nodeCount": 1,
+   "nodes": [
+    "Texturizer"
+   ]
+  },
+  {
+   "helper": "Landscapes.Rugged",
+   "nodeCount": 1,
+   "nodes": [
+    "Slump"
+   ]
+  },
+  {
+   "helper": "Landscapes.Sand",
+   "nodeCount": 1,
+   "nodes": [
+    "Sand"
+   ]
+  },
+  {
+   "helper": "Landscapes.Uplift",
+   "nodeCount": 1,
+   "nodes": [
+    "Uplift"
+   ]
+  },
+  {
+   "helper": "Migrated.IslandProcess",
+   "nodeCount": 1,
+   "nodes": [
+    "Island"
+   ]
+  },
+  {
+   "helper": "Migrated.TintProcess",
+   "nodeCount": 1,
+   "nodes": [
+    "Tint"
+   ]
+  },
+  {
+   "helper": "Noises.DriftNoise",
+   "nodeCount": 1,
+   "nodes": [
+    "DriftNoise"
+   ]
+  },
+  {
+   "helper": "Noises.Gabor",
+   "nodeCount": 1,
+   "nodes": [
+    "Gabor"
+   ]
+  },
+  {
+   "helper": "Others.SmoothedMedianBlur",
+   "nodeCount": 1,
+   "nodes": [
+    "Anastomosis"
+   ]
+  },
+  {
+   "helper": "Patterns.Dots",
+   "nodeCount": 1,
+   "nodes": [
+    "Pattern"
+   ]
+  },
+  {
+   "helper": "Patterns.Engrave",
+   "nodeCount": 1,
+   "nodes": [
+    "Pattern"
+   ]
+  },
+  {
+   "helper": "Patterns.Lines",
+   "nodeCount": 1,
+   "nodes": [
+    "Pattern"
+   ]
+  },
+  {
+   "helper": "Profiles.Filter",
+   "nodeCount": 1,
+   "nodes": [
+    "Normals"
+   ]
+  },
+  {
+   "helper": "Profiles.Sine",
+   "nodeCount": 1,
+   "nodes": [
+    "Texturizer"
+   ]
+  },
+  {
+   "helper": "Profiles.Triangle",
+   "nodeCount": 1,
+   "nodes": [
+    "Volcano"
+   ]
+  },
+  {
+   "helper": "RandomNoises.FixedWhite",
+   "nodeCount": 1,
+   "nodes": [
+    "Shrubs"
+   ]
+  },
+  {
+   "helper": "RandomNoises.Gaussian",
+   "nodeCount": 1,
+   "nodes": [
+    "Noise"
+   ]
+  },
+  {
+   "helper": "RandomNoises.Random",
+   "nodeCount": 1,
+   "nodes": [
+    "Noise"
+   ]
+  },
+  {
+   "helper": "Scatters.Bomb",
+   "nodeCount": 1,
+   "nodes": [
+    "Bomber"
+   ]
+  },
+  {
+   "helper": "Scatters.RenderRockColored",
+   "nodeCount": 1,
+   "nodes": [
+    "Debris"
+   ]
+  },
+  {
+   "helper": "Simulations.CreateFlowMap",
+   "nodeCount": 1,
+   "nodes": [
+    "Anastomosis"
+   ]
+  },
+  {
+   "helper": "Simulations.Crumble",
+   "nodeCount": 1,
+   "nodes": [
+    "Crumble"
+   ]
+  },
+  {
+   "helper": "Simulations.Snow",
+   "nodeCount": 1,
+   "nodes": [
+    "Snowfield"
+   ]
+  },
+  {
+   "helper": "Surfacer.Rocky",
+   "nodeCount": 1,
+   "nodes": [
+    "Dusting"
+   ]
+  },
+  {
+   "helper": "Waters.Rivers",
+   "nodeCount": 1,
+   "nodes": [
+    "Rivers"
+   ]
+  }
+ ],
+ "nodes": [
+  {
+   "name": "AO",
+   "cls": "AO",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tRenderAsMask((byte)1 != 0);\r\n\t\t\t\\uf55c\\uf0ba\\ue6e4 obj = new \\uf55c\\uf0ba\\ue6e4(base.context.Resolution)\r\n\t\t\t{\r\n\t\t\t\t\\ue724\\ue2f6\\ue9a1 = ((byte)1 != 0),\r\n\t\t\t\t\\ue724\\ue2f6\\ue99c = 5,\r\n\t\t\t\t\\ue724\\ue2f6\\ue99e = 2,\r\n\t\t\t\t\\ue724\\ue2f6\\ue99d = 4,\r\n\t\t\t\t\\ue724\\ue2f6\\ue9a0 = 0.2f,\r\n\t\t\t\t\\ue724\\ue2f6\\ue99d = ((byte)0 != 0),\r\n\t\t\t\t\\ue724\\ue2f6\\ue99f = ((byte)0 != 0),\r\n\t\t\t\t\\ue724\\ue2f6\\ue99e = ((byte)1 != 0),\r\n\t\t\t\t\\ue724\\ue2f6\\ue9a0 = ((byte)1 != 0),\r\n\t\t\t\t\\ue724\\ue2f6\\ue99c = ((byte)0 != 0),\r\n\t\t\t\t\\ue724\\ue2f6\\ue99c = (LightingAmbientOcclusionModel)1\r\n\t\t\t};\r\n\t\t\tswitch (Quality)\r\n\t\t\t{\r\n\t\t\tcase AOQuality.Ultra:\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99c = (LightingAmbientOcclusionModel)0;\r\n\t\t\t\tbreak;\r\n\t\t\tcase AOQuality.High:\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99d = 4;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99e = 2;\r\n\t\t\t\tbreak;\r\n\t\t\tcase AOQuality.Medium:\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99d = 3;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99e = 3;\r\n\t\t\t\tbreak;\r\n\t\t\tcase AOQuality.Low:\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99d = 3;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99e = 4;\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\tobj.\\uf2e1\\ueb48\\ueb65(33f, 90f);\r\n\t\t\tobj.\\uf2e1\\ueb48\\ueb68(base.In.\\uf072\\uf1d6\\uf748().Copy(), null);\r\n\t\t\tMap map = obj.\\ue975\\uecc4\\uf225.Copy();\r\n\t\t\tmap = map.\\ueb77\\uf21d\\ue95e(0f - Enhance);\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "ColorThreshold",
+   "cls": "ColorThreshold",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tRenderAsMask((byte)1 != 0);\r\n\t\t\tusing MagickImage magickImage = \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2bd(base.In.\\uf072\\uf1d6\\uf748());\r\n\t\t\tfloat r = Start.R;\r\n\t\t\tfloat g = Start.G;\r\n\t\t\tfloat b = Start.B;\r\n\t\t\tmagickImage.Alpha((AlphaOption)13);\r\n\t\t\tmagickImage.ColorFuzz = new Percentage(Falloff * 100f);\r\n\t\t\tmagickImage.Transparent(new MagickColor(r * 65535f, g * 65535f, b * 65535f));\r\n\t\t\tusing IMagickImage<float> magickImage2 = magickImage.Separate((Channels)16)[0];\r\n\t\t\tmagickImage2.Negate();\r\n\t\t\tmagickImage2.ColorType = (ColorType)2;\r\n\t\t\tMap map = (magickImage2.Clone() as MagickImage).\\ue755\\ue39c\\uf2bd((byte)0 != 0);\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Draw",
+   "cls": "Draw",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tobject maskLock = _maskLock;\r\n\t\t\tbool lockTaken = (byte)0 != 0;\r\n\t\t\ttry\r\n\t\t\t{\r\n\t\t\t\tMonitor.Enter(maskLock, ref lockTaken);\r\n\t\t\t\tMap map = rasterMask;\r\n\t\t\t\tif (map != null && !map.IsDisposed && rasterMask.Resolution == base.context.Resolution)\r\n\t\t\t\t{\r\n\t\t\t\t\t<Build>g__ActualProcess|29_0(rasterMask);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\trasterMask?.Dispose();\r\n\t\t\t\tif (vectorMask.IsEmpty())\r\n\t\t\t\t{\r\n\t\t\t\t\tif (string.IsNullOrEmpty(StrokeData))\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tCommit(\\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2be((byte)0 != 0).Copy(), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t\ttry\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tLoadData();\r\n\t\t\t\t\t}\r\n\t\t\t\t\tcatch (Exception ex)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tex.\\ueeb2\\ueab1\\ue24f(\\ue0002.\\ue000(13075));\r\n\t\t\t\t\t\tthrow ExHelper.NodeFailed(\\ue0002.\\ue000(13248));\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\tRenderAll();\r\n\t\t\t\t<Build>g__ActualProcess|29_0(rasterMask);\r\n\t\t\t}\r\n\t\t\tfinally\r\n\t\t\t{\r\n\t\t\t\tif (lockTaken)\r\n\t\t\t\t{\r\n\t\t\t\t\tMonitor.Exit(maskLock);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Heal",
+   "cls": "Heal",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tusing MagickImage magickImage = \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2bd(base.In.\\uf072\\uf1d6\\uf748());\r\n\t\t\tfor (int i = 0; i < Passes; i += 1)\r\n\t\t\t{\r\n\t\t\t\tmagickImage.WaveletDenoise(new Percentage(Reconstruction.\\uf353\\uee79\\ue793()));\r\n\t\t\t}\r\n\t\t\tMap map = magickImage.\\ue755\\ue39c\\uf2bd((byte)1 != 0);\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "HydroFix",
+   "cls": "HydroFix",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap heightmap = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tif (\\uf55c\\uf0ba\\ue6e0.\\uf153\\uf506\\ue2e1.\\uee18\\uede2\\ue11c(new \\uf55c\\uf0ba\\ue6e0.\\uf153\\uf506\\ue2e1.\\ue5b2\\ue55a\\uf70a\r\n\t\t\t{\r\n\t\t\t\t\\ue13a\\ue665\\uebc3 = heightmap.Resolution,\r\n\t\t\t\t\\ue13a\\ue665\\uebc4 = Downcutting\r\n\t\t\t}, in heightmap, out var heightmapProcessed))\r\n\t\t\t{\r\n\t\t\t\tCommit(heightmapProcessed, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Layers",
+   "cls": "Layers",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tfloat[] array = new float[7];\r\n\t\t\tarray[0] = Blend2;\r\n\t\t\tarray[1] = Blend3;\r\n\t\t\tarray[2] = Blend4;\r\n\t\t\tarray[3] = Blend5;\r\n\t\t\tarray[4] = Blend6;\r\n\t\t\tarray[5] = Blend7;\r\n\t\t\tarray[6] = Blend8;\r\n\t\t\tfloat[] array2 = array;\r\n\t\t\tfor (int i = 1; i < 8; i += 1)\r\n\t\t\t{\r\n\t\t\t\tMap map2 = this.\\uf072\\uf1d6\\uf72d(\\ue0002.\\ue000(5786) + i)?.\\uf072\\uf1d6\\uf748();\r\n\t\t\t\tif (map2 != null)\r\n\t\t\t\t{\r\n\t\t\t\t\tMap map3 = this.\\uf072\\uf1d6\\uf72d(\\ue0002.\\ue000(4463) + i)?.\\uf072\\uf1d6\\uf748();\r\n\t\t\t\t\tif (map3 != null)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tmap = Masking.Mask(map, map2, map3 * array2[i - 1]);\r\n\t\t\t\t\t}\r\n\t\t\t\t\telse\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tmap += map2;\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tmap = map.\\ueb77\\uf21d\\ue95c(0f, 1f);\r\n\t\t\tif (map.NumberOfChannels > 1)\r\n\t\t\t{\r\n\t\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "LightX",
+   "cls": "LightX",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tRenderAsMask((byte)0 != 0);\r\n\t\t\t\\uf55c\\uf0ba\\ue6e4 obj = new \\uf55c\\uf0ba\\ue6e4(base.context.Resolution)\r\n\t\t\t{\r\n\t\t\t\t\\ue724\\ue2f6\\ue9a1 = AutomaticColors,\r\n\t\t\t\t\\ue724\\ue2f6\\ue99c = 5,\r\n\t\t\t\t\\ue724\\ue2f6\\ue99e = 2,\r\n\t\t\t\t\\ue724\\ue2f6\\ue99d = 4,\r\n\t\t\t\t\\ue724\\ue2f6\\ue9a0 = AngularDiameter,\r\n\t\t\t\t\\ue724\\ue2f6\\ue99d = DirectLight,\r\n\t\t\t\t\\ue724\\ue2f6\\ue99f = Shadows,\r\n\t\t\t\t\\ue724\\ue2f6\\ue99e = AmbientLight,\r\n\t\t\t\t\\ue724\\ue2f6\\ue9a0 = AmbientOcclusion,\r\n\t\t\t\t\\ue724\\ue2f6\\ue9a4 = SunIntensity,\r\n\t\t\t\t\\ue724\\ue2f6\\ue99d = ColorToVector3(SunColor),\r\n\t\t\t\t\\ue724\\ue2f6\\ue9a5 = AmbientIntensity,\r\n\t\t\t\t\\ue724\\ue2f6\\ue99c = ColorToVector3(AmbientColor),\r\n\t\t\t\t\\ue724\\ue2f6\\ue99c = ((byte)0 != 0),\r\n\t\t\t\t\\ue724\\ue2f6\\ue9a3 = Exposure,\r\n\t\t\t\t\\ue724\\ue2f6\\ue9a2 = ((byte)0 != 0),\r\n\t\t\t\t\\ue724\\ue2f6\\ue9a1 = AirDensity * 0.01f,\r\n\t\t\t\t\\ue724\\ue2f6\\ue9a8 = Haze * 0.05f,\r\n\t\t\t\t\\ue724\\ue2f6\\ue99d = Ozone * 0.0025f,\r\n\t\t\t\t\\ue724\\ue2f6\\ue99f = GroundBrightness\r\n\t\t\t};\r\n\t\t\tswitch (Quality)\r\n\t\t\t{\r\n\t\t\tcase AOQuality.Ultra:\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99c = (LightingAmbientOcclusionModel)0;\r\n\t\t\t\tbreak;\r\n\t\t\tcase AOQuality.High:\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99c = (LightingAmbientOcclusionModel)1;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99d = 4;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99e = 2;\r\n\t\t\t\tbreak;\r\n\t\t\tcase AOQuality.Medium:\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99c = (LightingAmbientOcclusionModel)1;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99d = 3;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99e = 3;\r\n\t\t\t\tbreak;\r\n\t\t\tcase AOQuality.Low:\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99c = (LightingAmbientOcclusionModel)1;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99d = 3;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99e = 4;\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\tif (DirectionSelection == (LightingDirectionType)1)\r\n\t\t\t{\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6e4.\\uf2e1\\ueb48\\ueb63(Latitude, DayOfYear, SolarHour, out var \\ued14\\ueb11\\uf526, out var \\ued14\\ueb11\\uf5262);\r\n\t\t\t\tobj.\\uf2e1\\ueb48\\ueb65(North + \\ued14\\ueb11\\uf526, \\ued14\\ueb11\\uf5262);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tobj.\\uf2e1\\ueb48\\ueb65(SunAzimuth, SunElevation);\r\n\t\t\t}\r\n\t\t\tobj.\\uf2e1\\ueb48\\ueb68(base.In.\\uf072\\uf1d6\\uf748().\\ue755\\ue39c\\uf2bd((GrayscaleConversion)3), base.Ins[1].\\uf072\\uf1d6\\uf748()?.Copy());\r\n\t\t\tbase.Out.RenderIntent = (RenderIntent)4;\r\n\t\t\tCommit(obj.\\ue975\\uecc4\\uf222.Copy(), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(15112), obj.\\ue975\\uecc4\\uf223?.Copy() ?? \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2be((byte)1 != 0), (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(15128), obj.\\ue975\\uecc4\\uf221?.Copy() ?? \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2be((byte)1 != 0), (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(15038), obj.\\ue975\\uecc4\\uf225?.Copy() ?? \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2be((byte)1 != 0), (RenderIntent)0);\r\n\t\t}\r"
+  },
+  {
+   "name": "LoopBegin",
+   "cls": "LoopBegin",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tNode node = base.Ins[1].\\uf072\\uf1d6\\uf747();\r\n\t\t\tif (node != null)\r\n\t\t\t{\r\n\t\t\t\tif (!(node is Combine { Ins: var ins }))\r\n\t\t\t\t{\r\n\t\t\t\t\tif (node is Var var)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tvar.SetToDefaultValue();\r\n\t\t\t\t\t}\r\n\t\t\t\t\telse\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tnode.\\uf072\\uf1d6\\uf6d1();\r\n\t\t\t\t\t\tnode.Build();\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\telse\r\n\t\t\t\t{\r\n\t\t\t\t\tfor (int i = 0; i < ins.Length; i += 1)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tNode node2 = ins[i].\\uf072\\uf1d6\\uf747();\r\n\t\t\t\t\t\tif (node2 != null)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tif (node2 is Var var2)\r\n\t\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\t\tvar2.SetToDefaultValue();\r\n\t\t\t\t\t\t\t\tcontinue;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tnode2.\\uf072\\uf1d6\\uf6d1();\r\n\t\t\t\t\t\t\tnode2.Build();\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tCommit(base.In.\\uf072\\uf1d6\\uf748().Copy(), (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "LoopEnd",
+   "cls": "LoopEnd",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tif (\\uf55c\\uf0ba\\ue6cc.\\ue8fb\\ue29d\\ueaae)\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.NodeCancelled(\\ue0002.\\ue000(5278));\r\n\t\t\t}\r\n\t\t\tif (LoopInProgress)\r\n\t\t\t{\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tif (\\uf55c\\uf0ba\\ue6d3.\\ue6f1\\ue421\\ue028 == ApplicationMode.UI && !Primed)\r\n\t\t\t{\r\n\t\t\t\tCommit(base.In.\\uf072\\uf1d6\\uf748().Copy(), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6d3.\\ue157\\ueb2d\\ue955(base.Thumbprint);\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tApplicationMode applicationMode = \\uf55c\\uf0ba\\ue6d3.\\ue6f1\\ue421\\ue028;\r\n\t\t\tbool flag = (byte)(((uint)(applicationMode - 1) > (uint)1) ? 0 : 1) != 0;\r\n\t\t\tif (flag && !PrimedBuild)\r\n\t\t\t{\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tNode[] source = \\uf55c\\uf0ba\\ue6cb.\\ue6f8\\ue1a7\\uf003(this).ToArray();\r\n\t\t\tNode parent = base.In.Parent;\r\n\t\t\tif (source.LastOrDefault((Node x) => x is LoopBegin) is LoopBegin loopBegin)\r\n\t\t\t{\r\n\t\t\t\ttry\r\n\t\t\t\t{\r\n\t\t\t\t\tLoopInProgress = (byte)1 != 0;\r\n\t\t\t\t\tfor (int num = 1; num < Loops; num += 1)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tif (\\uf55c\\uf0ba\\ue6cc.\\ue8fb\\ue29d\\ueaae)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tLoopInProgress = (byte)0 != 0;\r\n\t\t\t\t\t\t\tthrow ExHelper.NodeCancelled(\\ue0002.\\ue000(5278));\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tNode node = base.Ins[1].\\uf072\\uf1d6\\uf747();\r\n\t\t\t\t\t\tif (node is Combine { Ins: var ins })\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tfor (int num2 = 0; num2 < ins.Length; num2 += 1)\r\n\t\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\t\tins[num2].\\uf072\\uf1d6\\uf747()?.Build();\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\telse\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tnode?.Build();\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tloopBegin.Commit(base.In.\\uf072\\uf1d6\\uf748().Copy(), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\t\t\tNode[] array = \\uf55c\\uf0ba\\ue6cb.\\ue6f8\\ue1a7\\ueffb(loopBegin);\r\n\t\t\t\t\t\tfor (int num2 = 0; num2 < array.Length; num2 += 1)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tNode node2 = array[num2];\r\n\t\t\t\t\t\t\tif (node2 != loopBegin && node2 != node)\r\n\t\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\t\tif (MutateSeeds)\r\n\t\t\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\t\t\tnode2.\\uf072\\uf1d6\\uf6c9();\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\tnode2.\\uf072\\uf1d6\\uf6d1();\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tif (\\uf55c\\uf0ba\\ue6cc.\\ue8fb\\ue29d\\ueaae)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tLoopInProgress = (byte)0 != 0;\r\n\t\t\t\t\t\t\tthrow ExHelper.NodeCancelled(\\ue0002.\\ue000(5278));\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tQuadSpinner.Gaea.Engine.State.Engine = (EngineState)0;\r\n\t\t\t\t\t\t\\uf55c\\uf0ba\\ue6cb.\\ue6f8\\ue1a7\\uf004(parent);\r\n\t\t\t\t\t\tif (\\uf55c\\uf0ba\\ue6cc.\\ue8fb\\ue29d\\ueaae)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tLoopInProgress = (byte)0 != 0;\r\n\t\t\t\t\t\t\tthrow ExHelper.NodeCancelled(\\ue0002.\\ue000(5278));\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\tcatch (Exception)\r\n\t\t\t\t{\r\n\t\t\t\t\tLoopInProgress = (byte)0 != 0;\r\n\t\t\t\t}\r\n\t\t\t\tfinally\r\n\t\t\t\t{\r\n\t\t\t\t\tLoopInProgress = (byte)0 != 0;\r\n\t\t\t\t\t\\uf55c\\uf0ba\\ue6d3.\\ue157\\ueb2d\\ue955(loopBegin.Thumbprint);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tif (\\uf55c\\uf0ba\\ue6cc.\\ue8fb\\ue29d\\ueaae)\r\n\t\t\t{\r\n\t\t\t\tLoopInProgress = (byte)0 != 0;\r\n\t\t\t\tthrow ExHelper.NodeCancelled(\\ue0002.\\ue000(5278));\r\n\t\t\t}\r\n\t\t\tQuadSpinner.Gaea.Engine.State.Engine = (EngineState)1;\r\n\t\t\tCommit(base.In.\\uf072\\uf1d6\\uf748().Copy(), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\\uf55c\\uf0ba\\ue6d3.\\ue157\\ueb2d\\ue955(base.Thumbprint);\r\n\t\t}\r"
+  },
+  {
+   "name": "MacroPort",
+   "cls": "MacroPort",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tmap = Fallback switch\r\n\t\t\t\t{\r\n\t\t\t\t\tFallbackMap.Null => null, \r\n\t\t\t\t\tFallbackMap.Black => \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2be((byte)1 != 0), \r\n\t\t\t\t\tFallbackMap.White => \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2bd((byte)1 != 0), \r\n\t\t\t\t\tFallbackMap.Grey => \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2bd((byte)1 != 0, (byte)1 != 0), \r\n\t\t\t\t\t_ => null, \r\n\t\t\t\t};\r\n\t\t\t}\r\n\t\t\tif (map != null)\r\n\t\t\t{\r\n\t\t\t\tMap map2 = map;\r\n\t\t\t\tRenderIntent renderIntent = Display switch\r\n\t\t\t\t{\r\n\t\t\t\t\tDisplayIntent.Heightfield => (RenderIntent)1, \r\n\t\t\t\t\tDisplayIntent.Mask => (RenderIntent)2, \r\n\t\t\t\t\tDisplayIntent.Color => (RenderIntent)3, \r\n\t\t\t\t\t_ => (RenderIntent)1, \r\n\t\t\t\t};\r\n\t\t\t\tmap2.Info.RenderIntent = renderIntent;\r\n\t\t\t\tbase.Out.RenderIntent = map.Info.RenderIntent;\r\n\t\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Match",
+   "cls": "Match",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In?.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tMap map2 = base.Ins[1]?.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tif (map == null || map2 == null)\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.RequiredNotConnected(\\ue0002.\\ue000(9839));\r\n\t\t\t}\r\n\t\t\tif (Mode == MatchType.Height)\r\n\t\t\t{\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(map2, out var \\ued14\\ueb11\\uf526, out var \\ued14\\ueb11\\uf5262);\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(map, out var \\ued14\\ueb11\\uf5263, out var \\ued14\\ueb11\\uf5264);\r\n\t\t\t\tCommit(\\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(map, \\ued14\\ueb11\\uf5263, \\ued14\\ueb11\\uf5264, \\ued14\\ueb11\\uf526, \\ued14\\ueb11\\uf5262), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tCommit(\\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(map, map2, 65536), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Meshify",
+   "cls": "Meshify",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tMap map2 = this.\\uf072\\uf1d6\\uf72f(\\ue0002.\\ue000(10164))?.Copy();\r\n\t\t\tResolution resolution = base.context.Resolution;\r\n\t\t\tVector3[] points = new Vector3[(int)Vertices];\r\n\t\t\tusing Map probability = GetProbabilityMask(map, DetailSensitivity);\r\n\t\t\tLog.Information(base.Version.ToString());\r\n\t\t\tif (base.Version == 0)\r\n\t\t\t{\r\n\t\t\t\tPlacePoints0(map, probability, points, (int)Vertices, Seed);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tPlacePoints1(map, probability, points, (int)Vertices, Seed);\r\n\t\t\t}\r\n\t\t\tMeshRasterizer.RasterizePointCloud(new MeshRasterizer.Parameters\r\n\t\t\t{\r\n\t\t\t\t\\uf8c7\\ue251\\ue916 = resolution\r\n\t\t\t}, points, out (Map, Map) outMaps, map2);\r\n\t\t\tCommit(outMaps.Item1, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(10124), outMaps.Item2, (RenderIntent)0);\r\n\t\t\tif (map2 != null)\r\n\t\t\t{\r\n\t\t\t\tCommit(\\ue0002.\\ue000(10119), map2, (RenderIntent)3);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Mixer",
+   "cls": "Mixer",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map;\r\n\t\t\tif (ShowSimplified)\r\n\t\t\t{\r\n\t\t\t\tmap = new Map(base.context.Resolution, 3);\r\n\t\t\t\tMap map2 = map;\r\n\t\t\t\tfloat[] array = new float[1];\r\n\t\t\t\tarray[0] = 0.2f;\r\n\t\t\t\tmap2.Clear(array);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tmap = base.In.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\t}\r\n\t\t\tif (map != null && map.NumberOfChannels == 1)\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.NodeFailed(\\ue0002.\\ue000(4582));\r\n\t\t\t}\r\n\t\t\tif (Reference == null)\r\n\t\t\t{\r\n\t\t\t\tReference = this.\\uf072\\uf1d6\\uf72d(\\ue0002.\\ue000(4525));\r\n\t\t\t}\r\n\t\t\tLayerCount = 0;\r\n\t\t\tBlendLayer[] array2 = new BlendLayer[15];\r\n\t\t\tarray2[0] = Layer1;\r\n\t\t\tarray2[1] = Layer2;\r\n\t\t\tarray2[2] = Layer3;\r\n\t\t\tarray2[3] = Layer4;\r\n\t\t\tarray2[4] = Layer5;\r\n\t\t\tarray2[5] = Layer6;\r\n\t\t\tarray2[6] = Layer7;\r\n\t\t\tarray2[7] = Layer8;\r\n\t\t\tarray2[8] = Layer9;\r\n\t\t\tarray2[9] = Layer10;\r\n\t\t\tarray2[10] = Layer11;\r\n\t\t\tarray2[11] = Layer12;\r\n\t\t\tarray2[12] = Layer13;\r\n\t\t\tarray2[13] = Layer14;\r\n\t\t\tarray2[14] = Layer15;\r\n\t\t\tBlendLayer[] array3 = array2.OrderBy((BlendLayer x) => x.Order).ToArray();\r\n\t\t\tfor (int num = 0; num < array3.Length; num += 1)\r\n\t\t\t{\r\n\t\t\t\tBlendLayer blendLayer = array3[num];\r\n\t\t\t\tif (blendLayer.IsVisible)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap = ProcessLayer(blendLayer, map);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tmap = map.\\ueb77\\uf21d\\ue95c(0f, 1f);\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Object",
+   "cls": "Object",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\t//IL_0110: Unknown result type (might be due to invalid IL or missing references)\r\n\t\t\t//IL_0116: Expected O, but got Unknown\r\n\t\t\tif (Path.IsPathFullyQualified(FileName) && RelativePath)\r\n\t\t\t{\r\n\t\t\t\tFileName = \\uf55c\\uf0ba\\ue6ed.\\ue538\\uf8fe\\uee24(FileName);\r\n\t\t\t}\r\n\t\t\tstring text = FileName;\r\n\t\t\tif (RelativePath)\r\n\t\t\t{\r\n\t\t\t\ttext = \\uf55c\\uf0ba\\ue6ed.\\ue538\\uf8fe\\uee21(FileName, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t\tif (!File.Exists(text))\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.NodeFailed(\\ue0002.\\ue000(15593));\r\n\t\t\t}\r\n\t\t\tMeshRasterizer.Parameters obj = new MeshRasterizer.Parameters\r\n\t\t\t{\r\n\t\t\t\t\\uf8c7\\ue251\\ue916 = base.context.Resolution,\r\n\t\t\t\t\\uf8c7\\ue251\\ue918 = \\uf55c\\uf0ba\\ue6d3.Terrain.Height / \\uf55c\\uf0ba\\ue6d3.Terrain.Width,\r\n\t\t\t\t\\uf8c7\\ue251\\ue919 = Pitch,\r\n\t\t\t\t\\uf8c7\\ue251\\ue91a = Yaw,\r\n\t\t\t\t\\uf8c7\\ue251\\ue91b = Roll,\r\n\t\t\t\t\\uf8c7\\ue251\\ue91c = Scale,\r\n\t\t\t\t\\uf8c7\\ue251\\ue91d = OffsetX,\r\n\t\t\t\t\\uf8c7\\ue251\\ue91e = OffsetY,\r\n\t\t\t\t\\uf8c7\\ue251\\ue91f = OffsetZ,\r\n\t\t\t\t\\uf8c7\\ue251\\ue923 = DropToFloor,\r\n\t\t\t\t\\uf8c7\\ue251\\ue924 = Antialiasing\r\n\t\t\t};\r\n\t\t\tFileInfo val = new FileInfo(text);\r\n\t\t\tif (text != meshFileName || ((FileSystemInfo)val).LastWriteTime > meshLastWriteTime)\r\n\t\t\t{\r\n\t\t\t\tmesh?.Dispose();\r\n\t\t\t\tmesh = \\uf55c\\uf0ba\\ue6e0.\\uf153\\uf506\\ue2e2.\\ue75f\\ue068\\ue311(text);\r\n\t\t\t\tmeshFileName = text;\r\n\t\t\t\tmeshLastWriteTime = ((FileSystemInfo)val).LastWriteTime;\r\n\t\t\t}\r\n\t\t\tMeshRasterizer.\\uf81a\\uee34\\uf5d6(obj, mesh, out var heightmap);\r\n\t\t\tCommit(heightmap, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "PointCloud",
+   "cls": "PointCloud",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tif (base.In.\\uf072\\uf1d6\\uf747() is Debris { ExportPointCloud: not false } debris)\r\n\t\t\t{\r\n\t\t\t\tpointCloud = debris.pointCloud.ToArray();\r\n\t\t\t}\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tExHelper.RequiredNotConnected(\\ue0002.\\ue000(8073));\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Reseed",
+   "cls": "Reseed",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tNode node = base.In.\\uf072\\uf1d6\\uf747();\r\n\t\t\tif (node != null)\r\n\t\t\t{\r\n\t\t\t\tNode node2 = node.\\ue05d\\uedfb\\ue0ca();\r\n\t\t\t\tnode2.\\uf072\\uf1d6\\uf73d(\\ue0002.\\ue000(5780)).SetValue(node2, Seed);\r\n\t\t\t\tif (node.In.IsConnected)\r\n\t\t\t\t{\r\n\t\t\t\t\tnode2.In.Connection = new Connection\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tParent = node2.In,\r\n\t\t\t\t\t\tTarget = node.In.Connection.Target\r\n\t\t\t\t\t};\r\n\t\t\t\t}\r\n\t\t\t\tnode2.Build();\r\n\t\t\t\tCommit(\\uf55c\\uf0ba\\ue6d3.\\ue157\\ueb2d\\ue93e(node2.Id, \\ue0002.\\ue000(4506)).Data.Copy(), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "RockNoise",
+   "cls": "RockNoise",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tDefaultInterpolatedStringHandler val = default(DefaultInterpolatedStringHandler);\r\n\t\t\t((DefaultInterpolatedStringHandler)(ref val))..ctor(0, 3);\r\n\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendFormatted<int>(base.context.Resolution.X);\r\n\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendFormatted<int>(Seed);\r\n\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendFormatted<int>(Variety);\r\n\t\t\tstring text = ((DefaultInterpolatedStringHandler)(ref val)).ToStringAndClear();\r\n\t\t\tif (CacheThumbprint != text)\r\n\t\t\t{\r\n\t\t\t\tCached = RockCore.MakeNoiseStamps(base.context.Resolution.X, Variety, Seed);\r\n\t\t\t\tCacheThumbprint = text;\r\n\t\t\t}\r\n\t\t\tMap map = RockCore.Noise(base.context.Resolution.X, Variety, Octaves, Size, Seed, Cached);\r\n\t\t\tABC style = Style;\r\n\t\t\tif (style != (ABC)1)\r\n\t\t\t{\r\n\t\t\t\tif (style == (ABC)2)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap = SlopeBlurCore.Warp(map, map.Copy(), 0.25f, 1, 0f, (byte)0 != 0, (SlopeQuality)0, (SlopeAntialiasing)0);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tmap = SlopeBlurCore.Blur(map, map.Copy(), 0.25f, 1, 0f, 1f, (byte)0 != 0, (SlopeWindow)0, (SlopeQuality)0, (SlopeAntialiasing)0);\r\n\t\t\t}\r\n\t\t\tMap map2 = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tif (map2 != null)\r\n\t\t\t{\r\n\t\t\t\tCommit(map2 + map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Sandstone",
+   "cls": "Sandstone",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\t\\uf55c\\uf0ba\\ue6cf.\\ue7e6\\ue396\\uee40 = Passes * Iterations + Passes * 3;\r\n\t\t\t\\uf55c\\uf0ba\\ue6cf.\\ue7e6\\ue396\\uee3f = 0;\r\n\t\t\tMap[] array = RockCore.Sandstone(map, Passes, Iterations, Spacing, Intensity, Convexity, Tilt, Direction, Chaos, Seed, Chipped, Chipping);\r\n\t\t\tCommit(array[0], (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(5992), array[1], (RenderIntent)0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Shatter",
+   "cls": "Shatter",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tCommit(RockCore.Shatter(base.In.\\uf072\\uf1d6\\uf748(), Shatters, Size, Coverage, Seed), (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "SlopeBlur",
+   "cls": "SlopeBlur",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = SlopeBlurCore.Blur(base.In.\\uf072\\uf1d6\\uf748(), base.Ins[1].\\uf072\\uf1d6\\uf748().Copy(), Intensity, Iterations, Direction, Asymmetry, Normalized, Window, Quality, Antialiasing);\r\n\t\t\tif (map.NumberOfChannels > 1)\r\n\t\t\t{\r\n\t\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "SlopeWarp",
+   "cls": "SlopeWarp",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = SlopeBlurCore.Warp(base.In.\\uf072\\uf1d6\\uf748(), base.Ins[1].\\uf072\\uf1d6\\uf748(), Intensity, Iterations, Direction, Normalized, Quality, Antialiasing);\r\n\t\t\tif (map.NumberOfChannels > 1)\r\n\t\t\t{\r\n\t\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Splat",
+   "cls": "Splat",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\t<>c__DisplayClass25_0 CS$<>8__locals17 = new <>c__DisplayClass25_0();\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tMap map2 = base.Ins[1].\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tMap map3 = base.Ins[2].\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tMap map4 = base.Ins[3]?.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tbool flag = map4 != null;\r\n\t\t\tif (Autolevel)\r\n\t\t\t{\r\n\t\t\t\tmap = map.\\ueb77\\uf21d\\ue961() * R;\r\n\t\t\t\tmap2 = map2.\\ueb77\\uf21d\\ue961() * G;\r\n\t\t\t\tmap3 = map3.\\ueb77\\uf21d\\ue961() * B;\r\n\t\t\t\tif (flag)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap4 = map4.\\ueb77\\uf21d\\ue961() * A;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tCS$<>8__locals17.final = new Map(base.context.Resolution, flag ? 4 : 3);\r\n\t\t\tif (ClampProduct)\r\n\t\t\t{\r\n\t\t\t\tif (flag)\r\n\t\t\t\t{\r\n\t\t\t\t\tParallel.For(0, CS$<>8__locals17.final.R.Data.Length, delegate(int i)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tfloat num = CS$<>8__locals17.final.R.Data[i];\r\n\t\t\t\t\t\tfloat num2 = CS$<>8__locals17.final.G.Data[i];\r\n\t\t\t\t\t\tfloat num3 = CS$<>8__locals17.final.B.Data[i];\r\n\t\t\t\t\t\tfloat num4 = CS$<>8__locals17.final[3].Data[i];\r\n\t\t\t\t\t\twhile (num + num2 + num3 + num4 > 1f)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tnum *= 0.99f;\r\n\t\t\t\t\t\t\tif (num + num2 + num3 + num4 > 1f)\r\n\t\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\t\tnum2 *= 0.99f;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (num + num2 + num3 + num4 > 1f)\r\n\t\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\t\tnum3 *= 0.99f;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (num + num2 + num3 + num4 > 1f)\r\n\t\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\t\tnum4 *= 0.99f;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tCS$<>8__locals17.final.R.Data[i] = num;\r\n\t\t\t\t\t\tCS$<>8__locals17.final.G.Data[i] = num2;\r\n\t\t\t\t\t\tCS$<>8__locals17.final.B.Data[i] = num3;\r\n\t\t\t\t\t\tCS$<>8__locals17.final[3].Data[i] = num4;\r\n\t\t\t\t\t});\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tParallel.For(0, CS$<>8__locals17.final.R.Data.Length, delegate(int i)\r\n\t\t\t\t{\r\n\t\t\t\t\tfloat num = CS$<>8__locals17.final.R.Data[i];\r\n\t\t\t\t\tfloat num2 = CS$<>8__locals17.final.G.Data[i];\r\n\t\t\t\t\tfloat num3 = CS$<>8__locals17.final.B.Data[i];\r\n\t\t\t\t\twhile (num + num2 + num3 > 1f)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tnum *= 0.99f;\r\n\t\t\t\t\t\tif (num + num2 + num3 > 1f)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tnum2 *= 0.99f;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tif (num + num2 + num3 > 1f)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tnum3 *= 0.99f;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t\tCS$<>8__locals17.final.R.Data[i] = num;\r\n\t\t\t\t\tCS$<>8__locals17.final.G.Data[i] = num2;\r\n\t\t\t\t\tCS$<>8__locals17.final.B.Data[i] = num3;\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tMap map5;\r\n\t\t\t\tif (!flag)\r\n\t\t\t\t{\r\n\t\t\t\t\tMap[] array = new Map[3];\r\n\t\t\t\t\tarray[0] = map;\r\n\t\t\t\t\tarray[1] = map2;\r\n\t\t\t\t\tarray[2] = map3;\r\n\t\t\t\t\tmap5 = new Map(array);\r\n\t\t\t\t}\r\n\t\t\t\telse\r\n\t\t\t\t{\r\n\t\t\t\t\tMap[] array2 = new Map[4];\r\n\t\t\t\t\tarray2[0] = map;\r\n\t\t\t\t\tarray2[1] = map2;\r\n\t\t\t\t\tarray2[2] = map3;\r\n\t\t\t\t\tarray2[3] = map4;\r\n\t\t\t\t\tmap5 = new Map(array2);\r\n\t\t\t\t}\r\n\t\t\t\tCommit(map5, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Sunlight",
+   "cls": "Sunlight",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tRenderAsMask((byte)1 != 0);\r\n\t\t\t\\uf55c\\uf0ba\\ue6e4 obj = new \\uf55c\\uf0ba\\ue6e4(base.context.Resolution);\r\n\t\t\tMap heightmap = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tobj.\\uf2e1\\ueb48\\ueb6a(heightmap, (int)(Year.X * 360f), (int)(Year.Y * 360f), Latitude, North);\r\n\t\t\theightmap = obj.\\ue975\\uecc4\\uf223;\r\n\t\t\tCommit(heightmap, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "SuperColor",
+   "cls": "SuperColor",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\t\\uf55c\\uf0ba\\ue6d0.\\uf372\\uecea\\uf319();\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tMap textureMap = GetTextureMap(map);\r\n\t\t\tMap satMap = GetSatMap(textureMap);\r\n\t\t\tsatMap = GetColorizedMap(map, satMap);\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tRenderAsMask((byte)0 != 0);\r\n\t\t\tCommit(satMap, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Switch",
+   "cls": "Switch",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tMap map2 = base.Ins[1].\\uf072\\uf1d6\\uf748();\r\n\t\t\tif (map == null || map2 == null)\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.RequiredNotConnected(\\ue0002.\\ue000(8109));\r\n\t\t\t}\r\n\t\t\tif (SwitchRoute)\r\n\t\t\t{\r\n\t\t\t\tif (map2 != null)\r\n\t\t\t\t{\r\n\t\t\t\t\tSetIntent(map2.Info.RenderIntent, (byte)1 != 0);\r\n\t\t\t\t\tCommit(map2.Copy(), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\t}\r\n\t\t\t\telse if (map != null)\r\n\t\t\t\t{\r\n\t\t\t\t\tSetIntent(map.Info.RenderIntent, (byte)1 != 0);\r\n\t\t\t\t\tCommit(map.Copy(), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\telse if (map != null)\r\n\t\t\t{\r\n\t\t\t\tSetIntent(map.Info.RenderIntent, (byte)1 != 0);\r\n\t\t\t\tCommit(map.Copy(), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t\telse if (map2 != null)\r\n\t\t\t{\r\n\t\t\t\tSetIntent(map2.Info.RenderIntent, (byte)1 != 0);\r\n\t\t\t\tCommit(map2.Copy(), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Synth",
+   "cls": "Synth",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tMap map = base.Ins[1].\\uf072\\uf1d6\\uf748();\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tmap = \\uf55c\\uf0ba\\ue6cb.\\ue6f8\\ue1a7\\ueff0(this);\r\n\t\t\t\tif (map == null)\r\n\t\t\t\t{\r\n\t\t\t\t\tthrow ExHelper.RequiredNotConnected(\\ue0002.\\ue000(15744));\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tif (Data == null)\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.NodeFailed(\\ue0002.\\ue000(15512));\r\n\t\t\t}\r\n\t\t\tlineR.RebuildFromUnsortedData(Data, (Float4 item) => item.W, (Float4 item) => item.X);\r\n\t\t\tlineG.RebuildFromUnsortedData(Data, (Float4 item) => item.W, (Float4 item) => item.Y);\r\n\t\t\tlineB.RebuildFromUnsortedData(Data, (Float4 item) => item.W, (Float4 item) => item.Z);\r\n\t\t\tMap map2 = Map.Generate(map, (Vector<float> h) => lineR.Interpolate(h));\r\n\t\t\tMap map3 = Map.Generate(map, (Vector<float> h) => lineG.Interpolate(h));\r\n\t\t\tMap map4 = Map.Generate(map, (Vector<float> h) => lineB.Interpolate(h));\r\n\t\t\tMap[] array = new Map[3];\r\n\t\t\tarray[0] = map2;\r\n\t\t\tarray[1] = map3;\r\n\t\t\tarray[2] = map4;\r\n\t\t\tCommit(new Map(array), (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "TextureBaker",
+   "cls": "TextureBaker",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tif (!(base.In.\\uf072\\uf1d6\\uf747() is Mesher))\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.NodeFailed(\\ue0002.\\ue000(15557));\r\n\t\t\t}\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.RequiredNotConnected(\\ue0002.\\ue000(16367));\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tif (base.Ins.Length <= 1)\r\n\t\t\t{\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tforeach (Port item in base.Ins.Skip(1))\r\n\t\t\t{\r\n\t\t\t\tMap map2 = item.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\t\tif (map2 == null)\r\n\t\t\t\t{\r\n\t\t\t\t\tthrow ExHelper.RequiredNotConnected(item.Name);\r\n\t\t\t\t}\r\n\t\t\t\tCommit(item.Name.Replace(\\ue0002.\\ue000(16367), \\ue0002.\\ue000(16364)), map2, map2.Info.RenderIntent);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "ThermalShaper",
+   "cls": "ThermalShaper",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tMap item = base.Ins[1]?.\\uf072\\uf1d6\\uf748();\r\n\t\t\tQuadSpinner.Gaea.Engine.SyclFunctions.ThermalShaper.Process(new QuadSpinner.Gaea.Engine.SyclFunctions.ThermalShaper.Parameters\r\n\t\t\t{\r\n\t\t\t\t\\uf3c2\\uf291\\ue076 = map.Resolution,\r\n\t\t\t\t\\uf3c2\\uf291\\ue077 = \\uf55c\\uf0ba\\ue6d3.Terrain.Width,\r\n\t\t\t\t\\uf3c2\\uf291\\ue078 = \\uf55c\\uf0ba\\ue6d3.Terrain.Height,\r\n\t\t\t\t\\uf3c2\\uf291\\ue079 = Scale,\r\n\t\t\t\t\\uf3c2\\uf291\\ue07a = Influence,\r\n\t\t\t\t\\uf3c2\\uf291\\ue07b = Shape,\r\n\t\t\t\t\\uf3c2\\uf291\\ue07c = MicrodetailPreservation\r\n\t\t\t}, (map, item), out var output);\r\n\t\t\tCommit(output, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "TileInput",
+   "cls": "TileInput",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = null;\r\n\t\t\tif (Path.IsPathFullyQualified(FileName) && RelativePath)\r\n\t\t\t{\r\n\t\t\t\tFileName = \\uf55c\\uf0ba\\ue6ed.\\ue538\\uf8fe\\uee24(FileName);\r\n\t\t\t}\r\n\t\t\tstring text = FileName;\r\n\t\t\tif (RelativePath)\r\n\t\t\t{\r\n\t\t\t\ttext = \\uf55c\\uf0ba\\ue6ed.\\ue538\\uf8fe\\uee21(FileName, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t\tif (!File.Exists(text))\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.NodeFailed(\\ue0002.\\ue000(15260));\r\n\t\t\t}\r\n\t\t\t\\uf55c\\uf0ba\\ue6da.\\uf525\\ue282\\uf23d();\r\n\t\t\t\\uf55c\\uf0ba\\ue6da.\\ued5c\\uf18d\\ue2b9 = \\uf55c\\uf0ba\\ue6da.\\uf525\\ue282\\uf23a(text);\r\n\t\t\tif (\\uf55c\\uf0ba\\ue6da.\\ued5c\\uf18d\\ue2b9 == null || \\uf55c\\uf0ba\\ue6da.\\ued5c\\uf18d\\ue2b9.Length <= 1)\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.NodeFailed(\\ue0002.\\ue000(14961));\r\n\t\t\t}\r\n\t\t\tDefaultInterpolatedStringHandler val = default(DefaultInterpolatedStringHandler);\r\n\t\t\t((DefaultInterpolatedStringHandler)(ref val))..ctor(19, 1);\r\n\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendLiteral(\\ue0002.\\ue000(14937));\r\n\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendFormatted<int>(\\uf55c\\uf0ba\\ue6da.\\ued5c\\uf18d\\ue2b9.Length);\r\n\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendLiteral(\\ue0002.\\ue000(14886));\r\n\t\t\tLog.Debug(((DefaultInterpolatedStringHandler)(ref val)).ToStringAndClear());\r\n\t\t\tUpdateUI();\r\n\t\t\tCache cache = \\uf55c\\uf0ba\\ue6d3.\\ue157\\ueb2d\\ue940(base.Id, \\ue0002.\\ue000(14881));\r\n\t\t\tif (cache != null)\r\n\t\t\t{\r\n\t\t\t\tmap = cache.Data.Copy();\r\n\t\t\t}\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tList<LoadedTile> list = LoadAllTiles();\r\n\t\t\t\tif (list != null)\r\n\t\t\t\t{\r\n\t\t\t\t\tLog.Debug(\\ue0002.\\ue000(14896));\r\n\t\t\t\t\tmap = MergeTiles(list);\r\n\t\t\t\t\t\\uf55c\\uf0ba\\ue6d3.\\ue157\\ueb2d\\ue93a(base.Id, \\ue0002.\\ue000(14849), map, (CacheClusters)2);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tif (map != null && map.Resolution != base.context.Resolution)\r\n\t\t\t{\r\n\t\t\t\tmap = Transformer.Resize(map, base.context.Resolution, (Transformer.ResizeMethod)1);\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Transform3D",
+   "cls": "Transform3D",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap heighmap = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tMeshRasterizer.Parameters obj = new MeshRasterizer.Parameters\r\n\t\t\t{\r\n\t\t\t\t\\uf8c7\\ue251\\ue916 = base.context.Resolution,\r\n\t\t\t\t\\uf8c7\\ue251\\ue918 = \\uf55c\\uf0ba\\ue6d3.Terrain.Height / \\uf55c\\uf0ba\\ue6d3.Terrain.Width,\r\n\t\t\t\t\\uf8c7\\ue251\\ue919 = Pitch,\r\n\t\t\t\t\\uf8c7\\ue251\\ue91a = Yaw,\r\n\t\t\t\t\\uf8c7\\ue251\\ue91b = Roll,\r\n\t\t\t\t\\uf8c7\\ue251\\ue91c = Scale,\r\n\t\t\t\t\\uf8c7\\ue251\\ue91d = OffsetX,\r\n\t\t\t\t\\uf8c7\\ue251\\ue91e = OffsetY,\r\n\t\t\t\t\\uf8c7\\ue251\\ue91f = OffsetZ,\r\n\t\t\t\t\\uf8c7\\ue251\\ue923 = DropToFloor\r\n\t\t\t};\r\n\t\t\tmesh?.Dispose();\r\n\t\t\tmesh = \\uf55c\\uf0ba\\ue6e0.\\uf153\\uf506\\ue2e2.\\ue75f\\ue068\\ue311(heighmap, (byte)0 != 0, 0);\r\n\t\t\tMeshRasterizer.\\uf81a\\uee34\\uf5d6(obj, mesh, out var heightmap);\r\n\t\t\tCommit(heightmap, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Trees",
+   "cls": "Trees",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tMap custom = base.Ins[1].\\uf072\\uf1d6\\uf748()?.Copy().\\ueb77\\uf21d\\ue961();\r\n\t\t\tif (Output == TreeOutput.Instances)\r\n\t\t\t{\r\n\t\t\t\tBuildInstances(map, custom);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tBuildAreaMask(map, custom);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Unity",
+   "cls": "Unity",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tif (base.In.IsConnected)\r\n\t\t\t{\r\n\t\t\t\tint num = 0;\r\n\t\t\t\tPort[] ins = base.Ins;\r\n\t\t\t\tfor (int i = 0; i < ins.Length; i += 1)\r\n\t\t\t\t{\r\n\t\t\t\t\tMap map = ins[i].\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\t\t\tCommit(base.In.Name.Replace(\\ue0002.\\ue000(14326), \\ue0002.\\ue000(14323)), map, map.Info.RenderIntent);\r\n\t\t\t\t\tnum += 1;\r\n\t\t\t\t}\r\n\t\t\t\tif (\\uf55c\\uf0ba\\ue6d3.\\ue6f1\\ue421\\ue028 != ApplicationMode.UI)\r\n\t\t\t\t{\r\n\t\t\t\t\t\\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(\\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(base.In.\\uf072\\uf1d6\\uf748().Copy()).\\ueb77\\uf21d\\ue95f(), out var \\ued14\\ueb11\\uf526, out var _);\r\n\t\t\t\t\tstring text = \\uf55c\\uf0ba\\ue6cb.\\ue6f8\\ue1a7\\uefc5(\\uf55c\\uf0ba\\ue6d3.Terrain.Id.ToString(\\ue0002.\\ue000(14287)), GetUnitySize(TargetSize), \\uf55c\\uf0ba\\ue6d3.Terrain.Width, \\ued14\\ueb11\\uf526 * \\uf55c\\uf0ba\\ue6d3.Terrain.Height, \\uf55c\\uf0ba\\ue6d3.Terrain.Height);\r\n\t\t\t\t\tFile.WriteAllText(DefinitionFile, text);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Unreal",
+   "cls": "Unreal",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tif (!base.In.IsConnected)\r\n\t\t\t{\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tif (((\\uf55c\\uf0ba\\ue6d3.\\ue6f1\\ue421\\ue028.OutputType == OutputType.SingleImage) ? \\uf55c\\uf0ba\\ue6d3.\\ue6f1\\ue421\\ue028.Resolution : \\uf55c\\uf0ba\\ue6d3.\\ue6f1\\ue421\\ue028.TileResolution) > 8192)\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.NodeFailed(\\ue0002.\\ue000(8546));\r\n\t\t\t}\r\n\t\t\tif (\\uf55c\\uf0ba\\ue6d3.\\ue6f1\\ue421\\ue028 != ApplicationMode.UI)\r\n\t\t\t{\r\n\t\t\t\tFileFormats format = Format switch\r\n\t\t\t\t{\r\n\t\t\t\t\tUnrealFormat.R16 => (FileFormats)4, \r\n\t\t\t\t\tUnrealFormat.RAW => (FileFormats)3, \r\n\t\t\t\t\tUnrealFormat.PNG => (FileFormats)9, \r\n\t\t\t\t\t_ => (FileFormats)9, \r\n\t\t\t\t};\r\n\t\t\t\tbase.SaveDefinition = new SaveDefinition(base.Id, \"\", format, (byte)1 != 0)\r\n\t\t\t\t{\r\n\t\t\t\t\tFilename = \"\"\r\n\t\t\t\t};\r\n\t\t\t}\r\n\t\t\tint num = 0;\r\n\t\t\tPort[] ins = base.Ins;\r\n\t\t\tfor (int i = 0; i < ins.Length; i += 1)\r\n\t\t\t{\r\n\t\t\t\tPort port = ins[i];\r\n\t\t\t\tUEMapType mapType = GetMapType(num);\r\n\t\t\t\tMap map = port.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\t\tif (mapType == UEMapType.Height)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap = map.\\ueb77\\uf21d\\ue961();\r\n\t\t\t\t}\r\n\t\t\t\tCommit(port.Name.Replace(\\ue0002.\\ue000(8672), \\ue0002.\\ue000(8701)), map, map.Info.RenderIntent);\r\n\t\t\t\tnum += 1;\r\n\t\t\t}\r\n\t\t\tif (\\uf55c\\uf0ba\\ue6d3.\\ue6f1\\ue421\\ue028 != ApplicationMode.UI)\r\n\t\t\t{\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(\\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(base.In.\\uf072\\uf1d6\\uf748().Copy()).\\ueb77\\uf21d\\ue95f(), out var \\ued14\\ueb11\\uf526, out var _);\r\n\t\t\t\tstring text = \\uf55c\\uf0ba\\ue6cb.\\ue6f8\\ue1a7\\uefc5(\\uf55c\\uf0ba\\ue6d3.Terrain.Id.ToString(\\ue0002.\\ue000(8697)), GetResampleSize(), \\uf55c\\uf0ba\\ue6d3.Terrain.Width, \\ued14\\ueb11\\uf526 * \\uf55c\\uf0ba\\ue6d3.Terrain.Height, \\uf55c\\uf0ba\\ue6d3.Terrain.Height);\r\n\t\t\t\tFile.WriteAllText(DefinitionFile, text);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Var",
+   "cls": "Var",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2be((byte)0 != 0);\r\n\t\t\tif (EditMode == (VariableEdit)1)\r\n\t\t\t{\r\n\t\t\t\tVariable variable = \\uf55c\\uf0ba\\ue6ca.\\ue805\\ue714\\ue483[VariableName];\r\n\t\t\t\tDefaultInterpolatedStringHandler val = default(DefaultInterpolatedStringHandler);\r\n\t\t\t\t((DefaultInterpolatedStringHandler)(ref val))..ctor(14, 1);\r\n\t\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendLiteral(\\ue0002.\\ue000(7720));\r\n\t\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendFormatted<object>(variable.Value);\r\n\t\t\t\tLog.Verbose(((DefaultInterpolatedStringHandler)(ref val)).ToStringAndClear());\r\n\t\t\t\tVariable variable2 = variable;\r\n\t\t\t\tVarType type = variable.Type;\r\n\t\t\t\tobject value = ((type == (VarType)1) ? ((object)\\uf55c\\uf0ba\\ue6ca.\\ue239\\uef66\\ue44a(Expression, (float)variable.Value)) : ((type != (VarType)2) ? variable.Value : ((object)\\uf55c\\uf0ba\\ue6ca.\\ue239\\uef66\\ue44a(Expression, (int)variable.Value))));\r\n\t\t\t\tvariable2.Value = value;\r\n\t\t\t\tDefaultInterpolatedStringHandler val2 = default(DefaultInterpolatedStringHandler);\r\n\t\t\t\t((DefaultInterpolatedStringHandler)(ref val2))..ctor(13, 1);\r\n\t\t\t\t((DefaultInterpolatedStringHandler)(ref val2)).AppendLiteral(\\ue0002.\\ue000(7737));\r\n\t\t\t\t((DefaultInterpolatedStringHandler)(ref val2)).AppendFormatted<object>(variable.Value);\r\n\t\t\t\tLog.Verbose(((DefaultInterpolatedStringHandler)(ref val2)).ToStringAndClear());\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "VariableBlur",
+   "cls": "VariableBlur",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tCommit(new \\uf55c\\uf0ba\\ue6dd().\\uf588\\ue257\\uee9e(base.In.\\uf072\\uf1d6\\uf748().ToArray(), base.Ins[1].\\uf072\\uf1d6\\uf748().ToArray(), base.context.Resolution.X, Radius * (float)base.context.Resolution.X, 24).\\ue755\\ue39c\\uf2bd(), (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Whorl",
+   "cls": "Whorl",
+   "helpers": [],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\t//IL_0043: Unknown result type (might be due to invalid IL or missing references)\r\n\t\t\t//IL_0049: Expected O, but got Unknown\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tExHelper.NodeFailed(\\ue0002.\\ue000(12141));\r\n\t\t\t}\r\n\t\t\tMagickImage magickImage = \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2bd(map);\r\n\t\t\tmagickImage.VirtualPixelMethod = (VirtualPixelMethod)4;\r\n\t\t\tmagickImage.Interpolate = (PixelInterpolateMethod)11;\r\n\t\t\tRandom val = new Random(Seed);\r\n\t\t\tList<double> list = new List<double>();\r\n\t\t\tint num = (int)((double)((float)magickImage.Width * Power) * 4);\r\n\t\t\tif (Type == (WhorlType)1)\r\n\t\t\t{\r\n\t\t\t\tmagickImage.SetArtifact(\\ue0002.\\ue000(12153), ((double)Power * 8).ToString(CultureInfo.InvariantCulture));\r\n\t\t\t\tfor (int i = 0; i < Whorls * 4; i += 1)\r\n\t\t\t\t{\r\n\t\t\t\t\tlist.Add(val.Next(0, (int)magickImage.Width));\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tfor (int j = 0; j < Whorls; j += 1)\r\n\t\t\t\t{\r\n\t\t\t\t\tint num2 = val.Next(0, (int)magickImage.Width);\r\n\t\t\t\t\tlist.Add(val.Next(num2 - num, num2 + num));\r\n\t\t\t\t\tlist.Add(val.Next(num2 - num, num2 + num));\r\n\t\t\t\t\tlist.Add(val.Next(num2 - num, num2 + num));\r\n\t\t\t\t\tlist.Add(val.Next(num2 - num, num2 + num));\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tmagickImage.Distort((DistortMethod)16, list.ToArray());\r\n\t\t\tCommit(magickImage.\\ue755\\ue39c\\uf2bd((byte)1 != 0), (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Bomber",
+   "cls": "Bomber",
+   "helpers": [
+    "Scatters.Bomb"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tif (!base.In.IsConnected || !base.Ins[2].IsConnected)\r\n\t\t\t{\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tList<Map> list = new List<Map>();\r\n\t\t\tfor (int i = 2; i < base.Ins.Length; i += 1)\r\n\t\t\t{\r\n\t\t\t\tMap map2 = base.Ins[i]?.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\t\tif (map2 != null)\r\n\t\t\t\t{\r\n\t\t\t\t\tlist.Add(map2);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tif (list.Any((Map x) => \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2bd(x)) && !list.All((Map x) => \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2bd(x)))\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.NodeFailed(\\ue0002.\\ue000(11911));\r\n\t\t\t}\r\n\t\t\tif (list.All((Map x) => \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2bd(x)))\r\n\t\t\t{\r\n\t\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\t\tif (!\\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2bd(map))\r\n\t\t\t\t{\r\n\t\t\t\t\tmap = \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2bd(map);\r\n\t\t\t\t}\r\n\t\t\t\tisRGB = (byte)1 != 0;\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tRenderAsHeightfield((byte)1 != 0);\r\n\t\t\t\tisRGB = (byte)0 != 0;\r\n\t\t\t}\r\n\t\t\tMap inhibit = this.\\uf072\\uf1d6\\uf72d(\\ue0002.\\ue000(10562))?.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tMap map3 = Scatters.Bomb(map, list, inhibit, Iterations, Multiplier, Size.X, Size.Y, SizeDistribution, Rotation.X, Rotation.Y, MaintainProportions, VariableHeight, Height.X, Height.Y, FadeEdges, Seed, Multiplier, Jitter, Distribution, BlendMode, Quality);\r\n\t\t\tCommit(map3, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "ColorErosion",
+   "cls": "ColorErosion",
+   "helpers": [
+    "RandomNoises.Fixed"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.Ins[1]?.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tMap map2 = base.In.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tif (map2 == null)\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.RequiredNotConnected(\\ue0002.\\ue000(12005));\r\n\t\t\t}\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tmap = \\uf55c\\uf0ba\\ue6cb.\\ue6f8\\ue1a7\\ueff0(this).Copy();\r\n\t\t\t\tif (map == null)\r\n\t\t\t\t{\r\n\t\t\t\t\tthrow ExHelper.RequiredNotConnected(\\ue0002.\\ue000(12002));\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tif (Diffusion > 0f)\r\n\t\t\t{\r\n\t\t\t\tmap += RandomNoises.Fixed(base.context.Resolution, (int)((float)base.context.Resolution.Area / 8f * Diffusion), (byte)1 != 0, 0f, 0.01f, Seed);\r\n\t\t\t}\r\n\t\t\tMap item = base.Ins[2]?.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tColorTransport.Simulation(new ColorTransport.Parameters\r\n\t\t\t{\r\n\t\t\t\tResolution = base.context.Resolution,\r\n\t\t\t\tTransportDistance = TransportDistance,\r\n\t\t\t\tSedimentDensity = SedimentDensity,\r\n\t\t\t\tBlend = Blend,\r\n\t\t\t\tFlowVolume = FlowVolume,\r\n\t\t\t\tColorHold = ColorHold,\r\n\t\t\t\tLaminarFlow = ((!LaminarFlow) ? ((byte)0 != 0) : (Diffusion == 0f)),\r\n\t\t\t\tSeed = Seed\r\n\t\t\t}, (map, map2, item, (Map)null), out var output);\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tRenderAsMask((byte)0 != 0);\r\n\t\t\tCommit(output, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Contours",
+   "cls": "Contours",
+   "helpers": [
+    "Cartographer.Contours"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tRenderAsMask((byte)1 != 0);\r\n\t\t\tRenderAsMask((byte)0 != 0);\r\n\t\t\tvar (map, map2, _) = Cartographer.Contours(base.In.\\uf072\\uf1d6\\uf748().Copy(), Count, Subdivision, Accuracy, LineIntensity, SubIntensity, LineThickness);\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(13911), map2, (RenderIntent)0);\r\n\t\t}\r"
+  },
+  {
+   "name": "CraterField",
+   "cls": "CraterField",
+   "helpers": [
+    "Landscapes.Craterfield"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tmap = new Map(base.context.Resolution, 1);\r\n\t\t\t\tMap map2 = map;\r\n\t\t\t\tfloat[] array = new float[1];\r\n\t\t\t\tarray[0] = 0.5f;\r\n\t\t\t\tmap2.Clear(array);\r\n\t\t\t}\r\n\t\t\tMap map3 = Landscapes.Craterfield(map, base.context.Resolution, Scale, Density, Depth, X, Y, Seed);\r\n\t\t\tCommit(map3, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Debris",
+   "cls": "Debris",
+   "helpers": [
+    "Scatters.RenderRockColored"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\t<>c__DisplayClass54_0 CS$<>8__locals9 = new <>c__DisplayClass54_0();\r\n\t\t\tCS$<>8__locals9.<>4__this = this;\r\n\t\t\tMap heightmap = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tMap emitter = base.Ins[1]?.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tMap removal = base.Ins[2]?.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tDebrisCore.Parameters parameters = new DebrisCore.Parameters\r\n\t\t\t{\r\n\t\t\t\tDebrisAmount = (int)((float)DebrisAmount * AmountMultiplier),\r\n\t\t\t\tSeed = Seed,\r\n\t\t\t\tFrictionCoefficient = Friction,\r\n\t\t\t\tRestitutionCoefficient = Restitution,\r\n\t\t\t\tDurability = 1f,\r\n\t\t\t\tHeightmapSize = \\uf55c\\uf0ba\\ue6d3.Terrain.Width / Scale,\r\n\t\t\t\tSceneHeight = \\uf55c\\uf0ba\\ue6d3.Terrain.Height / Scale,\r\n\t\t\t\tMaxDebrisSize = Size.Y,\r\n\t\t\t\tMinDebrisSize = Size.X,\r\n\t\t\t\tSizeDistribution = (int)Distribution,\r\n\t\t\t\tRenderStillRocks = RenderStillRocks,\r\n\t\t\t\tStressFormula = 0,\r\n\t\t\t\tRockHeight = Height\r\n\t\t\t};\r\n\t\t\tCS$<>8__locals9.shape = (int)Shape;\r\n\t\t\tScatters.warpfield = new WarpField(Seed, CS$<>8__locals9.shape);\r\n\t\t\tCS$<>8__locals9.colorIndex = new Map(base.context.Resolution, 1);\r\n\t\t\tCS$<>8__locals9.colorIndex.Clear();\r\n\t\t\tSetIntent((RenderIntent)2, (byte)0 != 0);\r\n\t\t\tDebrisCore debrisCore = new DebrisCore(heightmap, emitter, removal, parameters, delegate(DebrisCore.RockRenderingContext rockRenderingContext, DebrisCore.RockRenderingParameters rockRenderingParameters)\r\n\t\t\t{\r\n\t\t\t\tScatters.RenderRockColored(rockRenderingContext, rockRenderingParameters, CS$<>8__locals9.colorIndex, CS$<>8__locals9.<>4__this.Height, CS$<>8__locals9.shape);\r\n\t\t\t});\r\n\t\t\tif (ExportPointCloud && \\uf55c\\uf0ba\\ue6d3.\\ue6f1\\ue421\\ue028 != ApplicationMode.UI)\r\n\t\t\t{\r\n\t\t\t\tpointCloud = new List<Vector3>(parameters.DebrisAmount);\r\n\t\t\t\tdebrisCore.Simulation(pointCloud);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tdebrisCore.Simulation();\r\n\t\t\t}\r\n\t\t\tCommit(debrisCore.heightmap.Copy(), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(14577), CS$<>8__locals9.colorIndex.Copy(), (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(9363), debrisCore.debris.Copy(), (RenderIntent)0);\r\n\t\t}\r"
+  },
+  {
+   "name": "DriftNoise",
+   "cls": "DriftNoise",
+   "helpers": [
+    "Noises.DriftNoise"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tMap map2 = Noises.DriftNoise(base.context.Resolution.X, Passes, Chaos, ScaleLarge, ScaleSmall, TurbulenceLarge, TurbulenceSmall, WindDirectionLarge, WindDirectionSmall, OverlapShapes, Seed);\r\n\t\t\tif (map != null)\r\n\t\t\t{\r\n\t\t\t\tCommit(map + map2, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tCommit(map2, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "DuneSea",
+   "cls": "DuneSea",
+   "helpers": [
+    "Landscapes.DuneSea"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap aniso = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tMap map = Landscapes.DuneSea(base.context.Resolution, DuneType, Scale, Height.\\uf353\\uee79\\ue797(), Direction, Softness, Sharpness, Seed, Chaos, Undulation, aniso);\r\n\t\t\tif (base.In.IsConnected)\r\n\t\t\t{\r\n\t\t\t\tmap *= base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Gabor",
+   "cls": "Gabor",
+   "helpers": [
+    "Noises.Gabor"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap anisoMod = null;\r\n\t\t\tif (base.Ins[1].IsConnected)\r\n\t\t\t{\r\n\t\t\t\tanisoMod = base.Ins[1]?.\\uf072\\uf1d6\\uf748();\r\n\t\t\t}\r\n\t\t\tMap map = Noises.Gabor(base.context.Resolution, Size, Entropy, Anisotropy, AnisotropyAzimuth, Seed, anisoMod);\r\n\t\t\tmap *= Gain;\r\n\t\t\tif (base.In.IsConnected)\r\n\t\t\t{\r\n\t\t\t\tmap *= base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Grid",
+   "cls": "Grid",
+   "helpers": [
+    "Cartographer.Grid"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tRenderAsMask((byte)1 != 0);\r\n\t\t\tMap map = Cartographer.Grid(base.context.Resolution, Subdivision, LineIntensity, SubIntensity, LineThickness);\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Hillify",
+   "cls": "Hillify",
+   "helpers": [
+    "Erosions.Hillify"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tvar (map, map2) = Erosions.Hillify(base.In.\\uf072\\uf1d6\\uf748().Copy(), Coverage, Creep, Surface, Seed);\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(10074), map2, (RenderIntent)2);\r\n\t\t}\r"
+  },
+  {
+   "name": "Island",
+   "cls": "Island",
+   "helpers": [
+    "Migrated.IslandProcess"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tint x = base.context.Resolution.X;\r\n\t\t\tmap = Migrated.IslandProcess(map, x, Seed, Size, Chaos);\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "LineNoise",
+   "cls": "LineNoise",
+   "helpers": [
+    "AspectMaps.GetThreshold"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = new Map(new Resolution(BucketSize switch\r\n\t\t\t{\r\n\t\t\t\tLineNoiseSize.X1 => 512, \r\n\t\t\t\tLineNoiseSize.X2 => 1024, \r\n\t\t\t\tLineNoiseSize.X3 => 2048, \r\n\t\t\t\tLineNoiseSize.X4 => 4096, \r\n\t\t\t\t_ => 512, \r\n\t\t\t}, 1), 1);\r\n\t\t\tXorShift64Star xorShift64Star = new XorShift64Star(Seed);\r\n\t\t\tfor (int i = 0; i < map.Resolution.X; i += 1)\r\n\t\t\t{\r\n\t\t\t\tmap[i, 0] = xorShift64Star.\\ue099\\ue4ee\\uef14(0f, Clamp);\r\n\t\t\t}\r\n\t\t\tmap = Transformer.Resize(map, base.context.Resolution, (Transformer.ResizeMethod)0);\r\n\t\t\tLineNoiseStyle style = Style;\r\n\t\t\tswitch (style - 1)\r\n\t\t\t{\r\n\t\t\tcase LineNoiseStyle.Sharp:\r\n\t\t\t\tmap = map.\\ueb77\\uf21d\\ue95c(6f.\\uf353\\uee79\\ue797());\r\n\t\t\t\tbreak;\r\n\t\t\tcase LineNoiseStyle.Soft:\r\n\t\t\t\tmap = map.\\ueb77\\uf21d\\ue95c(6f.\\uf353\\uee79\\ue797()).\\ueb77\\uf21d\\ue961();\r\n\t\t\t\tmap = AspectMaps.GetThreshold(map, xorShift64Star.\\ue099\\ue4ee\\uef14());\r\n\t\t\t\tmap *= Clamp;\r\n\t\t\t\tbreak;\r\n\t\t\tcase LineNoiseStyle.Flat:\r\n\t\t\t\tmap = map.\\ueb77\\uf21d\\ue95c(10f.\\uf353\\uee79\\ue797()).\\ueb77\\uf21d\\ue961();\r\n\t\t\t\tmap *= 0.8f;\r\n\t\t\t\tmap *= Clamp;\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\tif (Direction != 0)\r\n\t\t\t{\r\n\t\t\t\tmap = Transformer.Rotate(map, Direction, (byte)0 != 0, (EdgeBehaviour)1, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t\tif (base.In.IsConnected)\r\n\t\t\t{\r\n\t\t\t\tmap *= base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Mesher",
+   "cls": "Mesher",
+   "helpers": [
+    "Profiles.GraphicEQ"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tif (Topology == (Topology)2 && \\uf55c\\uf0ba\\ue6d3.\\ue157\\ueb2d\\ue97c())\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.NodeFailed(\\ue0002.\\ue000(15164));\r\n\t\t\t}\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.RequiredNotConnected(\\ue0002.\\ue000(15115));\r\n\t\t\t}\r\n\t\t\tGeneric3 artifactReduction = ArtifactReduction;\r\n\t\t\tMap map2 = ((artifactReduction == (Generic3)1) ? Profiles.GraphicEQ(map, 1f, 1f, 1f, 1f, 1f, 1f, 0f) : ((artifactReduction != (Generic3)2) ? map : Profiles.GraphicEQ(map, 1f, 1f, 1f, 1f, 1f, 0f, 0f)));\r\n\t\t\tmap = map2;\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "MountainRange",
+   "cls": "MountainRange",
+   "helpers": [
+    "Landscapes.MountainRange"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = Landscapes.MountainRange(base.context.Resolution, Scale, Height, Style, Bulk, Seed);\r\n\t\t\tif (base.In.IsConnected)\r\n\t\t\t{\r\n\t\t\t\tmap *= base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Plates",
+   "cls": "Plates",
+   "helpers": [
+    "Landscapes.Plates"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = Landscapes.Plates(base.context.Resolution.X, Scale, Range, Falloff, Warp, Angle, Seed);\r\n\t\t\tif (base.In.IsConnected)\r\n\t\t\t{\r\n\t\t\t\tmap *= base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Rivers",
+   "cls": "Rivers",
+   "helpers": [
+    "Waters.Rivers"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tRenderAsMask((byte)0 != 0);\r\n\t\t\tbyte[] array = new byte[105];\r\n\t\t\tRuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tint[] array2 = (int[])\\ue0003.\\ue004(array);\r\n\t\t\t(Map, Map, Map, Map, Map) tuple = Waters.Rivers(base.In.\\uf072\\uf1d6\\uf748(), base.Ins[1]?.\\uf072\\uf1d6\\uf748(), Headwaters, Water, Width, Depth, Downcutting, array2[(int)RiverValleyWidth], RenderSurface, Seed);\r\n\t\t\tCommit(tuple.Item1, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(10463), tuple.Item2, (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(10430), tuple.Item3, (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(10382), tuple.Item4, (RenderIntent)1);\r\n\t\t\tCommit(\\ue0002.\\ue000(11053), tuple.Item5, (RenderIntent)3);\r\n\t\t}\r"
+  },
+  {
+   "name": "Rockscape",
+   "cls": "Rockscape",
+   "helpers": [
+    "Combiner.Embed"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = RockCore.Large(base.context.Resolution.X, Size, Erosion, Roughness, Breakage, 0f, Clusters, Relief, Jitter, Seed);\r\n\t\t\tMap map2 = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tif (map2 != null)\r\n\t\t\t{\r\n\t\t\t\tmap2 = Combiner.Embed(map2, map, 1f, 0f);\r\n\t\t\t\tCommit(map2, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Shade",
+   "cls": "Shade",
+   "helpers": [
+    "Combiner.Mix"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.Ins[1]?.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tMap map2 = base.In.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tif (map2 == null)\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.RequiredNotConnected(\\ue0002.\\ue000(14884));\r\n\t\t\t}\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tmap = \\uf55c\\uf0ba\\ue6cb.\\ue6f8\\ue1a7\\ueff0(this);\r\n\t\t\t\tif (map == null)\r\n\t\t\t\t{\r\n\t\t\t\t\tthrow ExHelper.RequiredNotConnected(\\ue0002.\\ue000(14903));\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tRenderAsMask((byte)0 != 0);\r\n\t\t\tswitch (RenderStyle)\r\n\t\t\t{\r\n\t\t\tcase ShadeStyle.TableTop:\r\n\t\t\t{\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6e4 obj3 = new \\uf55c\\uf0ba\\ue6e4(base.context.Resolution)\r\n\t\t\t\t{\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue99c = (LightingAmbientOcclusionModel)1,\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue9a1 = ((byte)1 != 0),\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue99c = 5,\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue99e = 2,\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue99d = 4,\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue9a0 = 20f * SoftShadows,\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue99d = ((byte)1 != 0),\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue99f = ((byte)1 != 0),\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue9a3 = Sunlight,\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue99e = ((byte)1 != 0),\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue9a0 = ((byte)1 != 0),\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue9a2 = ((byte)0 != 0)\r\n\t\t\t\t};\r\n\t\t\t\tif (HighQuality)\r\n\t\t\t\t{\r\n\t\t\t\t\tobj3.\\ue724\\ue2f6\\ue99c = (LightingAmbientOcclusionModel)0;\r\n\t\t\t\t}\r\n\t\t\t\tobj3.\\uf2e1\\ueb48\\ueb65(SunAzimuth, SunElevation);\r\n\t\t\t\tobj3.\\uf2e1\\ueb48\\ueb68(map, map2);\r\n\t\t\t\tmap2 = ((!ReflectedLight) ? obj3.\\ue975\\uecc4\\uf222.Copy() : Combiner.Mix((BlendMode)17, 0.2f, obj3.\\ue975\\uecc4\\uf222.Copy(), obj3.\\ue975\\uecc4\\uf221.Copy().\\ueb77\\uf21d\\ue95c(0.4f, 1f)));\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\tcase ShadeStyle.HillShade:\r\n\t\t\tcase ShadeStyle.Occlusion:\r\n\t\t\t{\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6e4 obj2 = new \\uf55c\\uf0ba\\ue6e4(base.context.Resolution)\r\n\t\t\t\t{\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue9a1 = ((byte)1 != 0),\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue99c = 5,\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue99e = 2,\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue99d = 4,\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue9a0 = 1f,\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue99d = ((byte)1 != 0),\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue9a3 = Sunlight,\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue99f = ((byte)0 != 0),\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue99e = ((byte)1 != 0),\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue9a0 = (RenderStyle == (ShadeStyle)2),\r\n\t\t\t\t\t\\ue724\\ue2f6\\ue9a2 = ((byte)0 != 0)\r\n\t\t\t\t};\r\n\t\t\t\tif (RenderStyle == (ShadeStyle)2 && HighQuality)\r\n\t\t\t\t{\r\n\t\t\t\t\tobj2.\\ue724\\ue2f6\\ue99c = (LightingAmbientOcclusionModel)0;\r\n\t\t\t\t}\r\n\t\t\t\tobj2.\\uf2e1\\ueb48\\ueb65(0f, 90f);\r\n\t\t\t\tobj2.\\uf2e1\\ueb48\\ueb68(map, map2);\r\n\t\t\t\tShadeStyle renderStyle = RenderStyle;\r\n\t\t\t\tif (renderStyle != (ShadeStyle)1)\r\n\t\t\t\t{\r\n\t\t\t\t\tif (renderStyle == (ShadeStyle)2)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tmap2 *= ((ShadeBias != 0f) ? obj2.\\ue975\\uecc4\\uf225.Copy().\\ueb77\\uf21d\\ue95e(ShadeBias) : obj2.\\ue975\\uecc4\\uf225);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\telse\r\n\t\t\t\t{\r\n\t\t\t\t\tmap2 *= ((ShadeBias != 0f) ? obj2.\\ue975\\uecc4\\uf221.Copy().\\ueb77\\uf21d\\ue95e(ShadeBias) : obj2.\\ue975\\uecc4\\uf221);\r\n\t\t\t\t}\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\tcase ShadeStyle.SoftLight:\r\n\t\t\t{\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6e4 obj = new \\uf55c\\uf0ba\\ue6e4(base.context.Resolution);\r\n\t\t\t\tobj.\\uf2e1\\ueb48\\ueb6a(map, 180, 210, SunElevation, SunAzimuth);\r\n\t\t\t\tmap2 *= ((ShadeBias != 0f) ? obj.\\ue975\\uecc4\\uf223.Copy().\\ueb77\\uf21d\\ue95e(ShadeBias) : obj.\\ue975\\uecc4\\uf223);\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\t}\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tbase.Out.RenderIntent = (RenderIntent)4;\r\n\t\t\tCommit(map2, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Stratify",
+   "cls": "Stratify",
+   "helpers": [
+    "Profiles.ComplexTerraces"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap[] array = Profiles.ComplexTerraces(base.In.\\uf072\\uf1d6\\uf748().Copy(), Intensity, Shape, Spacing, TiltAmount, Direction, Octaves, Seed);\r\n\t\t\tCommit(array[0], (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(8804), array[1], (RenderIntent)0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Thermal2",
+   "cls": "Thermal2",
+   "helpers": [
+    "Erosions.Thermal2"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tMap map2 = base.Ins[1].\\uf072\\uf1d6\\uf748();\r\n\t\t\tMap map3 = base.Ins[2].\\uf072\\uf1d6\\uf748();\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tExHelper.NodeFailed(\\ue0002.\\ue000(5618));\r\n\t\t\t}\r\n\t\t\tif (Erosions.Thermal2(map, map2, map3, Duration, Strength, Anisotropy, Angle, FeatureScale, SedimentRemoval, map2 != null, map3 != null, out (Map, Map, Map) outMaps))\r\n\t\t\t{\r\n\t\t\t\tCommit(outMaps.Item1, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\tCommit(\\ue0002.\\ue000(5593), outMaps.Item2, (RenderIntent)0);\r\n\t\t\t\tCommit(\\ue0002.\\ue000(5544), outMaps.Item3, (RenderIntent)0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Tint",
+   "cls": "Tint",
+   "helpers": [
+    "Migrated.TintProcess"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().\\ue755\\ue39c\\uf2bd((GrayscaleConversion)3);\r\n\t\t\tProcessInput enhance = Enhance;\r\n\t\t\tif (enhance != (ProcessInput)1)\r\n\t\t\t{\r\n\t\t\t\tif (enhance == (ProcessInput)2)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap = \\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(map, 16384);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tmap = map.\\ueb77\\uf21d\\ue961();\r\n\t\t\t}\r\n\t\t\tif (Reverse)\r\n\t\t\t{\r\n\t\t\t\tmap = map.\\ueb77\\uf21d\\ue95d();\r\n\t\t\t}\r\n\t\t\tMap map2 = Migrated.TintProcess(map, Start, End, Hue, Saturation, Lightness);\r\n\t\t\tCommit(map2, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "WaveShine",
+   "cls": "WaveShine",
+   "helpers": [
+    "Noises.WaveShine"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tbase.Out.RenderIntent = (RenderIntent)2;\r\n\t\t\tMap map = Noises.WaveShine(base.context.Resolution.X, Frame, Octaves, Seed, AnimationSpeed, Size, Amplitude, Direction, Speed, WindPatchIntensity, WindPatchAnimationSpeed, WindPatchSize, Contrast, Brightness, SunAzimuth, SunElevation);\r\n\t\t\tif (base.In.IsConnected)\r\n\t\t\t{\r\n\t\t\t\tmap *= base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Wizard",
+   "cls": "Wizard",
+   "helpers": [
+    "Erosions.Classic"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tGeneric4 bulk = Bulk;\r\n\t\t\tfloat num = (bulk - 1) switch\r\n\t\t\t{\r\n\t\t\t\tGeneric4.Low => 0.25f, \r\n\t\t\t\tGeneric4.Med => 0.6f, \r\n\t\t\t\tGeneric4.High => 0.75f, \r\n\t\t\t\t_ => 0f, \r\n\t\t\t};\r\n\t\t\tif ((double)num > 0)\r\n\t\t\t{\r\n\t\t\t\tmap = map.\\ueb77\\uf21d\\ue95e(num);\r\n\t\t\t}\r\n\t\t\tfloat duration = 0f;\r\n\t\t\tfloat inhibition = 0f;\r\n\t\t\tfloat downcutting = 0f;\r\n\t\t\tfloat softness = 0f;\r\n\t\t\tfloat randomness = 0f;\r\n\t\t\tfloat baselevel = 0f;\r\n\t\t\tfloat sediments = 0f;\r\n\t\t\tGetRecipeStandard(ref duration, ref randomness, ref downcutting, ref inhibition, ref softness, ref baselevel, ref sediments);\r\n\t\t\tMap[] array = Erosions.Classic(map, duration, softness, 0.5f, downcutting, inhibition, baselevel, (byte)1 != 0, 1200, (int)\\uf55c\\uf0ba\\ue6d3.Terrain.Width, (int)\\uf55c\\uf0ba\\ue6d3.Terrain.Height, 0f, 0f, sediments, (AreaEffect)3, (BiasType)0, 0f, (byte)0 != 0, Seed, (byte)1 != 0, (byte)0 != 0);\r\n\t\t\tCommit(array[0], (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(12069), array[1], (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(12064), array[2], (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(12087), array[3], (RenderIntent)0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Wizard2",
+   "cls": "Wizard2",
+   "helpers": [
+    "Erosions.PE"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tGeneric4 power = Power;\r\n\t\t\tbyte[] array = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat value = GetValue(power, (float[])\\ue0003.\\ue004(array));\r\n\t\t\tGeneric4 deposits = Deposits;\r\n\t\t\tbyte[] array2 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array2, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat num = value + GetValue(deposits, (float[])\\ue0003.\\ue004(array2)).\\uf353\\uee79\\ue793();\r\n\t\t\tGeneric4 flow = Flow;\r\n\t\t\tbyte[] array3 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array3, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat duration = num + GetValue(flow, (float[])\\ue0003.\\ue004(array3)).\\uf353\\uee79\\ue793();\r\n\t\t\tGeneric4 depth = Depth;\r\n\t\t\tbyte[] array4 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array4, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat value2 = GetValue(depth, (float[])\\ue0003.\\ue004(array4));\r\n\t\t\tfloat downcuttingType = 0f;\r\n\t\t\tGeneric4 scale = Scale;\r\n\t\t\tbyte[] array5 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array5, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat value3 = GetValue(scale, (float[])\\ue0003.\\ue004(array5));\r\n\t\t\tGeneric4 deposits2 = Deposits;\r\n\t\t\tbyte[] array6 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array6, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat value4 = GetValue(deposits2, (float[])\\ue0003.\\ue004(array6));\r\n\t\t\tGeneric4 deposits3 = Deposits;\r\n\t\t\tbyte[] array7 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array7, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat value5 = GetValue(deposits3, (float[])\\ue0003.\\ue004(array7));\r\n\t\t\tGeneric4 flow2 = Flow;\r\n\t\t\tbyte[] array8 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array8, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat num2 = GetValue(flow2, (float[])\\ue0003.\\ue004(array8)).\\uf353\\uee79\\ue793();\r\n\t\t\tGeneric4 deposits4 = Deposits;\r\n\t\t\tbyte[] array9 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array9, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat bedLoadDischargeAmount = num2 + GetValue(deposits4, (float[])\\ue0003.\\ue004(array9)).\\uf353\\uee79\\ue793();\r\n\t\t\tGeneric4 flow3 = Flow;\r\n\t\t\tbyte[] array10 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array10, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat value6 = GetValue(flow3, (float[])\\ue0003.\\ue004(array10));\r\n\t\t\tGeneric4 flow4 = Flow;\r\n\t\t\tbyte[] array11 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array11, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat value7 = GetValue(flow4, (float[])\\ue0003.\\ue004(array11));\r\n\t\t\tGeneric4 deposits5 = Deposits;\r\n\t\t\tbyte[] array12 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array12, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat coarseSedimentsDischargeAmount = value7 + GetValue(deposits5, (float[])\\ue0003.\\ue004(array12));\r\n\t\t\tGeneric4 flow5 = Flow;\r\n\t\t\tbyte[] array13 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array13, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat value8 = GetValue(flow5, (float[])\\ue0003.\\ue004(array13));\r\n\t\t\tGeneric4 shape = Shape;\r\n\t\t\tbyte[] array14 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array14, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat value9 = GetValue(shape, (float[])\\ue0003.\\ue004(array14));\r\n\t\t\tGeneric4 shape2 = Shape;\r\n\t\t\tbyte[] array15 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array15, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tfloat value10 = GetValue(shape2, (float[])\\ue0003.\\ue004(array15));\r\n\t\t\tGeneric4 detail = Detail;\r\n\t\t\tbyte[] array16 = new byte[102];\r\n\t\t\tRuntimeHelpers.InitializeArray(array16, (RuntimeFieldHandle)/*OpCode not supported: LdMemberToken*/);\r\n\t\t\tMap[] array17 = Erosions.PE(map, null, duration, value2, downcuttingType, value3, value4, value5, bedLoadDischargeAmount, value6, coarseSedimentsDischargeAmount, value8, value9, value10, GetValue(detail, (float[])\\ue0003.\\ue004(array16)), Seed, 0f, 0f, (byte)0 != 0);\r\n\t\t\tCommit(array17[0], (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(12161), array17[1], (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(5036), array17[2], (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(5027), array17[3], (RenderIntent)0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Crumble",
+   "cls": "Crumble",
+   "helpers": [
+    "Gradients.LinearGradient",
+    "Simulations.Crumble"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap hx = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tGradientDirection direction = Direction;\r\n\t\t\tint num = (direction - 2) switch\r\n\t\t\t{\r\n\t\t\t\tGradientDirection.X => 90, \r\n\t\t\t\tGradientDirection.N => 180, \r\n\t\t\t\tGradientDirection.E => 270, \r\n\t\t\t\t_ => 0, \r\n\t\t\t};\r\n\t\t\tMap map = null;\r\n\t\t\tif ((int)Direction > 0)\r\n\t\t\t{\r\n\t\t\t\tmap = Gradients.LinearGradient(base.context.Resolution, num, (GradientEdgeBehaviour)0);\r\n\t\t\t\thx += map;\r\n\t\t\t}\r\n\t\t\tMap[] array = Simulations.Crumble(hx, base.Ins[1].\\uf072\\uf1d6\\uf748()?.Copy(), Duration, Strength, Coverage, Horizontal, Vertical, RockHardness, Edge, Downcutting, Depth);\r\n\t\t\tif ((int)Direction > 0)\r\n\t\t\t{\r\n\t\t\t\tMap[] array2 = array;\r\n\t\t\t\tarray2[0] = array2[0] - map;\r\n\t\t\t}\r\n\t\t\tCommit(array[0], (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(11043), array[1], (RenderIntent)0);\r\n\t\t}\r"
+  },
+  {
+   "name": "GroundTexture",
+   "cls": "GroundTexture",
+   "helpers": [
+    "Noises.Perlin",
+    "Migrated.GroundTextureProcess"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tif (Method == (GroundStyle)2)\r\n\t\t\t{\r\n\t\t\t\tMap map2 = Noises.Perlin(base.context.Resolution.X, 0.5f, 10, 0.9f, (PerlinNoiseType)0, base.Id, (NoiseWarpType)2, 0.05f, 0.5f, 10, 1f, 1f, 0f, 0f);\r\n\t\t\t\tCommit(map + map2 * (Strength * 0.03f), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tCommit(Migrated.GroundTextureProcess(map, Method, Strength, Coverage, Density), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Normals",
+   "cls": "Normals",
+   "helpers": [
+    "Profiles.Filter",
+    "AspectMaps.GetNormalMap"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tNormalMapType type = Type;\r\n\t\t\tif (type != NormalMapType.Standard)\r\n\t\t\t{\r\n\t\t\t\tif (type == (NormalMapType)1)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap = Profiles.Filter(map, 0.999f * (1f - DetailSize), 1f, 0.5f, (FilterMode)1, (byte)0 != 0);\r\n\t\t\t\t\tmap.Process((Vector<float> m) => m * (new Vector<float>(3f) / new Vector<float>(DetailSize * 99f + 1f) + new Vector<float>(0.97f)));\r\n\t\t\t\t\tCommit(AspectMaps.GetNormalMap(map, Width, Height, Handedness, UpAxis), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tCommit(AspectMaps.GetNormalMap(map, Width, Height, Handedness, UpAxis), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Sand",
+   "cls": "Sand",
+   "helpers": [
+    "Landscapes.Sand",
+    "Combiner.Embed"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tMap map2 = Landscapes.Sand(base.context.Resolution, Scale, Chaos, Height.\\uf353\\uee79\\ue798(), Softness, Direction, Seed, WarpByTerrain ? map : null);\r\n\t\t\tif (map != null && !WarpByTerrain)\r\n\t\t\t{\r\n\t\t\t\tmap2 = Combiner.Embed(map, map2, 1f, 0f);\r\n\t\t\t}\r\n\t\t\tCommit(map2, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "SatMap",
+   "cls": "SatMap",
+   "helpers": [
+    "Warps.FractalWarp",
+    "ColorCore.HSL"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tUpdateUI();\r\n\t\t\t\\uf55c\\uf0ba\\ue6d0.\\uf372\\uecea\\uf319();\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tByte3[][] array = \\uf55c\\uf0ba\\ue6d0.\\uf2e2\\uf860\\ue1d3[Library.Humanize() ?? \\ue0002.\\ue000(5666)];\r\n\t\t\tLibraryItem = Math.Min(LibraryItem, array.Length - 1);\r\n\t\t\tDefaultInterpolatedStringHandler val = default(DefaultInterpolatedStringHandler);\r\n\t\t\t((DefaultInterpolatedStringHandler)(ref val))..ctor(0, 2);\r\n\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendFormatted<CLUTLibrary>(Library);\r\n\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendFormatted<int>(LibraryItem);\r\n\t\t\tstring text = ((DefaultInterpolatedStringHandler)(ref val)).ToStringAndClear();\r\n\t\t\tByte3[] array2 = array[LibraryItem];\r\n\t\t\tif (Reverse)\r\n\t\t\t{\r\n\t\t\t\tarray2 = array2.Reverse().ToArray();\r\n\t\t\t}\r\n\t\t\tData = new List<Float4>();\r\n\t\t\tfloat num = array2.Length;\r\n\t\t\tint num2 = (int)((float)array2.Length * Range.X);\r\n\t\t\tint num3 = (int)((float)array2.Length * Range.Y);\r\n\t\t\tfor (int i = num2; i < num3; i += 1)\r\n\t\t\t{\r\n\t\t\t\tData.Add(new Float4((float)(int)array2[i].R / 255f, (float)(int)array2[i].G / 255f, (float)(int)array2[i].B / 255f, (float)i / num));\r\n\t\t\t}\r\n\t\t\tlastSelection = text;\r\n\t\t\tlineR.RebuildFromUnsortedData(Data, (Float4 item) => item.W, (Float4 item) => item.X);\r\n\t\t\tlineG.RebuildFromUnsortedData(Data, (Float4 item) => item.W, (Float4 item) => item.Y);\r\n\t\t\tlineB.RebuildFromUnsortedData(Data, (Float4 item) => item.W, (Float4 item) => item.Z);\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().\\ue755\\ue39c\\uf2bd((GrayscaleConversion)3);\r\n\t\t\tProcessInput enhance = Enhance;\r\n\t\t\tif (enhance != (ProcessInput)1)\r\n\t\t\t{\r\n\t\t\t\tif (enhance == (ProcessInput)2)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap = \\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(map, 16384);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tmap = map.\\ueb77\\uf21d\\ue961();\r\n\t\t\t}\r\n\t\t\tif (Bias != 0f)\r\n\t\t\t{\r\n\t\t\t\tmap = map.\\ueb77\\uf21d\\ue95e(Bias);\r\n\t\t\t}\r\n\t\t\tGeneric5 rough = Rough;\r\n\t\t\tint num4 = (rough - 1) switch\r\n\t\t\t{\r\n\t\t\t\tGeneric5.None => 1, \r\n\t\t\t\tGeneric5.Low => 4, \r\n\t\t\t\tGeneric5.Med => 8, \r\n\t\t\t\tGeneric5.High => 16, \r\n\t\t\t\t_ => 0, \r\n\t\t\t};\r\n\t\t\tif (num4 > 0)\r\n\t\t\t{\r\n\t\t\t\tXorShift64Star xorShift64Star = new XorShift64Star(base.Id);\r\n\t\t\t\tfor (int num5 = 0; num5 < num4; num5 += 1)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap = Warps.FractalWarp(map, 0.05f, 0.45f * \\uf55c\\uf0ba\\ue6c1.\\uf353\\uee79\\ue792(num4), (byte)1 != 0, 0f, (WarpNoiseType)0, 0.5f, 12, 0.85f, (byte)0 != 0, 1, (IterativeWarpMode)1, (EdgeBehaviour)0, xorShift64Star.\\ue099\\ue4ee\\uef14(0, 65535), null, 0f, 45f, 0.45f);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tMap map2 = Map.Generate(map, (Vector<float> h) => lineR.Interpolate(h));\r\n\t\t\tMap map3 = Map.Generate(map, (Vector<float> h) => lineG.Interpolate(h));\r\n\t\t\tMap map4 = Map.Generate(map, (Vector<float> h) => lineB.Interpolate(h));\r\n\t\t\tMap[] array3 = new Map[3];\r\n\t\t\tarray3[0] = map2;\r\n\t\t\tarray3[1] = map3;\r\n\t\t\tarray3[2] = map4;\r\n\t\t\tMap map5 = new Map(array3);\r\n\t\t\tif (Hue != 0f || Saturation != 0f || Lightness != 0f)\r\n\t\t\t{\r\n\t\t\t\tmap5 = ColorCore.HSL(map5, Hue, Saturation, Lightness);\r\n\t\t\t}\r\n\t\t\tCommit(map5, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Sharpen",
+   "cls": "Sharpen",
+   "helpers": [
+    "AspectMaps.GetCurvature",
+    "Profiles.GraphicEQ"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tif (Method == SharpenMethod.Edge)\r\n\t\t\t{\r\n\t\t\t\tCommit(map + AspectMaps.GetCurvature(map, 0f, 1f, 0.2f, (CurvatureType)1) * (0.008f * Amount), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tCommit(Profiles.GraphicEQ(map, 1f, 1f, 1f, 1f, 1f, 1f, 1f + Amount), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Slump",
+   "cls": "Slump",
+   "helpers": [
+    "Landscapes.Slump",
+    "Landscapes.Rugged"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = Style switch\r\n\t\t\t{\r\n\t\t\t\tABCD.A => Landscapes.Slump(base.context.Resolution.X, Scale, (ABC)0, (ABC)0, Seed), \r\n\t\t\t\tABCD.B => Landscapes.Rugged(base.context.Resolution, (ABC)0, Scale, 1, Seed), \r\n\t\t\t\tABCD.C => Landscapes.Rugged(base.context.Resolution, (ABC)1, Scale, 5, Seed), \r\n\t\t\t\tABCD.D => Landscapes.Rugged(base.context.Resolution, (ABC)2, Scale, 8, Seed), \r\n\t\t\t\t_ => throw new ArgumentOutOfRangeException(), \r\n\t\t\t};\r\n\t\t\tif (base.In.IsConnected)\r\n\t\t\t{\r\n\t\t\t\tmap *= base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Stones",
+   "cls": "Stones",
+   "helpers": [
+    "Landscapes.Craterfield",
+    "Combiner.Difference"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.RequiredNotConnected(\\ue0002.\\ue000(16377));\r\n\t\t\t}\r\n\t\t\tMap map2 = 1f - Landscapes.Craterfield(1f - map, base.context.Resolution, Scale.\\ue05d\\uedfb\\ue0c7(0.001f, 0.02f), Density, Height * 2f, 0f, 0f, Seed);\r\n\t\t\tCommit(map2, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(16326), \\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(Combiner.Difference(map2, map)), (RenderIntent)2);\r\n\t\t}\r"
+  },
+  {
+   "name": "Uplift",
+   "cls": "Uplift",
+   "helpers": [
+    "Landscapes.Uplift",
+    "Combiner.Max"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = Landscapes.Uplift(base.context.Resolution, Scale, Height, Octaves, Direction, Seed);\r\n\t\t\tif (Passes > 1)\r\n\t\t\t{\r\n\t\t\t\tList<Map> list = new List<Map>();\r\n\t\t\t\tXorShift64Star xorShift64Star = new XorShift64Star(Seed);\r\n\t\t\t\tfor (int i = 1; i < Passes; i += 1)\r\n\t\t\t\t{\r\n\t\t\t\t\t\\uf55c\\uf0ba\\ue6cf.\\ue45b\\uf74e\\uf8e1((float)i / (float)Passes * 100f);\r\n\t\t\t\t\tint direction = Direction + (int)(90f * ((xorShift64Star.\\ue099\\ue4ee\\uef14() - 0.5f) * Jitter));\r\n\t\t\t\t\tlist.Add(Landscapes.Uplift(base.context.Resolution, Scale, Height, Octaves, direction, Seed + i));\r\n\t\t\t\t}\r\n\t\t\t\tforeach (Map item in list)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap = Combiner.Max(map, item);\r\n\t\t\t\t}\r\n\t\t\t\tlist.ForEach(delegate(Map x)\r\n\t\t\t\t{\r\n\t\t\t\t\tx.Dispose();\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t\tif (base.In.IsConnected)\r\n\t\t\t{\r\n\t\t\t\tmap *= base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Anastomosis",
+   "cls": "Anastomosis",
+   "helpers": [
+    "Simulations.CreateFlowMap",
+    "Others.SmoothedMedianBlur",
+    "Combiner.Subtract"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tint num = base.context.Resolution.X;\r\n\t\t\tfloat rain = Impact * 0.005f;\r\n\t\t\tfloat width = Width;\r\n\t\t\tfloat num2 = Depth * 0.5f;\r\n\t\t\tint quality = (int)Quality;\r\n\t\t\tint iterations = 6;\r\n\t\t\tswitch ((int)Downcutting)\r\n\t\t\t{\r\n\t\t\tcase 0:\r\n\t\t\t\titerations = 3;\r\n\t\t\t\tnum2 *= 0.35f;\r\n\t\t\t\tbreak;\r\n\t\t\tcase 1:\r\n\t\t\t\titerations = 6;\r\n\t\t\t\tnum2 *= 0.75f;\r\n\t\t\t\tbreak;\r\n\t\t\tcase 2:\r\n\t\t\t\titerations = 20;\r\n\t\t\t\tbreak;\r\n\t\t\tcase 3:\r\n\t\t\t\titerations = 80;\r\n\t\t\t\tbreak;\r\n\t\t\tcase 4:\r\n\t\t\t\titerations = 120;\r\n\t\t\t\tbreak;\r\n\t\t\tcase 5:\r\n\t\t\t\titerations = 200;\r\n\t\t\t\tbreak;\r\n\t\t\tcase 6:\r\n\t\t\t\titerations = 400;\r\n\t\t\t\tbreak;\r\n\t\t\tcase 7:\r\n\t\t\t\titerations = 800;\r\n\t\t\t\tbreak;\r\n\t\t\tcase 8:\r\n\t\t\t\titerations = 2000;\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\tint num3 = Math.Min(quality switch\r\n\t\t\t{\r\n\t\t\t\t0 => 512, \r\n\t\t\t\t1 => 1024, \r\n\t\t\t\t2 => 2048, \r\n\t\t\t\t_ => num, \r\n\t\t\t}, num);\r\n\t\t\tMap heights;\r\n\t\t\tif (quality < 3)\r\n\t\t\t{\r\n\t\t\t\tnum = num3;\r\n\t\t\t\theights = Transformer.Resize(map, \\uf55c\\uf0ba\\ue6c1.\\uf353\\uee79\\ue792(num3), (Transformer.ResizeMethod)1);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\theights = map;\r\n\t\t\t}\r\n\t\t\tMap map2 = Simulations.CreateFlowMap(num, num, iterations, in heights, rain, (byte)0 != 0).\\ueb77\\uf21d\\ue961();\r\n\t\t\tif (quality < 3)\r\n\t\t\t{\r\n\t\t\t\tmap2 = Transformer.Resize(map2, base.context.Resolution, (Transformer.ResizeMethod)1);\r\n\t\t\t}\r\n\t\t\tmap2 = map2.\\ueb77\\uf21d\\ue95e(width);\r\n\t\t\tif (SmoothEdges)\r\n\t\t\t{\r\n\t\t\t\tmap2 = Others.SmoothedMedianBlur(map2, 2, 2, map2.Resolution.X);\r\n\t\t\t\tmap2 = Others.SmoothedMedianBlur(map2, 2, 2, map2.Resolution.X);\r\n\t\t\t}\r\n\t\t\tRenderAsMask((byte)0 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(11425), map2.Copy(), (RenderIntent)2);\r\n\t\t\tMap map3 = Combiner.Subtract(map, map2, num2 * 0.05f);\r\n\t\t\tCommit(map3, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Distress",
+   "cls": "Distress",
+   "helpers": [
+    "Profiles.Recurve",
+    "Profiles.GraphicEQ",
+    "Combiner.Subtract"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\t<>c__DisplayClass33_0 CS$<>8__locals9 = new <>c__DisplayClass33_0();\r\n\t\t\tCS$<>8__locals9.<>4__this = this;\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.RequiredNotConnected(\\ue0002.\\ue000(13069));\r\n\t\t\t}\r\n\t\t\tMap map2 = new Map(base.context.Resolution, 1);\r\n\t\t\tMap map3 = map2;\r\n\t\t\tfloat[] array = new float[1];\r\n\t\t\tarray[0] = 1f;\r\n\t\t\tmap3.Clear(array);\r\n\t\t\tXorShift64Star xorShift64Star = new XorShift64Star(Seed);\r\n\t\t\tCS$<>8__locals9.canyons = new Map[Octaves];\r\n\t\t\tParallel.For(0, Octaves, delegate(int i)\r\n\t\t\t{\r\n\t\t\t\tCS$<>8__locals9.canyons[i] = CS$<>8__locals9.<>4__this.GetCanyon(CS$<>8__locals9.<>4__this.Scale, 0.5f + (0.5f - CS$<>8__locals9.<>4__this.Influence.\\uf353\\uee79\\ue793()), \\uf55c\\uf0ba\\ue6c1.\\uf353\\uee79\\ue792(CS$<>8__locals9.<>4__this.Formation), CS$<>8__locals9.<>4__this.Seed + i);\r\n\t\t\t});\r\n\t\t\tMap[] canyons = CS$<>8__locals9.canyons;\r\n\t\t\tfor (int num = 0; num < canyons.Length; num += 1)\r\n\t\t\t{\r\n\t\t\t\tMap map4 = canyons[num];\r\n\t\t\t\tMap map5 = map4;\r\n\t\t\t\tfloat num2 = xorShift64Star.\\ue099\\ue4ee\\uef14();\r\n\t\t\t\tif ((double)num2 > 0.33)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap5 = Profiles.Recurve(map4, 1f, 3, (double)num2 > 0.66, (byte)0 != 0, 0.1f);\r\n\t\t\t\t\tif ((double)num2 > 0.9)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tmap5 = Profiles.Recurve(map4, 1f, 3, (double)num2 > 0.66, (byte)0 != 0, 0.1f);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\tmap5 = Profiles.GraphicEQ(map5, 1f, 1f, 1f, 1f, 1f, 1f, 2f);\r\n\t\t\t\tmap2 = Combiner.Subtract(map2, map5, Depth * 0.3f * xorShift64Star.\\ue099\\ue4ee\\uef14());\r\n\t\t\t}\r\n\t\t\tCommit(map * map2, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "IceFloe",
+   "cls": "IceFloe",
+   "helpers": [
+    "Profiles.Recurve",
+    "AspectMaps.GetThreshold",
+    "Combiner.Screen"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tRenderAsMask((byte)0 != 0);\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tMap map2 = base.Ins[1].\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tMap map3 = base.Ins[2].\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tExHelper.RequiredNotConnected(\\ue0002.\\ue000(9985));\r\n\t\t\t}\r\n\t\t\tif (map2 == null)\r\n\t\t\t{\r\n\t\t\t\tExHelper.RequiredNotConnected(\\ue0002.\\ue000(10002));\r\n\t\t\t}\r\n\t\t\tMap map4 = map2.Copy().\\ueb77\\uf21d\\ue961();\r\n\t\t\tMap map5 = map4.Copy();\r\n\t\t\tif (!Reverse)\r\n\t\t\t{\r\n\t\t\t\tmap5 = map5.\\ueb77\\uf21d\\ue95d();\r\n\t\t\t}\r\n\t\t\tif (Reverse2)\r\n\t\t\t{\r\n\t\t\t\tmap4 = map4.\\ueb77\\uf21d\\ue95d();\r\n\t\t\t}\r\n\t\t\tQuadSpinner.Gaea.Engine.SyclFunctions.Cellular3D.Render(new QuadSpinner.Gaea.Engine.SyclFunctions.Cellular3D.Parameters\r\n\t\t\t{\r\n\t\t\t\t\\uf1ce\\ue82a\\uf60f = base.context.Resolution,\r\n\t\t\t\t\\uf1ce\\ue82a\\uf610 = 1f / Size.\\uf353\\uee79\\ue798(),\r\n\t\t\t\t\\uf1ce\\ue82a\\uf611 = Density,\r\n\t\t\t\t\\uf1ce\\ue82a\\uf612 = 1f,\r\n\t\t\t\t\\uf1ce\\ue82a\\uf613 = 1f,\r\n\t\t\t\t\\uf1ce\\ue82a\\uf614 = 10f * Layers,\r\n\t\t\t\t\\uf1ce\\ue82a\\uf615 = 1f,\r\n\t\t\t\t\\uf1ce\\ue82a\\uf616 = 1f,\r\n\t\t\t\t\\uf1ce\\ue82a\\uf617 = 1f,\r\n\t\t\t\t\\uf1ce\\ue82a\\uf618 = (uint)Seed,\r\n\t\t\t\t\\uf1ce\\ue82a\\uf619 = \\uf55c\\uf0ba\\ue6d3.Terrain.Width,\r\n\t\t\t\t\\uf1ce\\ue82a\\uf61a = \\uf55c\\uf0ba\\ue6d3.Terrain.Height,\r\n\t\t\t\t\\uf1ce\\ue82a\\uf61b = 1\r\n\t\t\t}, (map5.\\ueb77\\uf21d\\ue95e(Shaper1), map4.\\ueb77\\uf21d\\ue95e(Shaper2)), out (Map, Map) outMaps);\r\n\t\t\tMap item = outMaps.Item1;\r\n\t\t\titem = Profiles.Recurve(item, 0.5f, 3, (byte)1 != 0, (byte)0 != 0, 0.1f);\r\n\t\t\titem *= AspectMaps.GetThreshold(map2, 0.0001f);\r\n\t\t\tif (map3 != null)\r\n\t\t\t{\r\n\t\t\t\tCommit(\\ue0002.\\ue000(10214), Combiner.Screen(map3, item.\\ueb77\\uf21d\\ue961()), (RenderIntent)0);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tMap map6 = new Map(base.context.Resolution, 3);\r\n\t\t\t\tmap6.Clear(new float[3]);\r\n\t\t\t\tCommit(\\ue0002.\\ue000(10214), map6, (RenderIntent)0);\r\n\t\t\t}\r\n\t\t\titem *= Thickness * 0.005f;\r\n\t\t\tCommit(map + item, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(10237), item, (RenderIntent)0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Pattern",
+   "cls": "Pattern",
+   "helpers": [
+    "Patterns.Lines",
+    "Patterns.Engrave",
+    "Patterns.Dots"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = Type switch\r\n\t\t\t{\r\n\t\t\t\tPatternType.Lines => Patterns.Lines(base.context.Resolution, Size, Steps, Direction), \r\n\t\t\t\tPatternType.Engraving => Patterns.Engrave(base.context.Resolution, Size, Size, Steps, Direction), \r\n\t\t\t\tPatternType.Grid => Patterns.Dots(base.context.Resolution, Spacing, DotSize, (byte)0 != 0), \r\n\t\t\t\tPatternType.Dots => Patterns.Dots(base.context.Resolution, Spacing, DotSize, (byte)1 != 0), \r\n\t\t\t\t_ => null, \r\n\t\t\t};\r\n\t\t\tif (PixelSize > 1)\r\n\t\t\t{\r\n\t\t\t\tmap = Morphology.Dilate(map, (KernalType)0, 1f / (float)base.context.Resolution.X * (float)PixelSize, 1, 0f);\r\n\t\t\t}\r\n\t\t\tRenderAsMask((byte)1 != 0);\r\n\t\t\tif (base.In.IsConnected)\r\n\t\t\t{\r\n\t\t\t\tmap *= base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t}\r\n\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Scree",
+   "cls": "Scree",
+   "helpers": [
+    "Landscapes.Craterfield",
+    "Simulations.Flow2",
+    "Combiner.Difference"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tMap precip = base.Ins[1].\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tthrow ExHelper.RequiredNotConnected(\\ue0002.\\ue000(7368));\r\n\t\t\t}\r\n\t\t\tMap map2 = map.Copy();\r\n\t\t\tfor (int i = 0; i < Density; i += 1)\r\n\t\t\t{\r\n\t\t\t\tmap2 = 1f - Landscapes.Craterfield(1f - map2, base.context.Resolution, Scale.\\ue05d\\uedfb\\ue0c7(0.001f, 0.02f), 0.4f, Height * 2f, 0f, 0f, Seed + i);\r\n\t\t\t}\r\n\t\t\tMap mask = Simulations.Flow2(map, precip, 1f, Edge, Seed).\\ueb77\\uf21d\\ue961().\\ueb77\\uf21d\\ue95e(Spread);\r\n\t\t\tMap map3 = Masking.Mask(map, map2, mask);\r\n\t\t\tCommit(map3, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(7296), \\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(Combiner.Difference(map3, map)), (RenderIntent)2);\r\n\t\t}\r"
+  },
+  {
+   "name": "Shrubs",
+   "cls": "Shrubs",
+   "helpers": [
+    "RandomNoises.FixedWhite",
+    "Texturize.GetAccumulation",
+    "AspectMaps.GetThreshold"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tMap map2 = base.Ins[1].\\uf072\\uf1d6\\uf748()?.Copy().\\ueb77\\uf21d\\ue961();\r\n\t\t\tvar (deadZones, inhibitors) = BuildInhibitors(map, Seed, Slope.X, Slope.Y, SlopeFalloff, Altitude.X, Altitude.Y, AltitudeFalloff, DeadFlow, Math.Max(1f, ConsolidateFlows * 20f), SimulationBias, Chaos, BlurEdges);\r\n\t\t\tif (SimulationBias != 0f)\r\n\t\t\t{\r\n\t\t\t\tmap = map.\\ueb77\\uf21d\\ue95e(SimulationBias);\r\n\t\t\t}\r\n\t\t\tMap map3 = BuildFreshwaterMap(map, ref deadZones);\r\n\t\t\tMap map4 = BuildGrowthCells(map3, inhibitors);\r\n\t\t\tMap map5 = RandomNoises.FixedWhite(map4.Resolution, Math.Min(base.context.Resolution.Area / 2, ShrubCount * 1000), 0.001f, IsRelative, Seed) * map4 * map3;\r\n\t\t\tif (map2 != null)\r\n\t\t\t{\r\n\t\t\t\tif (Trim > 0f)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap2 = \\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95e(map2, Trim, 1f);\r\n\t\t\t\t}\r\n\t\t\t\tif (CustomInfluence > 0f)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap2 = Morphology.Dilate(map2, (KernalType)0, 0.2f * CustomInfluence, 1, 0f);\r\n\t\t\t\t}\r\n\t\t\t\tmap5 -= map2;\r\n\t\t\t}\r\n\t\t\tif ((int)AvoidTrees > 0)\r\n\t\t\t{\r\n\t\t\t\tMap map6 = null;\r\n\t\t\t\tif (AvoidTrees == (AvoidTrees)2)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap6 = Texturize.GetAccumulation((AccumulatorType)8, base.context.Resolution, 0);\r\n\t\t\t\t}\r\n\t\t\t\telse\r\n\t\t\t\t{\r\n\t\t\t\t\tNode node = base.In.\\uf072\\uf1d6\\uf747();\r\n\t\t\t\t\tif (((node == null || (!(node is Trees) && !(node is Shrubs))) ? 0 : 1) != 0)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tCache cache = \\uf55c\\uf0ba\\ue6d3.\\ue157\\ueb2d\\ue93e(node.Id, \\ue0002.\\ue000(9187));\r\n\t\t\t\t\t\tif (cache != null)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tmap6 = cache.Data.Copy();\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\tmap6 = AspectMaps.GetThreshold(map6, 0.0005f);\r\n\t\t\t\tmap5 -= map6;\r\n\t\t\t}\r\n\t\t\tif (map2 != null || (int)AvoidTrees > 0)\r\n\t\t\t{\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(map5);\r\n\t\t\t}\r\n\t\t\tif ((int)Shape > 0)\r\n\t\t\t{\r\n\t\t\t\tmap5 = Morphology2.Aperture(map5, (float)map5.Resolution.X * (1f / (float)map5.Resolution.X), (ApertureKernel)0, (ApertureMode)0, 4, (byte)0 != 0, 0f, 90f);\r\n\t\t\t}\r\n\t\t\tRenderAsMask((byte)0 != 0);\r\n\t\t\tCommit(base.In.\\uf072\\uf1d6\\uf748() + map5, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(9213), deadZones, (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(9161), map3, (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(9187), map5, (RenderIntent)0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Weathering",
+   "cls": "Weathering",
+   "helpers": [
+    "Texturize.Soil2",
+    "Combiner.Screen",
+    "ColorCore.HSL"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\t\\uf55c\\uf0ba\\ue6d0.\\uf372\\uecea\\uf319();\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tMap map = base.Ins[1]?.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tMap map2 = base.In.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tif (map == null)\r\n\t\t\t{\r\n\t\t\t\tmap = \\uf55c\\uf0ba\\ue6cb.\\ue6f8\\ue1a7\\ueff0(this).Copy();\r\n\t\t\t\tif (map == null)\r\n\t\t\t\t{\r\n\t\t\t\t\tthrow ExHelper.RequiredNotConnected(\\ue0002.\\ue000(13180));\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tif (Inverse)\r\n\t\t\t{\r\n\t\t\t\tmap = map.\\ueb77\\uf21d\\ue95d();\r\n\t\t\t}\r\n\t\t\tByte3[] array = \\uf55c\\uf0ba\\ue6d0.\\uf2e2\\uf860\\ue1d3[\\ue0002.\\ue000(10935)][117];\r\n\t\t\tfloat num = array.Length;\r\n\t\t\tList<Float4> list = new List<Float4>();\r\n\t\t\tfor (int i = 0; (float)i < num; i += 1)\r\n\t\t\t{\r\n\t\t\t\tlist.Add(new Float4((float)(int)array[i].R / 255f, (float)(int)array[i].G / 255f, (float)(int)array[i].B / 255f, (float)i / num));\r\n\t\t\t}\r\n\t\t\tlineR.RebuildFromUnsortedData(list, (Float4 item) => item.W, (Float4 item) => item.X);\r\n\t\t\tMap m = Map.Generate(Texturize.Soil2(map, Scale.\\ue05d\\uedfb\\ue0c7(1e-06f, 0.6f)).\\ueb77\\uf21d\\ue965().\\ueb77\\uf21d\\ue95e(1f - Creep), (Vector<float> h) => lineR.Interpolate(h));\r\n\t\t\tm = m.\\ueb77\\uf21d\\ue961();\r\n\t\t\tif (WashedOut)\r\n\t\t\t{\r\n\t\t\t\tColorTransport.Simulation(new ColorTransport.Parameters\r\n\t\t\t\t{\r\n\t\t\t\t\tResolution = base.context.Resolution,\r\n\t\t\t\t\tTransportDistance = 0.5f,\r\n\t\t\t\t\tSedimentDensity = 0.65f,\r\n\t\t\t\t\tBlend = 0.65f,\r\n\t\t\t\t\tFlowVolume = 0f,\r\n\t\t\t\t\tColorHold = 0.5f,\r\n\t\t\t\t\tLaminarFlow = ((byte)0 != 0),\r\n\t\t\t\t\tSeed = base.Id\r\n\t\t\t\t}, (map, m, (Map)null, (Map)null), out var output);\r\n\t\t\t\tm = output.Copy();\r\n\t\t\t}\r\n\t\t\tMap map4;\r\n\t\t\tif (Dirt != 0f)\r\n\t\t\t{\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6e4 obj = new \\uf55c\\uf0ba\\ue6e4(base.context.Resolution);\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue9a1 = (byte)1 != 0;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99c = 5;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99e = 2;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99d = 4;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue9a0 = 0.2f;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99d = (byte)0 != 0;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99f = (byte)0 != 0;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99e = (byte)1 != 0;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue9a0 = (byte)1 != 0;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99c = (byte)0 != 0;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99c = (LightingAmbientOcclusionModel)1;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99d = 4;\r\n\t\t\t\tobj.\\ue724\\ue2f6\\ue99e = 2;\r\n\t\t\t\tobj.\\uf2e1\\ueb48\\ueb65(33f, 90f);\r\n\t\t\t\tobj.\\uf2e1\\ueb48\\ueb68(map, null);\r\n\t\t\t\tMap map3 = obj.\\ue975\\uecc4\\uf225.Copy();\r\n\t\t\t\tmap3 = map3.\\ueb77\\uf21d\\ue95e(Darker ? (0f - Dirt) : (1f - Dirt));\r\n\t\t\t\tmap4 = Combiner.Screen(map2 * map3, m, Amount);\r\n\t\t\t\tmap3.Dispose();\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tmap4 = Combiner.Screen(map2, m, Amount);\r\n\t\t\t}\r\n\t\t\tif (Hue != 0f || Saturation != 0f || Lightness != 0f)\r\n\t\t\t{\r\n\t\t\t\tmap4 = ColorCore.HSL(map4, Hue, Saturation, Lightness);\r\n\t\t\t}\r\n\t\t\tCommit(map4, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tm.Dispose();\r\n\t\t\tmap2.Dispose();\r\n\t\t}\r"
+  },
+  {
+   "name": "DataExtractor",
+   "cls": "DataExtractor",
+   "helpers": [
+    "AspectMaps.GetHeightNormalized",
+    "Warps.FractalWarp",
+    "AspectMaps.GetSlope",
+    "AspectMaps.GetThreshold"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tRenderAsMask((byte)1 != 0);\r\n\t\t\tNode node = base.In.\\uf072\\uf1d6\\uf747();\r\n\t\t\tif (node == null)\r\n\t\t\t{\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tswitch (Data)\r\n\t\t\t{\r\n\t\t\tcase DataExtraction.ModifierMask:\r\n\t\t\t{\r\n\t\t\t\tList<Modifier> modifiers = node.Modifiers;\r\n\t\t\t\tif (modifiers == null)\r\n\t\t\t\t{\r\n\t\t\t\t\tbreak;\r\n\t\t\t\t}\r\n\t\t\t\tMap map2 = \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2be((byte)1 != 0);\r\n\t\t\t\tMap map3 = node.In.\\uf072\\uf1d6\\uf748()?.Copy() ?? \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2be((byte)1 != 0);\r\n\t\t\t\tif (modifiers.FirstOrDefault((Modifier x) => x is QuadSpinner.Gaea.Nodes.Modifiers.Height) is QuadSpinner.Gaea.Nodes.Modifiers.Height height)\r\n\t\t\t\t{\r\n\t\t\t\t\tMap map4 = AspectMaps.GetHeightNormalized(map3, height.Range.X, height.Range.Y, height.Falloff);\r\n\t\t\t\t\tif (height.Distort > 0f)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tmap4 = Warps.FractalWarp(map4, 0.5f, height.Distort, (byte)1 != 0, 0f, (WarpNoiseType)0, 0.5f, 12, 0.5f, (byte)0 != 0, 1, (IterativeWarpMode)1, (EdgeBehaviour)0, node.Id, null, 0f, 45f, 0.45f);\r\n\t\t\t\t\t}\r\n\t\t\t\t\tmap2 += map4;\r\n\t\t\t\t}\r\n\t\t\t\tif (modifiers.FirstOrDefault((Modifier x) => x is QuadSpinner.Gaea.Nodes.Modifiers.Slope) is QuadSpinner.Gaea.Nodes.Modifiers.Slope slope)\r\n\t\t\t\t{\r\n\t\t\t\t\tMap slope2 = AspectMaps.GetSlope(map3, slope.Range.X, slope.Range.Y, slope.Falloff);\r\n\t\t\t\t\tmap2 += slope2;\r\n\t\t\t\t}\r\n\t\t\t\tCommit(map2, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\tcase DataExtraction.Difference:\r\n\t\t\tcase DataExtraction.Boundary:\r\n\t\t\t{\r\n\t\t\t\tMap map5 = node.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t\tMap map6 = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t\tif (map5 != null && map6 != null)\r\n\t\t\t\t{\r\n\t\t\t\t\tMap map7 = (map6 - map5).\\ueb77\\uf21d\\ue95e();\r\n\t\t\t\t\tif (Data == (DataExtraction)2)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tmap7 = AspectMaps.GetThreshold(map7, Level);\r\n\t\t\t\t\t}\r\n\t\t\t\t\tCommit(map7, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\t}\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\tcase DataExtraction.MixerMask:\r\n\t\t\t\tif (node is Mixer mixer)\r\n\t\t\t\t{\r\n\t\t\t\t\tif (!mixer.PreserveMasks)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tthrow ExHelper.NodeFailed(\\ue0002.\\ue000(8250));\r\n\t\t\t\t\t}\r\n\t\t\t\t\tint id = node.Id;\r\n\t\t\t\t\tDefaultInterpolatedStringHandler val = default(DefaultInterpolatedStringHandler);\r\n\t\t\t\t\t((DefaultInterpolatedStringHandler)(ref val))..ctor(7, 1);\r\n\t\t\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendLiteral(\\ue0002.\\ue000(8418));\r\n\t\t\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendFormatted<int>(Layer);\r\n\t\t\t\t\tMap map = \\uf55c\\uf0ba\\ue6d3.\\ue157\\ueb2d\\ue93e(id, ((DefaultInterpolatedStringHandler)(ref val)).ToStringAndClear())?.Data.Copy();\r\n\t\t\t\t\tif (map == null)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tDefaultInterpolatedStringHandler val2 = default(DefaultInterpolatedStringHandler);\r\n\t\t\t\t\t\t((DefaultInterpolatedStringHandler)(ref val2))..ctor(58, 1);\r\n\t\t\t\t\t\t((DefaultInterpolatedStringHandler)(ref val2)).AppendLiteral(\\ue0002.\\ue000(8394));\r\n\t\t\t\t\t\t((DefaultInterpolatedStringHandler)(ref val2)).AppendFormatted<int>(Layer);\r\n\t\t\t\t\t\t((DefaultInterpolatedStringHandler)(ref val2)).AppendLiteral(\\ue0002.\\ue000(8387));\r\n\t\t\t\t\t\tthrow ExHelper.NodeFailed(((DefaultInterpolatedStringHandler)(ref val2)).ToStringAndClear());\r\n\t\t\t\t\t}\r\n\t\t\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\t}\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Sediments",
+   "cls": "Sediments",
+   "helpers": [
+    "Erosions.SedimentsOld",
+    "Erosions.Sediments",
+    "Erosions.Thermal2",
+    "Combiner.Max"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tSedimentation type = Type;\r\n\t\t\t(Map, Map, Map) outMaps;\r\n\t\t\tif (type != Sedimentation.Fine)\r\n\t\t\t{\r\n\t\t\t\tif (type == (Sedimentation)2)\r\n\t\t\t\t{\r\n\t\t\t\t\tvar (map2, map3, map4) = Erosions.SedimentsOld(map, Style, Scale, GrainyDeposits, base.Id);\r\n\t\t\t\t\tCommit(map2, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\t\tCommit(\\ue0002.\\ue000(8604), map3, (RenderIntent)2);\r\n\t\t\t\t\tCommit(\\ue0002.\\ue000(8594), map4, (RenderIntent)2);\r\n\t\t\t\t}\r\n\t\t\t\telse\r\n\t\t\t\t{\r\n\t\t\t\t\tvar (map5, map6, map7) = Erosions.Sediments(map, Passes, Scale, base.Id);\r\n\t\t\t\t\tRenderAsMask((byte)0 != 0);\r\n\t\t\t\t\tCommit(map5, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\t\tCommit(\\ue0002.\\ue000(8604), map6, (RenderIntent)2);\r\n\t\t\t\t\tCommit(\\ue0002.\\ue000(8594), map7, (RenderIntent)2);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\telse if (Erosions.Thermal2(map, null, null, Scale, 0.4f, 0.8f, Angle, 20 * Passes, 0f, (byte)0 != 0, (byte)0 != 0, out outMaps))\r\n\t\t\t{\r\n\t\t\t\tCommit(Combiner.Max(outMaps.Item1, map), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\tCommit(\\ue0002.\\ue000(8604), (outMaps.Item1 - map).\\ueb77\\uf21d\\ue965(), (RenderIntent)2);\r\n\t\t\t\tCommit(\\ue0002.\\ue000(8594), outMaps.Item2, (RenderIntent)2);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "TextureBase",
+   "cls": "TextureBase",
+   "helpers": [
+    "Texturize.TextureBase",
+    "Profiles.GraphicEQ",
+    "Texturize.Soil2",
+    "AspectMaps.GetCurvature"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tRenderAsMask((byte)1 != 0);\r\n\t\t\t\\uf55c\\uf0ba\\ue6d0.\\uf372\\uecea\\uf319();\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tMap m = Texturize.TextureBase(map, Slope, Scale, Soil, Chaos, Patches, Seed, base.Ins[1]?.\\uf072\\uf1d6\\uf748()?.Copy(), base.Version < 3);\r\n\t\t\tm = m.\\ueb77\\uf21d\\ue961();\r\n\t\t\tif (Peaks > 0f)\r\n\t\t\t{\r\n\t\t\t\tMap map2 = Profiles.GraphicEQ(map, 0f, 2f, 2f, 2f, 2f, 1f, 1f).\\ueb77\\uf21d\\ue961() * Peaks;\r\n\t\t\t\tm += map2;\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(m);\r\n\t\t\t}\r\n\t\t\tAccentuateType accentuation = Accentuation;\r\n\t\t\tif (accentuation != (AccentuateType)1)\r\n\t\t\t{\r\n\t\t\t\tif (accentuation == (AccentuateType)2)\r\n\t\t\t\t{\r\n\t\t\t\t\t<>c__DisplayClass42_0 CS$<>8__locals3 = new <>c__DisplayClass42_0();\r\n\t\t\t\t\tCS$<>8__locals3.lineR = new Polyline1DIrregular();\r\n\t\t\t\t\tByte3[] array = \\uf55c\\uf0ba\\ue6d0.\\uf2e2\\uf860\\ue1d3[\\ue0002.\\ue000(14829)][117];\r\n\t\t\t\t\tfloat num = array.Length;\r\n\t\t\t\t\tList<Float4> list = new List<Float4>();\r\n\t\t\t\t\tfor (int i = 0; (float)i < num; i += 1)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tlist.Add(new Float4((float)(int)array[i].R / 255f, (float)(int)array[i].G / 255f, (float)(int)array[i].B / 255f, (float)i / num));\r\n\t\t\t\t\t}\r\n\t\t\t\t\tCS$<>8__locals3.lineR.RebuildFromUnsortedData(list, (Float4 item) => item.W, (Float4 item) => item.X);\r\n\t\t\t\t\tMap map3 = Map.Generate(Texturize.Soil2(map, 0.0009999999f).\\ueb77\\uf21d\\ue95e(0.5f).\\ueb77\\uf21d\\ue965(), (Vector<float> h) => CS$<>8__locals3.lineR.Interpolate(h));\r\n\t\t\t\t\tm += map3 * 0.33f;\r\n\t\t\t\t\t\\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(m);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tMap curvature = AspectMaps.GetCurvature(map, 0f, 1f, 0.1f, (CurvatureType)2);\r\n\t\t\t\tm += curvature * 0.5f;\r\n\t\t\t}\r\n\t\t\tProcessInput enhance = Enhance;\r\n\t\t\tif (enhance != (ProcessInput)1)\r\n\t\t\t{\r\n\t\t\t\tif (enhance == (ProcessInput)2)\r\n\t\t\t\t{\r\n\t\t\t\t\tm = \\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(m, 16384);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tm = m.\\ueb77\\uf21d\\ue961();\r\n\t\t\t}\r\n\t\t\tif (Reverse)\r\n\t\t\t{\r\n\t\t\t\tm = m.\\ueb77\\uf21d\\ue95d();\r\n\t\t\t}\r\n\t\t\tCommit(m, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "EasyErosion",
+   "cls": "EasyErosion",
+   "helpers": [
+    "Gradients.LinearGradient",
+    "Erosions.PE",
+    "Combiner.Min",
+    "Profiles.ComplexTerraces",
+    "Combiner.Max"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy();\r\n\t\t\tMap[] array = null;\r\n\t\t\tGradientDirection biasAngle = BiasAngle;\r\n\t\t\tint num = (biasAngle - 2) switch\r\n\t\t\t{\r\n\t\t\t\tGradientDirection.X => 90, \r\n\t\t\t\tGradientDirection.N => 180, \r\n\t\t\t\tGradientDirection.E => 270, \r\n\t\t\t\t_ => 0, \r\n\t\t\t};\r\n\t\t\tMap map2 = null;\r\n\t\t\tif ((int)BiasAngle > 0)\r\n\t\t\t{\r\n\t\t\t\tmap2 = Gradients.LinearGradient(base.context.Resolution, num, (GradientEdgeBehaviour)0) * 0.33f;\r\n\t\t\t\tmap += map2;\r\n\t\t\t}\r\n\t\t\tswitch (Style)\r\n\t\t\t{\r\n\t\t\tcase QuickErosion.Simple:\r\n\t\t\t\tmap = Erosions.PE(map, null, 10f + 10f * Influence, 0.25f, 0f, 1000f, 1f, 24f, 0.6f, 15f, 0f, 10f, 0.2f, 0.6f, 0.8f, Seed + 1, 0f, 0f, (byte)0 != 0)[0];\r\n\t\t\t\tarray = Erosions.PE(map, null, 6f + 6f * Influence, 0.25f, 0f, 1000f, 1f, 24f, 0f, 15f, 0.35f, 45f, 0.2f, 0.6f, 0.8f, Seed + 2, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tbreak;\r\n\t\t\tcase QuickErosion.Ancient:\r\n\t\t\t\tmap = Erosions.PE(map, null, 10f + 10f * Influence, 0.25f, 0f, 1000f, 1f, 24f, Influence, 15f, 0f, 10f, 0.2f, 0.6f, 0.8f, Seed + 2, 0f, 0f, (byte)0 != 0)[0];\r\n\t\t\t\tmap = Erosions.PE(map, null, 10f + 10f * Influence, 0.25f, 0f, 1000f, 1f, 24f, 0f, 15f, 0f, 10f, 0.2f, 0.6f, 0.8f, Seed + 3, 0f, 0f, (byte)0 != 0)[0];\r\n\t\t\t\tmap = Erosions.PE(map, null, 40f, 0.25f, 0f, 1000f, 1f, 24f, Influence, 15f, 0f, 10f, 0.2f, 0.6f, 0.8f, Seed + 4, 0f, 0f, (byte)0 != 0)[0];\r\n\t\t\t\tmap = Erosions.PE(map, null, 60f, 0.25f, 0f, 1000f, 1f, 24f, 0f, 15f, 0f, 10f, Influence, 0.6f, 0.8f, Seed + 5, 0f, 0f, (byte)0 != 0)[0];\r\n\t\t\t\tmap = Erosions.PE(map, null, 80f, 0.25f, 0f, 1000f, 1f, 24f, 0f, 15f, 0f, 10f, 0.2f, 0.6f, 0.8f, Seed + 6, 0f, 0f, (byte)0 != 0)[0];\r\n\t\t\t\tarray = Erosions.PE(map, null, 10f, 0.25f, 0f, 1000f, 1f, 24f, 0f, 15f, 0f, 10f, 0.2f, 0.6f, 0.8f, Seed + 7, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tbreak;\r\n\t\t\tcase QuickErosion.Ancient2:\r\n\t\t\t\tmap = Erosions.PE(map, null, 10f, 0.25f, 0f, 1000f, 1f, 24f, 0f, 15f, 0f, 10f, 0.2f, 0.6f, 0.8f, Seed + 1, 0f, 0f, (byte)0 != 0)[0];\r\n\t\t\t\tmap = Erosions.PE(map, null, 25f + (15f + Influence), 0.23f, 1f, 226f, 1f, 24f, 0f, 15f, 0f, 10f, 0.8f, 0.6f, 0.8f, Seed + 2, 0f, 0f, (byte)0 != 0)[0];\r\n\t\t\t\tmap = Erosions.PE(map, null, 33f, 0.25f, 0f, 1000f, 1f, 24f, 0f, 15f, 0f, 10f, 0.89f, Seed: Seed + 3, ShapeSharpness: 0.5f + Influence.\\uf353\\uee79\\ue793(), ShapeDetailScale: 0.8f, DepositionBoost: 0f, ExtraDepositionBoost: 0f, NoErosion: (byte)0 != 0)[0];\r\n\t\t\t\tmap = Erosions.PE(map, null, 33f, 0.25f, 0f, 1000f, 1f, 24f, 0f, 15f, 0f, 10f, 0.2f, 0.6f, 0.8f, Seed + 4, 0f, 0f, (byte)0 != 0)[0];\r\n\t\t\t\tarray = Erosions.PE(map, null, 10f, 0.25f, 0f, 1280f, 1f, 24f, 0f, 15f, 0.5f, 10f, 0.2f, 0.6f, 0.8f, Seed + 5, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tbreak;\r\n\t\t\tcase QuickErosion.Alpine:\r\n\t\t\t\tarray = Erosions.PE(map, null, 8f + 15f * Influence.\\uf353\\uee79\\ue793(), 0.25f, 0f, 1000f, Seed: Seed, SuspendedLoadDischargeAmount: 0.45f + Influence.\\uf353\\uee79\\ue796(), SuspendedLoadDischargeAngle: 24f, BedLoadDischargeAmount: 0f, BedLoadDischargeAngle: 15f, CoarseSedimentsDischargeAmount: 0f, CoarseSedimentsDischargeAngle: 10f, Shape: 0.95f, ShapeSharpness: 0.97f, ShapeDetailScale: 1f - Influence, DepositionBoost: 0f, ExtraDepositionBoost: 0f, NoErosion: (byte)0 != 0);\r\n\t\t\t\tbreak;\r\n\t\t\tcase QuickErosion.Rocky:\r\n\t\t\t\tmap += RockCore.Noise(map.Resolution.X, 1, (int)(Influence * 500f), new Float2(0.4f, 1f), Seed);\r\n\t\t\t\tmap = Erosions.PE(map, null, Influence.\\uf353\\uee79\\ue796() * 33f, 0.25f, 0f, 1000f, 1f, 24f, 0f, 15f, 0f, 10f, 0.2f, 0.6f, 0.8f, Seed + 2, 0f, 0f, (byte)0 != 0)[0];\r\n\t\t\t\tarray = Erosions.PE(map, null, 10f, 0.25f, 0f, 1000f, 1f, 24f, 0f, 15f, 0f, 10f, 0.2f, 0.6f, 0.8f, Seed + 3, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tbreak;\r\n\t\t\tcase QuickErosion.Flows:\r\n\t\t\t\tarray = Erosions.PE(map, null, 30f + 40f * Influence, 0.64f, 0f, 888f, 0.8f, 45f, Seed: Seed, BedLoadDischargeAmount: 0.6f + 0.4f * Influence, BedLoadDischargeAngle: 45f + 20f * Influence.\\uf353\\uee79\\ue798(), CoarseSedimentsDischargeAmount: 0.8f, CoarseSedimentsDischargeAngle: 45f, Shape: 0.61765105f, ShapeSharpness: 0.6f, ShapeDetailScale: 0.8f, DepositionBoost: 0f, ExtraDepositionBoost: 0f, NoErosion: (byte)0 != 0);\r\n\t\t\t\tbreak;\r\n\t\t\tcase QuickErosion.Exposed:\r\n\t\t\t\tarray = Erosions.PE(map, null, 30f + 20f * Influence, 0.64f, 0f, 323f + 200f * Influence, 0.80821735f, 36.278553f, 0.8365995f, 36.917152f, 0.86295444f, 39.38032f, 0.61765105f, 0.6f, 0.8f, Seed, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tarray[0] = Combiner.Min(map, array[0]);\r\n\t\t\t\tbreak;\r\n\t\t\tcase QuickErosion.Flows2:\r\n\t\t\t\tmap = Profiles.ComplexTerraces(map, 0.5f, 0f, 0.02f, Direction: Direction, TiltAmount: 0.05f + 0.1f * Influence, Octaves: 12, Seed: Seed)[0];\r\n\t\t\t\tarray = Erosions.PE(map, null, 30f + 45f * Influence, 0.5f, 0f, 850f, 0.80821735f, 36.278553f, 0.8365995f, 36.917152f, 0.86295444f, 39.38032f, 0.61765105f, 0.6f, 0.8f, Seed + 5, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tmap = Combiner.Min(map, array[0]);\r\n\t\t\t\tbreak;\r\n\t\t\tcase QuickErosion.Strata:\r\n\t\t\t\tmap = Profiles.ComplexTerraces(map, 0.5f, -0.25f, 0.02f + 0.05f * Influence, 0.1f, Direction, 12, Seed + 5)[0];\r\n\t\t\t\tarray = Erosions.PE(map, null, 60f, 0.5f, 0f, 850f, 0.80821735f, 36.278553f, 0.8365995f, 36.917152f, 0.86295444f, 39.38032f, 0.61765105f, 0.6f, 0.8f, Seed + 15, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tmap = Combiner.Max(map, array[0]);\r\n\t\t\t\tarray = Erosions.PE(map, null, 33f, 0.25f, 0f, 1000f, 1f, 24f, 0f, 15f, 0f, 10f, 0.2f, 0.6f, 0.8f, Seed + 22, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tbreak;\r\n\t\t\tcase QuickErosion.Flows3:\r\n\t\t\t\tarray = Erosions.PE(map, null, Influence * 100f, 0.34f, 0f, 1500f, 0.8f, 66f, 0.8f, 66f, 0.8f, 66f, 0.2f, 0.6f, 0.8f, Seed + 2, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tbreak;\r\n\t\t\tcase QuickErosion.Withered:\r\n\t\t\t\tarray = Erosions.PE(map, null, Influence * 44f, 1f, 0f, 2000f, 0f, 24f, 0f, 15f, 0f, 10f, 0f, 0.6f, 0.8f, Seed, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tbreak;\r\n\t\t\tcase QuickErosion.SoftSoil:\r\n\t\t\t\tarray = Erosions.PE(map, null, Influence * 44.485607f, 1f, 0f, 2000f, 1f, 3.6187322f, 0.023651846f, 45f, 0.043924853f, 10f, 1f, 0.041897554f, 0.09866198f, Seed, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tbreak;\r\n\t\t\tcase QuickErosion.SoftSoil2:\r\n\t\t\t\tarray = Erosions.PE(map, null, 6f * Influence, 0.9682472f, 0f, 2000f, 1f, 24f, 0.30747163f, 15f, 0.64379454f, 10f, 1f, 0.75260484f, 0.029095542f, 30074, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tbreak;\r\n\t\t\tcase QuickErosion.Dessicated:\r\n\t\t\t\tarray = Erosions.PE(map, null, Influence * 65f, 0.2f, 0f, 1000f, 1f, 24f, 0.85889983f, 15f, 0.9095824f, 10f, 0.86700904f, 0.9399919f, 0.8f, Seed, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tbreak;\r\n\t\t\tcase QuickErosion.Thin:\r\n\t\t\t\tarray = Erosions.PE(map, null, Influence * 10f, 0.7757805f, 0.45749426f, 226.59332f, 1f, 24f, 0.85889983f, 15f, 0.9095824f, 10f, 0.3601838f, 0.85281795f, 0.10271658f, Seed, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\tif ((int)BiasAngle > 0)\r\n\t\t\t{\r\n\t\t\t\tMap[] array2 = array;\r\n\t\t\t\tarray2[0] = array2[0] - map2;\r\n\t\t\t}\r\n\t\t\tSave(array);\r\n\t\t}\r"
+  },
+  {
+   "name": "Volcano",
+   "cls": "Volcano",
+   "helpers": [
+    "Gradients.RadialGradient",
+    "Profiles.Triangle",
+    "Combiner.Min",
+    "Warps.FractalWarp",
+    "Erosions.PE"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tint x = base.context.Resolution.X;\r\n\t\t\tMap heightfield = Gradients.RadialGradient(x, (float)x * X, (float)x * Y, (float)x * Scale.\\uf353\\uee79\\ue793(), Height);\r\n\t\t\theightfield = Profiles.Triangle(heightfield, null, Mouth.\\ue05d\\uedfb\\ue0c7(0.2f, 0.6f), (byte)0 != 0).\\ueb77\\uf21d\\ue95e(Bulk).\\ueb77\\uf21d\\ue95f();\r\n\t\t\tif (Surface == (HillSurface)1)\r\n\t\t\t{\r\n\t\t\t\theightfield = Combiner.Min(heightfield, Warps.FractalWarp(heightfield, 0.1f, 0.5f, (byte)1 != 0, 0f, (WarpNoiseType)1, 0.5f, 12, 0.5f, (byte)0 != 0, 1, (IterativeWarpMode)1, (EdgeBehaviour)0, Seed, null, 0f, 45f, 0.45f));\r\n\t\t\t\tMap map = Erosions.PE(heightfield, null, 10f, 0.25f, 0f, 1000f, 1f, 24f, 0.5f, 15f, 0f, 10f, 0.2f, 0.6f, 0.8f, Seed, 0f, 0f, (byte)0 != 0)[0].Copy();\r\n\t\t\t\tif (base.In.IsConnected)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap *= base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t\t}\r\n\t\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tif (base.In.IsConnected)\r\n\t\t\t\t{\r\n\t\t\t\t\theightfield *= base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t\t}\r\n\t\t\t\tCommit(heightfield, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "Cartography",
+   "cls": "Cartography",
+   "helpers": [
+    "Cartographer.Contours",
+    "AspectMaps.GetThreshold",
+    "Cartographer.Outline",
+    "Cartographer.Grid",
+    "ColorCore.Clut",
+    "Combiner.Multiply"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tbool isConnected = base.Ins[1].IsConnected;\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748().Copy().\\ueb77\\uf21d\\ue961();\r\n\t\t\tRenderAsMask((byte)0 != 0);\r\n\t\t\tMap map2 = null;\r\n\t\t\tMap map3 = \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2be((byte)1 != 0);\r\n\t\t\tMap map4 = null;\r\n\t\t\tMap map5 = null;\r\n\t\t\tMap map6 = \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2be((byte)1 != 0);\r\n\t\t\tMap map7 = null;\r\n\t\t\tvar (map8, map9, map10) = Cartographer.Contours(map, LandContours, 5, Accuracy, LandContourIntenstity.Y, LandContourIntenstity.X, ContourThickness);\r\n\t\t\tif (isConnected)\r\n\t\t\t{\r\n\t\t\t\tmap2 = base.Ins[1].\\uf072\\uf1d6\\uf748()?.Copy().\\ueb77\\uf21d\\ue961();\r\n\t\t\t\tmap3 = Cartographer.Contours(map2, WaterContours, 5, Accuracy, WaterContourIntenstity.Y, WaterContourIntenstity.X, ContourThickness).contours;\r\n\t\t\t\tmap4 = AspectMaps.GetThreshold(map2, 0.0001f + Trim * 0.05f);\r\n\t\t\t\tmap6 = Cartographer.Outline(map4, LandContourIntenstity.Y, BoundaryThickness);\r\n\t\t\t\tmap5 = map4.Copy().\\ueb77\\uf21d\\ue95d();\r\n\t\t\t\tmap8 *= map5;\r\n\t\t\t\tmap9 *= map5;\r\n\t\t\t\tmap10 *= map5;\r\n\t\t\t}\r\n\t\t\tMap map11;\r\n\t\t\tif (GridStyle == MapGridStyle.None || (GridStyle == (MapGridStyle)1 && !isConnected))\r\n\t\t\t{\r\n\t\t\t\tmap11 = \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2be((byte)1 != 0);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tmap11 = Cartographer.Grid(map8.Resolution, GridCount, GridIntenstity.Y, GridIntenstity.X, GridThickness);\r\n\t\t\t\tMapGridStyle gridStyle = GridStyle;\r\n\t\t\t\tif (gridStyle != (MapGridStyle)1)\r\n\t\t\t\t{\r\n\t\t\t\t\tif (gridStyle == (MapGridStyle)2 && isConnected)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tmap11 *= map5;\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\telse if (isConnected)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap11 *= map4;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tMap map12 = (map8 + map3 + map6 + map11).\\ueb77\\uf21d\\ue95c(0f, 1f).\\ueb77\\uf21d\\ue95d();\r\n\t\t\tCommit(\\ue0002.\\ue000(13149), map12, (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(13096), map11, (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(13091), map8, (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(15958), map3, (RenderIntent)0);\r\n\t\t\tMap map13 = GradientStyle switch\r\n\t\t\t{\r\n\t\t\t\tMapGradientStyle.Smooth => map, \r\n\t\t\t\tMapGradientStyle.LargeContours => map9, \r\n\t\t\t\tMapGradientStyle.AllContours => map10, \r\n\t\t\t\t_ => throw new ArgumentOutOfRangeException(), \r\n\t\t\t};\r\n\t\t\tif (!EqualizeGradient)\r\n\t\t\t{\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(base.In.\\uf072\\uf1d6\\uf748(), out var \\ued14\\ueb11\\uf526, out var \\ued14\\ueb11\\uf5262);\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(map13, out var \\ued14\\ueb11\\uf5263, out var \\ued14\\ueb11\\uf5264);\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(map13, \\ued14\\ueb11\\uf5263, \\ued14\\ueb11\\uf5264, \\ued14\\ueb11\\uf526, \\ued14\\ueb11\\uf5262);\r\n\t\t\t}\r\n\t\t\tif (LandBias != 0f)\r\n\t\t\t{\r\n\t\t\t\tmap13 = map13.Copy().\\ueb77\\uf21d\\ue95e(LandBias);\r\n\t\t\t}\r\n\t\t\tFloat4[] gradientData = GetGradientData(base.Ins[2]);\r\n\t\t\tColor[] array = Cartographer.LandPalettes[(int)LandPalette];\r\n\t\t\tMap map14 = ((gradientData == null) ? ColorCore.Clut(map13, Reverse ? array.Reverse().ToArray() : array) : ColorCore.Clut(map13, gradientData));\r\n\t\t\tif (Erode)\r\n\t\t\t{\r\n\t\t\t\tColorTransport.Simulation(new ColorTransport.Parameters\r\n\t\t\t\t{\r\n\t\t\t\t\tResolution = base.context.Resolution,\r\n\t\t\t\t\tTransportDistance = 0.5f,\r\n\t\t\t\t\tSedimentDensity = 1f,\r\n\t\t\t\t\tBlend = 1f,\r\n\t\t\t\t\tFlowVolume = 0f,\r\n\t\t\t\t\tColorHold = 0.5f,\r\n\t\t\t\t\tLaminarFlow = ((byte)0 != 0),\r\n\t\t\t\t\tSeed = 256\r\n\t\t\t\t}, (map, map14, (Map)null, (Map)null), out var output);\r\n\t\t\t\tmap14 = output.Copy();\r\n\t\t\t}\r\n\t\t\tif (isConnected)\r\n\t\t\t{\r\n\t\t\t\tif (WaterBias != 0f)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap2 = map2.Copy().\\ueb77\\uf21d\\ue95e(WaterBias);\r\n\t\t\t\t}\r\n\t\t\t\tFloat4[] gradientData2 = GetGradientData(base.Ins[3]);\r\n\t\t\t\tmap7 = ((gradientData2 == null) ? ColorCore.Clut(map2, Cartographer.WaterPalettes[(int)WaterPalette]) : ColorCore.Clut(map2, gradientData2));\r\n\t\t\t\tif (Erode)\r\n\t\t\t\t{\r\n\t\t\t\t\tColorTransport.Simulation(new ColorTransport.Parameters\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tResolution = base.context.Resolution,\r\n\t\t\t\t\t\tTransportDistance = 0.5f,\r\n\t\t\t\t\t\tSedimentDensity = 0.5f,\r\n\t\t\t\t\t\tBlend = 0.5f,\r\n\t\t\t\t\t\tFlowVolume = 0f,\r\n\t\t\t\t\t\tColorHold = 0.5f,\r\n\t\t\t\t\t\tLaminarFlow = ((byte)0 != 0),\r\n\t\t\t\t\t\tSeed = 256\r\n\t\t\t\t\t}, (map, map7, (Map)null, (Map)null), out var output2);\r\n\t\t\t\t\tmap7 = output2.Copy();\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tMap a = (isConnected ? Masking.Mask(map14, map7, map4) : map14);\r\n\t\t\ta = Combiner.Multiply(a, map12);\r\n\t\t\tmap2?.Dispose();\r\n\t\t\tmap9?.Dispose();\r\n\t\t\tmap10?.Dispose();\r\n\t\t\tmap4?.Dispose();\r\n\t\t\tmap5?.Dispose();\r\n\t\t\tmap6?.Dispose();\r\n\t\t\tmap7?.Dispose();\r\n\t\t\tmap14?.Dispose();\r\n\t\t\tmap7?.Dispose();\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tCommit(a, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Noise",
+   "cls": "Noise",
+   "helpers": [
+    "RandomNoises.Random",
+    "RandomNoises.Perlin",
+    "RandomNoises.Gaussian",
+    "RandomNoises.Fixed",
+    "Combiner.Blend",
+    "Warps.FractalWarp"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tMap map2 = NoiseType switch\r\n\t\t\t{\r\n\t\t\t\tConstantNoiseType.Random => RandomNoises.Random(base.context.Resolution, 0f, Height, Seed), \r\n\t\t\t\tConstantNoiseType.Perlin => RandomNoises.Perlin(base.context.Resolution, Height, Seed), \r\n\t\t\t\tConstantNoiseType.Gaussian => RandomNoises.Gaussian(base.context.Resolution, Seed, 0f, Height), \r\n\t\t\t\tConstantNoiseType.Fixed => RandomNoises.Fixed(base.context.Resolution, (int)(5000000f * Density), RelativeDensity, 0f, Height, Seed), \r\n\t\t\t\tConstantNoiseType.Micro => Combiner.Blend(map, Warps.FractalWarp(map, 0.001f, Density * 10f, (byte)1 != 0, 0f, (WarpNoiseType)0, 0.5f, 2, 1f, (byte)0 != 0, 1, (IterativeWarpMode)1, (EdgeBehaviour)0, Seed, null, 0f, 45f, 0.45f), Height), \r\n\t\t\t\t_ => RandomNoises.Random(base.context.Resolution, 0f, Height, Seed), \r\n\t\t\t};\r\n\t\t\tif (map != null)\r\n\t\t\t{\r\n\t\t\t\tswitch (BlendMode)\r\n\t\t\t\t{\r\n\t\t\t\tcase PrimitiveBlendMode.Add:\r\n\t\t\t\t\tmap2 += map;\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tcase PrimitiveBlendMode.Multiply:\r\n\t\t\t\t\tmap2 *= map;\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tcase PrimitiveBlendMode.Subtract:\r\n\t\t\t\t\tmap2 = map - map2;\r\n\t\t\t\t\tbreak;\r\n\t\t\t\t}\r\n\t\t\t\tmap2 = \\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(map2);\r\n\t\t\t}\r\n\t\t\tCommit(map2, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Rugged",
+   "cls": "Rugged",
+   "helpers": [
+    "Surfaces.M2",
+    "Surfaces.M3",
+    "Surfaces.M4",
+    "Surfaces.M5",
+    "Surfaces.M6",
+    "Combiner.Embed"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = (Style switch\r\n\t\t\t{\r\n\t\t\t\tABCDE.A => Surfaces.M2(base.context.Resolution.X, Scale, Seed), \r\n\t\t\t\tABCDE.B => Surfaces.M3(base.context.Resolution.X, Scale, Seed), \r\n\t\t\t\tABCDE.C => Surfaces.M4(base.context.Resolution.X, Scale, Seed), \r\n\t\t\t\tABCDE.D => Surfaces.M5(base.context.Resolution.X, Scale, Seed), \r\n\t\t\t\tABCDE.E => Surfaces.M6(base.context.Resolution.X, Scale, Seed), \r\n\t\t\t\t_ => null, \r\n\t\t\t}).\\ueb77\\uf21d\\ue95e();\r\n\t\t\tMap map2 = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tif (map2 != null)\r\n\t\t\t{\r\n\t\t\t\tmap2 = Combiner.Embed(map2, map, 1f, 0f);\r\n\t\t\t\tCommit(map2, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t}\r"
+  },
+  {
+   "name": "WaterColor",
+   "cls": "WaterColor",
+   "helpers": [
+    "Texturize.GetAccumulation",
+    "Combiner.Max",
+    "AspectMaps.GetThreshold",
+    "Warps.FractalWarp",
+    "ColorCore.HSL",
+    "Noises.WaveShine"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tif (Palette != (WaterColors)8)\r\n\t\t\t{\r\n\t\t\t\tGetPaletteColors(Palette);\r\n\t\t\t}\r\n\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\tRenderAsMask((byte)0 != 0);\r\n\t\t\tVector3[] array = new Vector3[2];\r\n\t\t\tarray[((Reverse ? 1u : 0u) > (uint)0) ? 1u : 0u] = Shallow.ToVector3();\r\n\t\t\tarray[((Reverse ? 1 : 0) == 0) ? 1u : 0u] = Deep.ToVector3();\r\n\t\t\tMap map;\r\n\t\t\tif (Source == WaterSource.Port)\r\n\t\t\t{\r\n\t\t\t\tNode node = this.\\uf072\\uf1d6\\uf72d(\\ue0002.\\ue000(8336)).\\uf072\\uf1d6\\uf747();\r\n\t\t\t\tif (node == null)\r\n\t\t\t\t{\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tmap = \\uf55c\\uf0ba\\ue6d3.\\ue157\\ueb2d\\ue93d(node.Id, base.context.Cluster, \\ue0002.\\ue000(9061)).Data.Copy().\\ueb77\\uf21d\\ue961();\r\n\t\t\t\tCommit(\\ue0002.\\ue000(9087), \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2be((byte)1 != 0), (RenderIntent)0);\r\n\t\t\t\tCommit(\\ue0002.\\ue000(9080), \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2be((byte)1 != 0), (RenderIntent)0);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tint restrictGroup = (RestrictToGroup ? base.Group : 0);\r\n\t\t\t\tmap = Texturize.GetAccumulation((AccumulatorType)4, base.context.Resolution, restrictGroup).\\ueb77\\uf21d\\ue961().\\ueb77\\uf21d\\ue95e(Stillwater);\r\n\t\t\t\tCommit(\\ue0002.\\ue000(9080), map.Copy(), (RenderIntent)0);\r\n\t\t\t\tif (Rivers != 0f)\r\n\t\t\t\t{\r\n\t\t\t\t\tMap map2 = Texturize.GetAccumulation((AccumulatorType)2, base.context.Resolution, restrictGroup).\\ueb77\\uf21d\\ue961().\\ueb77\\uf21d\\ue95e(Rivers);\r\n\t\t\t\t\tCommit(\\ue0002.\\ue000(9087), map2.Copy(), (RenderIntent)0);\r\n\t\t\t\t\tmap = Combiner.Max(map, map2);\r\n\t\t\t\t}\r\n\t\t\t\telse\r\n\t\t\t\t{\r\n\t\t\t\t\tCommit(\\ue0002.\\ue000(9087), \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2be((byte)1 != 0), (RenderIntent)0);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tusing Map map3 = AspectMaps.GetThreshold(map.Copy().\\ueb77\\uf21d\\ue95e(MaskBias), 0.0001f);\r\n\t\t\tCommit(\\ue0002.\\ue000(9037), map3.Copy(), (RenderIntent)0);\r\n\t\t\tif (Refraction)\r\n\t\t\t{\r\n\t\t\t\tmap = Warps.FractalWarp(map.\\ueb77\\uf21d\\ue95c(0.2f), 0.04f, 0.3f, (byte)1 != 0, 0f, (WarpNoiseType)0, 0.5f, 12, 0.5f, (byte)0 != 0, 4, (IterativeWarpMode)1, (EdgeBehaviour)0, base.Id, null, 0f, 45f, 0.45f);\r\n\t\t\t}\r\n\t\t\tMap map4 = Colorize.\\uf5b3\\uef81\\uf635(map.\\ueb77\\uf21d\\ue95e(ColorBias), array);\r\n\t\t\tif (Hue != 0f || Saturation != 0f || Lightness != 0f)\r\n\t\t\t{\r\n\t\t\t\tmap4 = ColorCore.HSL(map4, Hue, Saturation, Lightness);\r\n\t\t\t}\r\n\t\t\tif (Waves)\r\n\t\t\t{\r\n\t\t\t\tmap4 += Noises.WaveShine(map.Resolution.X, 0, 4, 0, 1f, 0.025f, 0.5f, 0f, 0.1f, 0.1f, 1f, 30f, 2f, 1f, 315f, 30f);\r\n\t\t\t}\r\n\t\t\tCommit(\\ue0002.\\ue000(9031), map4.Copy(), (RenderIntent)0);\r\n\t\t\tMap map5 = Masking.Mask(base.In.\\uf072\\uf1d6\\uf748(), map4, map3);\r\n\t\t\tCommit(map5, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "MountainSide",
+   "cls": "MountainSide",
+   "helpers": [
+    "Noises.Perlin",
+    "Warps.FractalWarp",
+    "Erosions.PE",
+    "Profiles.ComplexTerraces",
+    "Gradients.LinearGradient",
+    "Combiner.Blend",
+    "Combiner.Min"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tif (Type == (MountainSideType)1)\r\n\t\t\t{\r\n\t\t\t\tMap map = Noises.Perlin(base.context.Resolution.X, Scale.\\ue05d\\uedfb\\ue0c7(0.3f, 0.7f), 5, 0.38f, (PerlinNoiseType)0, Seed, (NoiseWarpType)2, 0.05f, 0.5f, 10, 1f, 1f, 0f, 0f);\r\n\t\t\t\tswitch (Style)\r\n\t\t\t\t{\r\n\t\t\t\tcase MountainStyle.Basic:\r\n\t\t\t\t\tmap = Warps.FractalWarp(map, 0.5f, 0.5f, (byte)1 != 0, 0f, (WarpNoiseType)0, 0.5f, 12, 0.5f, (byte)0 != 0, 1, (IterativeWarpMode)1, (EdgeBehaviour)0, Seed, null, 0f, 45f, 0.45f);\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tcase MountainStyle.Eroded:\r\n\t\t\t\t\tmap = Erosions.PE(map, null, 15f, 0.5f, 0f, 1000f, 1f, 24f, 0f, 15f, 1f, 10f, 0.45f, 0.75f, Seed: Seed, ShapeDetailScale: Detail, DepositionBoost: 0f, ExtraDepositionBoost: 0f, NoErosion: (byte)0 != 0)[0];\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tcase MountainStyle.Alpine:\r\n\t\t\t\t\tmap = Erosions.PE(map, null, 45f, 0.5f, 0f, 1000f, 1f, 24f, 0f, 0f, 0f, 0f, 0.45f, 0.75f, Seed: Seed, ShapeDetailScale: Detail.\\uf353\\uee79\\ue797(), DepositionBoost: 0f, ExtraDepositionBoost: 0f, NoErosion: (byte)0 != 0)[0];\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tcase MountainStyle.Old:\r\n\t\t\t\t\tmap = Erosions.PE(map, null, 15f, 0.5f, 0f, 1000f, 1f, 24f, 0f, 15f, 1f, 10f, 0.45f, 0.35f, Seed: Seed, ShapeDetailScale: Detail.\\uf353\\uee79\\ue793(), DepositionBoost: 0f, ExtraDepositionBoost: 0f, NoErosion: (byte)0 != 0)[0];\r\n\t\t\t\t\tmap = Erosions.PE(map, null, 35f, 0.5f, 0f, 1200f, 1f, 24f, 0f, 15f, 1f, 10f, 0.45f, 0.35f, Seed: Seed + 1, ShapeDetailScale: Detail, DepositionBoost: 0f, ExtraDepositionBoost: 0f, NoErosion: (byte)0 != 0)[0];\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tcase MountainStyle.Strata:\r\n\t\t\t\t\tmap = Erosions.PE(map, null, 15f, 0.5f, 0f, 1000f, 1f, 24f, 0f, 15f, 1f, 10f, 0.45f, 0.75f, Seed: Seed, ShapeDetailScale: Detail, DepositionBoost: 0f, ExtraDepositionBoost: 0f, NoErosion: (byte)0 != 0)[0];\r\n\t\t\t\t\tmap = Profiles.ComplexTerraces(map.Copy(), 0.5f, 0f, 0.1f, 0.5f, Seed: Seed, Direction: Direction, Octaves: 12)[0];\r\n\t\t\t\t\tbreak;\r\n\t\t\t\t}\r\n\t\t\t\tif (base.In.IsConnected)\r\n\t\t\t\t{\r\n\t\t\t\t\tmap *= base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t\t}\r\n\t\t\t\tCommit(map, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tMap map2 = Noises.Perlin(6 + (int)(96f * Detail), Scale, 10, 0.5f, (PerlinNoiseType)0, Seed, (NoiseWarpType)2, 0.05f, 0.5f, 10, 1f, 1f, 0f, 0f);\r\n\t\t\tMap map3 = Transformer.Resize(map2, base.context.Resolution, (Transformer.ResizeMethod)0);\r\n\t\t\tint x = base.context.Resolution.X;\r\n\t\t\tMap map4 = Gradients.LinearGradient(x, \\uf55c\\uf0ba\\ue6c1.\\uf353\\uee79\\ue792(x), \\uf55c\\uf0ba\\ue6c1.\\uf353\\uee79\\ue792(x), x, Direction, (GradientEdgeBehaviour)2);\r\n\t\t\tMap m = Combiner.Blend(map4, map3, 0.35f);\r\n\t\t\tm = m.\\ueb77\\uf21d\\ue961();\r\n\t\t\tm = Warps.FractalWarp(m, 0.5f, 0.5f, (byte)1 != 0, 0f, (WarpNoiseType)1, 0.5f, 12, 0.43f, (byte)0 != 0, 1, (IterativeWarpMode)1, (EdgeBehaviour)0, Seed + 2, null, 0f, 45f, 0.45f);\r\n\t\t\tm = Combiner.Min(m, Warps.FractalWarp(m, 0.5f, 0.5f, (byte)1 != 0, 0f, (WarpNoiseType)0, 0.5f, 12, 0.5f, (byte)0 != 0, 1, (IterativeWarpMode)1, (EdgeBehaviour)0, Seed + 1, null, 0f, 45f, 0.45f));\r\n\t\t\tmap4.Dispose();\r\n\t\t\tmap3.Dispose();\r\n\t\t\tmap2.Dispose();\r\n\t\t\tMountainStyle style = Style;\r\n\t\t\tswitch (style - 1)\r\n\t\t\t{\r\n\t\t\tcase MountainStyle.Basic:\r\n\t\t\t{\r\n\t\t\t\tMap[] array2 = Erosions.PE(m, null, 10f, 0.1f, 0f, 666f + 1400f * Scale, 1f, 24f, 0.6f, 15f, 0f, 10f, 0.8f, 0.6f, 0.4f, Seed, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tm = array2[0].Copy();\r\n\t\t\t\tarray2[0].Dispose();\r\n\t\t\t\tarray2[1].Dispose();\r\n\t\t\t\tarray2[2].Dispose();\r\n\t\t\t\tarray2[3].Dispose();\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\tcase MountainStyle.Old:\r\n\t\t\t{\r\n\t\t\t\tMap[] array = Erosions.PE(m, null, 40f, 0.5f, 0f, 600f + 1200f * Scale, 1f, 24f, 0.6f, 15f, 0f, 10f, 0.8f, 0.6f, 0f, Seed, 0f, 0f, (byte)0 != 0);\r\n\t\t\t\tm = array[0].Copy();\r\n\t\t\t\tm *= 1.5f;\r\n\t\t\t\tarray[0].Dispose();\r\n\t\t\t\tarray[1].Dispose();\r\n\t\t\t\tarray[2].Dispose();\r\n\t\t\t\tarray[3].Dispose();\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\tcase MountainStyle.Eroded:\r\n\t\t\t\tm = Erosions.PE(m, null, 15f, 0.12f, 0f, 500f + 1200f * Scale, 1f, 24f, 0f, 15f, 1f, 10f, 0.45f, 0.35f, Seed: Seed, ShapeDetailScale: Detail.\\uf353\\uee79\\ue793(), DepositionBoost: 0f, ExtraDepositionBoost: 0f, NoErosion: (byte)0 != 0)[0];\r\n\t\t\t\tm = Erosions.PE(m, null, 35f, 0.23f, 0f, 1800f * Scale, 1f, 24f, 0f, 15f, 1f, 10f, 0.45f, 0.35f, Seed: Seed + 1, ShapeDetailScale: Detail, DepositionBoost: 0f, ExtraDepositionBoost: 0f, NoErosion: (byte)0 != 0)[0];\r\n\t\t\t\tbreak;\r\n\t\t\tcase MountainStyle.Alpine:\r\n\t\t\t\tm = Erosions.PE(m, null, 15f, 0.5f, 0f, 500f + 1000f * Scale, 1f, 24f, 0f, 15f, 1f, 10f, 0.45f, 0.75f, Seed: Seed, ShapeDetailScale: Detail, DepositionBoost: 0f, ExtraDepositionBoost: 0f, NoErosion: (byte)0 != 0)[0];\r\n\t\t\t\tm = Profiles.ComplexTerraces(m.Copy(), 0.5f, 0f, 0.1f, 0.5f, Seed: Seed, Direction: Direction, Octaves: 12)[0];\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\tif (base.In.IsConnected)\r\n\t\t\t{\r\n\t\t\t\tm *= base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\t}\r\n\t\t\tCommit(m, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Snowfield",
+   "cls": "Snowfield",
+   "helpers": [
+    "Gradients.LinearGradient",
+    "Warps.FractalWarp",
+    "AspectMaps.GetThreshold",
+    "Simulations.Snow",
+    "Combiner.Max",
+    "Profiles.Recurve",
+    "Erosions.Classic",
+    "Profiles.GraphicEQ",
+    "Migrated.GroundTextureProcess"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748();\r\n\t\t\tRenderAsMask((byte)0 != 0);\r\n\t\t\tGradientDirection direction = Direction;\r\n\t\t\tint num = (direction - 2) switch\r\n\t\t\t{\r\n\t\t\t\tGradientDirection.X => 90, \r\n\t\t\t\tGradientDirection.N => 180, \r\n\t\t\t\tGradientDirection.E => 270, \r\n\t\t\t\t_ => 0, \r\n\t\t\t};\r\n\t\t\tMap map2 = map.Copy();\r\n\t\t\tMap map3 = null;\r\n\t\t\tif ((int)Direction > 0)\r\n\t\t\t{\r\n\t\t\t\tmap3 = Gradients.LinearGradient(base.context.Resolution, num, (GradientEdgeBehaviour)0);\r\n\t\t\t\tmap2 += map3;\r\n\t\t\t}\r\n\t\t\tMap map4 = new Map(base.context.Resolution, 1);\r\n\t\t\tmap4.Clear();\r\n\t\t\tMap map5 = map4.Copy();\r\n\t\t\tMap map6 = map.Copy();\r\n\t\t\tr = new XorShift64Star(Seed);\r\n\t\t\tfloat num2 = (AlternateSnowfall ? SnowLine : (1f - SnowLine)) / (float)Cascades;\r\n\t\t\tfloat num3 = (TaperSnowfall ? (0.2f * TaperAmount) : 0f);\r\n\t\t\tDefaultInterpolatedStringHandler val = default(DefaultInterpolatedStringHandler);\r\n\t\t\tfor (int i = 0; i < Cascades; i += 1)\r\n\t\t\t{\r\n\t\t\t\t((DefaultInterpolatedStringHandler)(ref val))..ctor(23, 2);\r\n\t\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendLiteral(\\ue0002.\\ue000(10819));\r\n\t\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendFormatted<int>(i, \\ue0002.\\ue000(10767));\r\n\t\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendLiteral(\\ue0002.\\ue000(5202));\r\n\t\t\t\t((DefaultInterpolatedStringHandler)(ref val)).AppendFormatted<int>(Cascades, \\ue0002.\\ue000(10767));\r\n\t\t\t\t\\uf55c\\uf0ba\\ue6cf.\\ue45b\\uf74e\\uf8e1(((DefaultInterpolatedStringHandler)(ref val)).ToStringAndClear());\r\n\t\t\t\tfloat f = SnowLine + num2 * (float)i;\r\n\t\t\t\tfloat threshold = Randomize(f, 0.25f);\r\n\t\t\t\tusing Map snowmap = Warps.FractalWarp(AspectMaps.GetThreshold(map6, threshold), 0.5f, 0.5f, (byte)1 != 0, 0f, (WarpNoiseType)0, 0.5f, 12, 0.5f, (byte)0 != 0, 1, (IterativeWarpMode)1, (EdgeBehaviour)0, Seed + i, null, 0f, 45f, 0.45f).\\ueb77\\uf21d\\ue95c(8f);\r\n\t\t\t\tMap[] array = Simulations.Snow(map2, Randomize(Duration, 0.25f), Randomize(Intensity.\\uf353\\uee79\\ue793() - num3 * ((float)Cascades / ((float)Cascades - (float)i)), 0.25f), Randomize(SettleThaw, 0.25f), Randomize(Melt, 0.25f), 0f, (byte)1 != 0, 5000f, 2500f, Randomize(SlipOffAngle, 0.25f), Randomize(AdheredSnowMass, 0.25f), Randomize(5f, 1f), snowmap);\r\n\t\t\t\tmap4 = Combiner.Max(array[2], map4);\r\n\t\t\t\tmap5 = Combiner.Max(array[3], map5);\r\n\t\t\t\tmap2 = array[0].Copy();\r\n\t\t\t\tMap[] array2 = array;\r\n\t\t\t\tfor (int j = 0; j < array2.Length; j += 1)\r\n\t\t\t\t{\r\n\t\t\t\t\tarray2[j].Dispose();\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tif ((int)Direction > 0)\r\n\t\t\t{\r\n\t\t\t\tmap2 -= map3;\r\n\t\t\t}\r\n\t\t\tMap m = map2 - map;\r\n\t\t\tMap map7 = m.\\ueb77\\uf21d\\ue961().\\ueb77\\uf21d\\ue95e(1f);\r\n\t\t\tMap map8 = Profiles.Recurve(map2, 1f, 3, (byte)0 != 0, (byte)0 != 0, 0.1f);\r\n\t\t\tif (SharpBuildup)\r\n\t\t\t{\r\n\t\t\t\tmap8 = Profiles.Recurve(map8, 1f, 3, (byte)0 != 0, (byte)0 != 0, 0.1f);\r\n\t\t\t}\r\n\t\t\tmap2 = Masking.Mask(map2, map8, map7);\r\n\t\t\tif (Flows)\r\n\t\t\t{\r\n\t\t\t\tMap b = Erosions.Classic(map2.Copy(), 0.04f, 0.1f, FlowsDepth, 0.2f * FlowsDepth, 0f, 0f, (byte)1 != 0, 15, 10000, 2000, 0f, 0f, 0f, (AreaEffect)2, (BiasType)0, 0.7f, (byte)0 != 0, Seed, (byte)1 != 0, (byte)0 != 0, map7.Copy())[0];\r\n\t\t\t\tMap mask = Profiles.GraphicEQ(map2, 0f, 2f, 2f, 2f, 0f, 0f, 0f).\\ueb77\\uf21d\\ue961().\\ueb77\\uf21d\\ue95e(-0.28f)\r\n\t\t\t\t\t.\\ueb77\\uf21d\\ue965();\r\n\t\t\t\tb = Masking.Mask(map2, b, mask);\r\n\t\t\t\tmap2 = b;\r\n\t\t\t}\r\n\t\t\tif (SurfaceDetails > 0f)\r\n\t\t\t{\r\n\t\t\t\tmap2 = Migrated.GroundTextureProcess(map2, (GroundStyle)0, SurfaceDetails, 0.33f, 0f);\r\n\t\t\t}\r\n\t\t\tmap2 = map + (map2 - map);\r\n\t\t\tmap2 = Combiner.Max(map2, map);\r\n\t\t\tm = map2 - map;\r\n\t\t\tCommit(map2, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\tCommit(\\ue0002.\\ue000(5158), m, (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(5369), map4, (RenderIntent)0);\r\n\t\t\tCommit(\\ue0002.\\ue000(5298), map5, (RenderIntent)0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Texturizer",
+   "cls": "Texturizer",
+   "helpers": [
+    "Texturize.TextureBase",
+    "Profiles.Sine",
+    "Landscapes.Slump",
+    "Landscapes.Ridge",
+    "Landscapes.MountainRange",
+    "Surfaces.M2",
+    "Surfaces.M4",
+    "Surfaces.M3",
+    "Surfaces.M5",
+    "Surfaces.M6"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tRenderAsMask((byte)1 != 0);\r\n\t\t\tMap heightfield = Texturize.TextureBase(base.In.\\uf072\\uf1d6\\uf748().Copy(), Slope, Flows, Soil, 0.5f, 1f, Seed, null, base.Version < 2);\r\n\t\t\theightfield = Style switch\r\n\t\t\t{\r\n\t\t\t\tQuickTexture.A => Profiles.Sine(heightfield, Landscapes.Slump(base.context.Resolution.X, Factor.\\ue05d\\uedfb\\ue0c7(0.4f, 0.75f), (ABC)0, (ABC)0, Seed + 5), Factor.\\ue05d\\uedfb\\ue0c7(0.02f, 0.8f), (byte)0 != 0), \r\n\t\t\t\tQuickTexture.B => Profiles.Sine(heightfield, Landscapes.Slump(base.context.Resolution.X, Factor.\\ue05d\\uedfb\\ue0c7(0.4f, 0.75f), (ABC)0, (ABC)0, Seed + 25), Factor.\\ue05d\\uedfb\\ue0c7(0.05f, 1.8f), (byte)0 != 0), \r\n\t\t\t\tQuickTexture.C => Profiles.Sine(heightfield, Landscapes.Slump(base.context.Resolution.X, Factor.\\ue05d\\uedfb\\ue0c7(0.4f, 0.75f), (ABC)0, (ABC)0, Seed + 2), Factor.\\ue05d\\uedfb\\ue0c7(0.5f, 3f), (byte)0 != 0), \r\n\t\t\t\tQuickTexture.D => Profiles.Sine(heightfield, Landscapes.Ridge(base.context.Resolution.X, Factor.\\ue05d\\uedfb\\ue0c7(0.4f, 0.75f), 0.6f, 0.4f, Seed + 2, 1f, 1f), Factor.\\ue05d\\uedfb\\ue0c7(0.02f, 3f), (byte)0 != 0), \r\n\t\t\t\tQuickTexture.E => Profiles.Sine(heightfield, Landscapes.Ridge(base.context.Resolution.X, Factor.\\ue05d\\uedfb\\ue0c7(0.4f, 0.75f), 0.6f, 0.4f, Seed + 6, 1f, 1f), Factor.\\ue05d\\uedfb\\ue0c7(0.02f, 2f), (byte)0 != 0), \r\n\t\t\t\tQuickTexture.F => Profiles.Sine(heightfield, Landscapes.MountainRange(base.context.Resolution, Factor.\\ue05d\\uedfb\\ue0c7(0.4f, 0.75f), 0.5f, (MountainRangeStyle)1, (MountainBulk)1, Seed + 6), Factor.\\ue05d\\uedfb\\ue0c7(0.02f, 0.75f), (byte)0 != 0), \r\n\t\t\t\tQuickTexture.G => Profiles.Sine(heightfield, Surfaces.M2(base.context.Resolution.X, Factor.\\ue05d\\uedfb\\ue0c7(0.6f, 0.75f), Seed + 6), Factor.\\ue05d\\uedfb\\ue0c7(0.02f, 0.75f), (byte)0 != 0), \r\n\t\t\t\tQuickTexture.H => Profiles.Sine(heightfield, Surfaces.M2(base.context.Resolution.X, Factor.\\ue05d\\uedfb\\ue0c7(0.26f, 0.45f), Seed + 6), Factor.\\ue05d\\uedfb\\ue0c7(0.02f, 0.75f), (byte)0 != 0), \r\n\t\t\t\tQuickTexture.I => Profiles.Sine(heightfield, Surfaces.M4(base.context.Resolution.X, Factor.\\ue05d\\uedfb\\ue0c7(0.16f, 0.45f), Seed + 6), Factor.\\ue05d\\uedfb\\ue0c7(0.02f, 0.75f), (byte)0 != 0), \r\n\t\t\t\tQuickTexture.J => Profiles.Sine(heightfield, Surfaces.M3(base.context.Resolution.X, Factor.\\ue05d\\uedfb\\ue0c7(0.46f, 0.95f), Seed + 6), Factor.\\ue05d\\uedfb\\ue0c7(0.02f, 0.75f), (byte)0 != 0), \r\n\t\t\t\tQuickTexture.K => Profiles.Sine(heightfield, Surfaces.M5(base.context.Resolution.X, Factor.\\ue05d\\uedfb\\ue0c7(0.26f, 0.95f), Seed + 6), Factor.\\ue05d\\uedfb\\ue0c7(0.02f, 0.75f), (byte)0 != 0), \r\n\t\t\t\tQuickTexture.L => Profiles.Sine(heightfield, Surfaces.M6(base.context.Resolution.X, Factor.\\ue05d\\uedfb\\ue0c7(0.26f, 0.85f), Seed + 6), Factor.\\ue05d\\uedfb\\ue0c7(0.02f, 0.75f), (byte)0 != 0), \r\n\t\t\t\t_ => throw new ArgumentOutOfRangeException(), \r\n\t\t\t};\r\n\t\t\tif (Secondary > 0f)\r\n\t\t\t{\r\n\t\t\t\theightfield = Profiles.Sine(heightfield, heightfield, Secondary, (byte)0 != 0);\r\n\t\t\t}\r\n\t\t\tCommit(heightfield, (byte)1 != 0, (byte)1 != 0);\r\n\t\t}\r"
+  },
+  {
+   "name": "Dusting",
+   "cls": "Dusting",
+   "helpers": [
+    "Combiner.Screen",
+    "Surfacer.Rocky",
+    "AspectMaps.GetSlope",
+    "AspectMaps.GetHeightNormalized",
+    "AspectMaps.GetAngle",
+    "Simulations.Flow2",
+    "Combiner.Add",
+    "Profiles.GraphicEQ",
+    "RandomNoises.Perlin",
+    "Combiner.Mix",
+    "Combiner.Max"
+   ],
+   "body": "\t\tinternal override void Build()\r\n\t\t{\r\n\t\t\tMap map = base.In.\\uf072\\uf1d6\\uf748()?.Copy();\r\n\t\t\tMap map2 = base.Ins[1].\\uf072\\uf1d6\\uf748();\r\n\t\t\tif (Gritty)\r\n\t\t\t{\r\n\t\t\t\tmap = Combiner.Screen(map, Surfacer.Rocky(map, 0.0001f, 0f), 0.00036f);\r\n\t\t\t}\r\n\t\t\tfloat min = SlopeCoverage.X * 60f;\r\n\t\t\tfloat num = SlopeCoverage.Y * 60f;\r\n\t\t\tMap slope = AspectMaps.GetSlope(map, min, 30f, num - num * Melt);\r\n\t\t\tMap heightNormalized = AspectMaps.GetHeightNormalized(map, Snowline, 1f, Falloff);\r\n\t\t\tMap a = (Directional ? AspectMaps.GetAngle(map, Direction * 360f, Melt, 1f, Coverage).\\ueb77\\uf21d\\ue95c(0.3f) : \\uf55c\\uf0ba\\ue6c0.\\ue755\\ue39c\\uf2bd((byte)1 != 0, (byte)1 != 0));\r\n\t\t\tMap b = Simulations.Flow2(map, null, 1f, 1f, Seed);\r\n\t\t\ta = \\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(Combiner.Add(a, b, 1f));\r\n\t\t\tMap map4;\r\n\t\t\tif (Peaks > 0f)\r\n\t\t\t{\r\n\t\t\t\tMap map3 = Profiles.GraphicEQ(map, 0f, 2f, 2f, 2f, 2f, 1f, 0f).\\ueb77\\uf21d\\ue961().\\ueb77\\uf21d\\ue95e(-1f + Peaks)\r\n\t\t\t\t\t.\\ueb77\\uf21d\\ue961();\r\n\t\t\t\tmap4 = (slope * heightNormalized * a + map3) * Strength;\r\n\t\t\t\tmap3.Dispose();\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tmap4 = slope * heightNormalized * a * Strength;\r\n\t\t\t}\r\n\t\t\tColorTransport.Simulation(new ColorTransport.Parameters\r\n\t\t\t{\r\n\t\t\t\tResolution = base.context.Resolution,\r\n\t\t\t\tTransportDistance = Flow.\\uf353\\uee79\\ue797(),\r\n\t\t\t\tSedimentDensity = 1f,\r\n\t\t\t\tBlend = 0.5f,\r\n\t\t\t\tFlowVolume = 0.02f,\r\n\t\t\t\tColorHold = 0.15f,\r\n\t\t\t\tLaminarFlow = ((byte)1 != 0),\r\n\t\t\t\tSeed = Seed\r\n\t\t\t}, (map, map4, (Map)null, (Map)null), out var output);\r\n\t\t\tMap map5 = RandomNoises.Perlin(base.context.Resolution, 1f, Seed);\r\n\t\t\tMap map6 = \\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(Combiner.Mix((BlendMode)7, 1f, output, map5)).\\ueb77\\uf21d\\ue95e(0f - Melt.\\ue05d\\uedfb\\ue0c7(0.3f, 1f));\r\n\t\t\tif (ArtisticControl > 0f)\r\n\t\t\t{\r\n\t\t\t\tMap slope2 = AspectMaps.GetSlope(map, 0f, 90f * ArtisticControl, 0f);\r\n\t\t\t\tmap6 = \\uf55c\\uf0ba\\ue6d5.\\ueb77\\uf21d\\ue95c(map6 - slope2);\r\n\t\t\t}\r\n\t\t\tif (map2 == null)\r\n\t\t\t{\r\n\t\t\t\tNode node = base.In.\\uf072\\uf1d6\\uf747();\r\n\t\t\t\tbool flag = IncludeExistingSnow;\r\n\t\t\t\tif (flag)\r\n\t\t\t\t{\r\n\t\t\t\t\tbool flag2 = (byte)((!(node is Snow) && !(node is Snowfield)) ? 0 : 1) != 0;\r\n\t\t\t\t\tflag = flag2;\r\n\t\t\t\t}\r\n\t\t\t\tif (flag)\r\n\t\t\t\t{\r\n\t\t\t\t\tCache cache = \\uf55c\\uf0ba\\ue6d3.\\ue157\\ueb2d\\ue93d(node.Id, base.context.Cluster, \\ue0002.\\ue000(7770));\r\n\t\t\t\t\tif (cache != null)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tmap6 += cache.Data;\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\tRenderAsMask((byte)1 != 0);\r\n\t\t\t\tCommit(map6, (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tRenderAsColor((byte)1 != 0);\r\n\t\t\t\tCommit(Combiner.Max(map2, map6), (byte)1 != 0, (byte)1 != 0);\r\n\t\t\t}\r\n\t\t\tslope.Dispose();\r\n\t\t\theightNormalized.Dispose();\r\n\t\t\ta?.Dispose();\r\n\t\t\tmap4.Dispose();\r\n\t\t\tmap5.Dispose();\r\n\t\t}\r"
+  }
+ ]
+}
