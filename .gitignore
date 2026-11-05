@@ -95,3 +95,5 @@ tools/oracle-spec-*.json
 tools/oracle-spec-*.json
 evidence/oracle-*.json
 evidence/oracle-blurgrid.json
+
+.learn/

@@ -19,7 +19,7 @@ for (let i = 0; i < n; i++) {
   color.data[i * 4 + 3] = 1;
 }
 
-const names = ['Sharpen', 'Transpose', 'Soil', 'Peaks', 'Shaper', 'LinearGradient', 'RadialGradient', 'Cone', 'Hemisphere', 'HSL', 'Fold',
+const names = ['Contours', 'Sharpen', 'Transpose', 'Soil', 'Peaks', 'Shaper', 'LinearGradient', 'RadialGradient', 'Cone', 'Hemisphere', 'HSL', 'Fold',
   'Swirl', 'Shape', 'Median', 'Compare', 'RGBMerge', 'RGBSplit'];
 const inputsByName = {
   HSL: [color], RGBSplit: [color], RGBMerge: [height, height2, mask],

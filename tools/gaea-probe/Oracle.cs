@@ -456,6 +456,14 @@ internal static class Oracle
             var list = ((Array)v).Cast<object>().Select(x => (object?)Project(x)).ToArray();
             return new { t = "maps", items = list };
         }
+        // ValueTuples (e.g. Cartographer.Contours / Hillify / Sediments) project as their item list so
+        // a spec can request one deterministic component instead of an opaque type name.
+        if (v is System.Runtime.CompilerServices.ITuple tuple)
+        {
+            var items = new List<object?>();
+            for (var i = 0; i < tuple.Length; i++) items.Add(Project(tuple[i]));
+            return new { t = "tuple", items };
+        }
         switch (v)
         {
             case float[] fa: return new { t = "f32arr", data = fa, stats = Stats(fa) };

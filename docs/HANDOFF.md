@@ -15,11 +15,9 @@
 3. **可运行的重实现代码** — `web/js/` 下的浏览器实现
 4. **可复现分析工具链** — 从安装的 Gaea 重新生成以上一切的脚本
 
-**当前进度:目录 182 个节点中有 92 个已实现算法(50.5%),其中 21 个 `exact`、30 个 `model`。**
-本会话累计新增登记 19 个节点(73 → 92)。第一轮:Shaper、LinearGradient、RadialGradient、Cone、
-Hemisphere、HSL、Fold、Swirl、Shape、Median、Compare、RGBMerge、RGBSplit;第二轮:Seamless(exact)、
-Repeat(model)、Soil(model)、Peaks(model);第三轮:Transpose(三模式全部验证)、Sharpen。
-所有 exact 节点都有 oracle 逐数值对拍。
+**当前进度:目录 182 个节点中有 93 个已实现算法(51.1%),其中 21 个 `exact`、30 个 `model`。**
+本会话累计新增登记 20 个节点(73 → 93)。最近一批:Shaper 系列、Seamless、Repeat、Soil、Peaks、
+Transpose(三模式)、Sharpen、**Contours**。所有 exact 节点都有 oracle 逐数值对拍。
 
 ---
 
@@ -83,7 +81,7 @@ spec JSON 可以:
 ### 3.3 验证方式
 
 ```bash
-node tools/verify-exact.mjs      # 341 个数值用例:331 全过 + 10 例在已知近似界内(blur 边缘 / Repeat)
+node tools/verify-exact.mjs      # 351 个数值用例:338 全过 + 13 例在已知近似界内(blur 边缘 / Repeat / Contours)
 ```
 
 它把同一输入同时喂给"真实 Gaea"和"JS 移植",逐 float 比较。**只有 maxAbsDiff ≤ 2e-4 才算通过。**
@@ -136,6 +134,11 @@ node tools/verify-exact.mjs      # 341 个数值用例:331 全过 + 10 例在已
 | `AspectMaps.GetCurvature` | 源码+oracle | 有限差分 + 三种曲率(H/V/Average),注意 `max=Max/2` 而 `min=Min` 不除以 2;精确(2e-6) |
 | `Sharpen` | 源码 | Edge = `map + GetCurvature(0,1,0.2,Vertical)*0.008*Amount`;Frequency = GraphicEQ 顶带 +Amount |
 
+| `XorShift64Star` | 常量池 | 参数精确:步进 `>>12,<<25,>>7`、乘数 `2685821657736338717`、`nextFloat=(x*M>>24)*2^-40`、seed=0 用默认常量 |
+| `Profiles.Terrace` | 源码 + oracle | 10 轮边界抖动 + smoothstep 分档;与随机流一起验证(2e-5) |
+| `Morphology.DilateCross` | 源码 + oracle | van Herk 分段 max-filter,两次 transpose 得到十字膨胀;逐值一致(1e-6) |
+| `Cartographer.Contours` | 源码 + oracle | 两级 terrace + 曲率 + Max + 膨胀;但**极小半径 blur** 仍为模型 → 标 model |
+
 ---
 
 ## 6. 代码结构(新增部分)
@@ -147,6 +150,10 @@ web/js/kernel/gaea-combine.js   精确合成:Combiner.Mix 全模式/Mask/Normali
 web/js/kernel/gaea-mosaic.js    精确平铺:Resize(LinearFast)/Insert(Add)/Mosaic.Repeat/Seamless
 web/js/kernel/gaea-filter.js    FilterCore.FilterProcess(7 模式)+ Combiner.Transpose/Embed/Insert(全部验证)
 web/js/kernel/gaea-aspect.js    AspectMaps.GetCurvature / GetThreshold
+web/js/kernel/gaea-random.js    XorShift64Star 精确移植(所有带 Seed 节点的底座)
+web/js/kernel/gaea-terrace.js   Profiles.Terrace(精确)
+web/js/kernel/gaea-morphology.js Morphology.DilateCross(精确)
+web/js/kernel/gaea-cartographer.js Cartographer.Contours / Outline
 web/js/kernel/gaea-blur.js      原生 Map.Blur 的模型:分离卷积 + 实测核 LUT + 混合边缘规则
 web/js/kernel/blur-kernel-data.js  GENERATED:原生 blur 的可分离 1D 核(92 个半径)
 web/js/kernel/gaea-exact.js     追加:graphicEQ / soil2(基于 blur)
@@ -278,7 +285,7 @@ node tools/probe-range.mjs                   # Normalize/Autolevel/clamp
 node tools/probe-blur.mjs                    # 原生 blur 冲激响应
 node tools/probe-blur-percent.mjs            # 百分比换算 + 边缘规则
 node tools/build-blur-lut.mjs                # 重建 web/js/kernel/blur-kernel-data.js
-node tools/smoke-new-nodes.mjs               # 新增节点的最小求值冒烟(17/17)
+node tools/smoke-new-nodes.mjs               # 新增节点的最小求值冒烟(18/18)
 
 # 待办分析
 py -3.11 tools/list-pending-nodes.py

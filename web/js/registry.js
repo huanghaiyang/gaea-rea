@@ -48,10 +48,11 @@ import { gaeaAngle, gaeaFilter, gaeaEdge, gaeaRoughen, gaeaCraggy } from './kern
 import { gaeaHalftone, HALFTONE_PATTERN_NAMES } from './kernels/halftone.js';
 import { gaeaCLUTer, CLUT_NAMES } from './clut.js';
 import { gaeaThreshold, gaeaSoftClip, gaeaTerraces, gaeaPixelate, gaeaCurvature } from './kernels/ops.js';
-import { gaeaShaper, gaeaLinearGradient, gaeaRadialGradient, gaeaCone, gaeaHemisphere, gaeaHSL, gaeaFold, gaeaSwirl, gaeaShape, gaeaMedian, gaeaCompare, gaeaRGBMerge, gaeaRGBSplit, gaeaSeamless, gaeaRepeat, gaeaSoil, gaeaPeaks, gaeaTranspose, gaeaSharpen } from './kernels/profiles.js';
+import { gaeaShaper, gaeaLinearGradient, gaeaRadialGradient, gaeaCone, gaeaHemisphere, gaeaHSL, gaeaFold, gaeaSwirl, gaeaShape, gaeaMedian, gaeaCompare, gaeaRGBMerge, gaeaRGBSplit, gaeaSeamless, gaeaRepeat, gaeaSoil, gaeaPeaks, gaeaTranspose, gaeaSharpen, gaeaContours } from './kernels/profiles.js';
 import { AUTHORITATIVE_PARAMS, authoritativeParam } from './param-authority.js';
 import { gaeaGamma, gaeaBlobRemover } from './kernels/imaging.js';
 import { createField } from './kernel/field.js';
+import * as REMAINING from './kernels/remaining.js';
 
 /* ================================================================== passthrough */
 
@@ -724,6 +725,19 @@ export const NODES = [
     },
   },
   {
+    name: 'Contours', note: 'model', algorithm: gaeaContours, category: CAT.MASK,
+    summary: 'Contour lines from two nested terrace bands (Count/Subdivision), with line thickness via cross dilation.',
+    inputs: [H()], outputs: [OUT_H()],
+    params: {
+      Count: { d: 36, min: 2, max: 200, step: 1 },
+      Subdivision: { d: 6, min: 2, max: 20, step: 1 },
+      Accuracy: { d: 0.7, min: 0, max: 1, step: 0.01 },
+      'Line Intensity': { d: 1, min: 0, max: 2, step: 0.01 },
+      'Sub Intensity': { d: 0.25, min: 0, max: 2, step: 0.01 },
+      'Line Thickness': { d: 1, min: 1, max: 10, step: 1 },
+    },
+  },
+  {
     name: 'Median', note: 'exact', algorithm: gaeaMedian, category: CAT.ADJ,
     summary: 'Smoothed median blur; Classic and Advanced differ only in the filter window.',
     inputs: [H()], outputs: [OUT_H()],
@@ -1361,6 +1375,824 @@ export const NODES = [
       Seed: { d: 0, min: 0, max: 99999, step: 1 },
     },
   },
+
+  /* ---------------------------------------------------------- remaining Gaea nodes */
+{
+    name: 'Shatter',
+    algorithm: REMAINING.shatter,
+    category: CAT.SHAPE,
+    summary: 'Shatter transforms simple shapes into complex, highly eroded, and fractured terrains.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'VariableBlur',
+    algorithm: REMAINING.variableBlur,
+    category: CAT.ADJ,
+    summary: 'Blurs the input by varying the blur amount across the surface using local data or a guide.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'approx',
+  },
+
+  {
+    name: 'Grid',
+    algorithm: REMAINING.gridNode,
+    category: CAT.MASK,
+    summary: 'Generates a regular grid pattern useful for cartography, masking, or stylized surfaces.',
+    inputs: [], outputs: [MASK('Output')],
+    note: 'approx',
+  },
+
+  {
+    name: 'Hillify',
+    algorithm: REMAINING.hillify,
+    category: CAT.EROS,
+    summary: 'Softens and reshapes terrain into smoother, hill-like forms.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Stratify',
+    algorithm: REMAINING.stratify,
+    category: CAT.SHAPE,
+    summary: 'Stratify creates broken strata or rock layers on the terrain in a non-linear fashion, producing a robust, realistic formation.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Island',
+    algorithm: REMAINING.island,
+    category: CAT.SHAPE,
+    summary: 'Island draws basic shapes from which entire landmasses can be generated.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'MountainRange',
+    algorithm: REMAINING.mountainRange,
+    category: CAT.SHAPE,
+    summary: 'Range primitive quickly sets up an entire mountain terrain with shapes highly optimized for eroding large-scale landscapes.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Plates',
+    algorithm: REMAINING.plates,
+    category: CAT.SHAPE,
+    summary: 'Plates primitive is based on a Perlin core with flat plate-like formations created in between larger Perlin-esque shapes.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'SlopeBlur',
+    algorithm: REMAINING.slopeBlur,
+    category: CAT.ADJ,
+    summary: 'SlopeBlur is a versatile, low-level node that adds directional blurring based on the slopes of a Guide terrain or mask. It is one of our deceptively simple nodes that can create a wide array of shapes.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'approx',
+  },
+
+  {
+    name: 'SlopeWarp',
+    algorithm: REMAINING.slopeWarp,
+    category: CAT.WARP,
+    summary: 'SlopeBlur is a versatile, low-level node that adds directional warping based on the slopes of a Guide terrain or mask. It behaves similarly to SlopeBlur.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'approx',
+  },
+
+  {
+    name: 'Sandstone',
+    algorithm: REMAINING.sandstone,
+    category: CAT.SHAPE,
+    summary: 'Creates layered sandstone-like terracing and sedimentary rock structure.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Sunlight',
+    algorithm: REMAINING.sunlight,
+    category: CAT.FX,
+    summary: 'Sunlight is a Data Map that gives you the sunlight integral (sun light/shadow map) of any given period (up to 365 days). It can be used to drive snow melt, vegetation growth, and more.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [MASK('Output')],
+    note: 'model',
+  },
+
+  {
+    name: 'DuneSea',
+    algorithm: REMAINING.duneSea,
+    category: CAT.SHAPE,
+    summary: 'Creates broad fields of dune-like terrain suitable for deserts and wind-shaped landscapes.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Sand',
+    algorithm: REMAINING.sand,
+    category: CAT.SHAPE,
+    summary: 'Sand creates medium and small level sand patterns. It can also be used to simulate dunes.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'WaveShine',
+    algorithm: REMAINING.waveShine,
+    category: CAT.SHAPE,
+    summary: 'Generates wave-like reflective or rippling patterns useful for stylized surfaces and water-like forms.',
+    inputs: [], outputs: [MASK('Output')],
+    note: 'model',
+  },
+
+  {
+    name: 'Stones',
+    algorithm: REMAINING.stones,
+    category: CAT.SHAPE,
+    summary: 'Scatters stones or small rock forms across the surface.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'HydroFix',
+    algorithm: REMAINING.hydroFix,
+    category: CAT.EROS,
+    summary: 'HydroFix alters the terrain to create continuous drainage network friendly slopes. It can be used before Erosion or other flow related nodes to get better results.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'SuperColor',
+    algorithm: REMAINING.superColor,
+    category: CAT.FX,
+    summary: 'Applies procedural terrain colorization using texture, flow, peaks, and palette controls.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_C()],
+    note: 'approx',
+  },
+
+  {
+    name: 'DriftNoise',
+    algorithm: REMAINING.driftNoise,
+    category: CAT.PRIM,
+    summary: 'DriftNoise is a unique primitive that can create overlapping "shelves". It is a versatile primitive noise that can be used in various scenarios from cliffs to crack production.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'GroundTexture',
+    algorithm: REMAINING.groundTexture,
+    category: CAT.FX,
+    summary: 'GroundTexture adds superficial detail to the terrain to increase realism.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'PointCloud',
+    algorithm: REMAINING.pointCloud,
+    category: CAT.IO,
+    summary: 'Exports the terrain as a point cloud in formats such as PLY, XYZ, or CSV.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'stub',
+  },
+
+  {
+    name: 'Trees',
+    algorithm: REMAINING.trees,
+    category: CAT.MASK,
+    summary: 'The Arboreal Node gives you the power of creating superficial forests and vegetation. These forests are part of the heightfield while being "detached" enough for various export scenarios.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }, { name: 'Mask 3', kind: 'height' }, { name: 'Mask 4', kind: 'height' }], outputs: [MASK('Output')],
+    note: 'model',
+  },
+
+  {
+    name: 'Rockscape',
+    algorithm: REMAINING.rockscape,
+    category: CAT.SHAPE,
+    summary: 'Creates broad rocky surface formations and broken stone-like terrain detail.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'CraterField',
+    algorithm: REMAINING.craterField,
+    category: CAT.SHAPE,
+    summary: 'Creates a landscape full of craters.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Gabor',
+    algorithm: REMAINING.gabor,
+    category: CAT.PRIM,
+    summary: 'Gabor noise is one of the lesser used noises, but provides a wonderful pattern-friendly noise that can be used to simulate various aspects of nature.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Slump',
+    algorithm: REMAINING.slump,
+    category: CAT.EROS,
+    summary: 'Slump is a simple primitive that creates relative smooth hills with slumped (collapsed) areas. It is very useful for creating large landscapes.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'ThermalShaper',
+    algorithm: REMAINING.thermalShaper,
+    category: CAT.EROS,
+    summary: 'ThermalShaper is a fast, basic simulation of the concavity and convexity that can be achieved from thermal erosion. The effect can be exaggerated for artistic effect.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Mesher',
+    algorithm: REMAINING.mesher,
+    category: CAT.IO,
+    summary: 'Mesher can save specific nodes as meshes instead of heightfields, and can also generate LODs.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'stub',
+  },
+
+  {
+    name: 'Thermal2',
+    algorithm: REMAINING.thermal2,
+    category: CAT.EROS,
+    summary: 'Thermal2 is an evolution of the previous node. It creates Thermal Erosion to create realistic talus and debris.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Input 2', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'MathX',
+    algorithm: REMAINING.mathX,
+    category: CAT.COMB,
+    summary: 'Evaluates mathematical expressions to generate or modify terrain data procedurally.',
+    inputs: [{ name: 'A', kind: 'height' }, { name: 'B', kind: 'height' }], outputs: [OUT_H()],
+    note: 'approx',
+  },
+
+  {
+    name: 'Scree',
+    algorithm: REMAINING.scree,
+    category: CAT.SHAPE,
+    summary: 'Creates accumulations of loose rock fragments scattered across slopes and terrain edges.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Reseed',
+    algorithm: REMAINING.reseed,
+    category: CAT.COMB,
+    summary: 'Re-randomizes an upstream procedural node by overriding or refreshing its seed behavior.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'approx',
+  },
+
+  {
+    name: 'Match',
+    algorithm: REMAINING.match,
+    category: CAT.COMB,
+    summary: 'Matches the height range or histogram of one terrain to another.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'approx',
+  },
+
+  {
+    name: 'Normals',
+    algorithm: REMAINING.normals,
+    category: CAT.FX,
+    summary: 'Generates a normal map from the terrain for shading and downstream workflows.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_C()],
+    note: 'approx',
+  },
+
+  {
+    name: 'Unity',
+    algorithm: REMAINING.unity,
+    category: CAT.IO,
+    summary: 'Exports terrain data in Unity-friendly resolutions and formats.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'stub',
+  },
+
+  {
+    name: 'Pattern',
+    algorithm: REMAINING.patternNode,
+    category: CAT.PRIM,
+    summary: 'Generates repeatable geometric or decorative patterns for masking and stylized terrain work.',
+    inputs: [], outputs: [MASK('Output')],
+    note: 'approx',
+  },
+
+  {
+    name: 'Transform3D',
+    algorithm: REMAINING.transform3D,
+    category: CAT.WARP,
+    summary: 'Applies full 3D transformation to the terrain, including rotation and spatial adjustment.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'approx',
+  },
+
+  {
+    name: 'Rugged',
+    algorithm: REMAINING.rugged,
+    category: CAT.SHAPE,
+    summary: 'Rugged is a very powerful primitive node that creates a strong, rocky surface for any terrain while preserving overall shape.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Tint',
+    algorithm: REMAINING.tint,
+    category: CAT.FX,
+    summary: 'QuickColor quickly maps a 2-color gradient to any mask. Useful for simple scenarios where CLUTer would be overkill. ',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_C()],
+    note: 'approx',
+    params: {
+      'Start': { d: [0.12, 0.16, 0.28, 1] },
+      'End': { d: [0.85, 0.82, 0.72, 1] },
+    },
+  },
+
+  {
+    name: 'Var',
+    algorithm: REMAINING.varNode,
+    category: CAT.COMB,
+    summary: 'Reads or modifies named graph variables for procedural control and automation.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'approx',
+  },
+
+  {
+    name: 'Volcano',
+    algorithm: REMAINING.volcano,
+    category: CAT.SHAPE,
+    summary: 'Generates a volcanic landform with a central cone and crater structure.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Texturizer',
+    algorithm: REMAINING.texturizer,
+    category: CAT.FX,
+    summary: 'Generates terrain texture masks using preset styles and controllable secondary effects.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [MASK('Output')],
+    note: 'model',
+  },
+
+  {
+    name: 'TextureBaker',
+    algorithm: REMAINING.textureBaker,
+    category: CAT.IO,
+    summary: 'Bakes derived texture maps from the terrain for export and downstream use.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Item', kind: 'height' }], outputs: [OUT_H()],
+    note: 'stub',
+  },
+
+  {
+    name: 'Crumble',
+    algorithm: REMAINING.crumble,
+    category: CAT.EROS,
+    summary: 'Crumble runs a different kind of simulation that feeds off of existing crevices, erosive information, and other subtle details to collapse the terrain. Just as the name implies, the terrain starts crumbling from the edges.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Meshify',
+    algorithm: REMAINING.meshify,
+    category: CAT.IO,
+    summary: 'Converts terrain into a faceted, mesh-like surface with controllable vertex density and detail sensitivity.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Input 2', kind: 'height' }, { name: 'Mask', kind: 'height' }], outputs: [OUT_H()],
+    note: 'stub',
+  },
+
+  {
+    name: 'Uplift',
+    algorithm: REMAINING.uplift,
+    category: CAT.SHAPE,
+    summary: 'Creates tectonic-style uplift by raising and shaping large terrain masses.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Synth',
+    algorithm: REMAINING.synth,
+    category: CAT.PRIM,
+    summary: 'Synth takes a bitmap image (photo or artwork) and converts it to CLUT map that can be used with a texture mask to colorize your terrain.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'MacroPort',
+    algorithm: REMAINING.macroPort,
+    category: CAT.IO,
+    summary: 'Defines an input or output port inside a macro for passing height, mask, or color data.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'stub',
+  },
+
+  {
+    name: 'Wizard',
+    algorithm: REMAINING.wizard,
+    category: CAT.EROS,
+    summary: 'The Erosion Wizard is a lightweight wrapper for the Erosion node. It simplifies the settings through curated presets, and provides secondary passes for additional processing.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Noise',
+    algorithm: REMAINING.noiseNode,
+    category: CAT.PRIM,
+    summary: 'Noise applies controlled single-pixel noise onto the terrain.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Sediments',
+    algorithm: REMAINING.sediments,
+    category: CAT.EROS,
+    summary: 'Sediments creates a thick layer of generic sedimentation on top of the terrain, which can be used for sand or snow.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask', kind: 'height' }], outputs: [OUT_H()],
+    note: 'approx',
+  },
+
+  {
+    name: 'Switch',
+    algorithm: REMAINING.switchNode,
+    category: CAT.COMB,
+    summary: 'Switch chooses between two different heightfield inputs and relies on a boolean (true/false) input.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'approx',
+  },
+
+  {
+    name: 'FlowMapClassic',
+    algorithm: REMAINING.flowMapClassic,
+    category: CAT.EROS,
+    summary: 'Generates a classic-style flow map based on legacy flow behavior.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'ColorErosion',
+    algorithm: REMAINING.colorErosion,
+    category: CAT.EROS,
+    summary: 'Applies erosion-style transport and deposition to color data, creating more natural weathered color variation.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask', kind: 'height' }], outputs: [OUT_C()],
+    note: 'model',
+  },
+
+  {
+    name: 'RockNoise',
+    algorithm: REMAINING.rockNoise,
+    category: CAT.PRIM,
+    summary: 'RockNoise is a useful tool for generating fields of rocks with size variations and controllable density.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'LoopBegin',
+    algorithm: REMAINING.loopBegin,
+    category: CAT.COMB,
+    summary: 'Begins a Loop circuit.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'stub',
+  },
+
+  {
+    name: 'Bomber',
+    algorithm: REMAINING.bomber,
+    category: CAT.SHAPE,
+    summary: 'Bomber takes an input heightfield and "stamps" or bombs it across the entire terrain surface using the randomization properties you set.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Input 2', kind: 'height' }, { name: 'Mask', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Layers',
+    algorithm: REMAINING.layers,
+    category: CAT.COMB,
+    summary: 'Combines multiple layers using blend operations in a stacked workflow.',
+    inputs: [{ name: 'Layer 1', kind: 'height' }, { name: 'Layer 2', kind: 'height' }, { name: 'Layer 3', kind: 'height' }, { name: 'Layer 4', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Distress',
+    algorithm: REMAINING.distress,
+    category: CAT.MASK,
+    summary: 'Adds superficial wear, breakup, and irregular damage to a surface.',
+    inputs: [], outputs: [MASK('Output')],
+    note: 'approx',
+  },
+
+  {
+    name: 'AO',
+    algorithm: REMAINING.ao,
+    category: CAT.MASK,
+    summary: 'Creates an ambient occlusion map that darkens recessed areas and enhances terrain depth.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [MASK('Output')],
+    note: 'model',
+  },
+
+  {
+    name: 'Object',
+    algorithm: REMAINING.objectNode,
+    category: CAT.IO,
+    summary: 'Loads external object or mesh data for use inside the graph.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'stub',
+  },
+
+  {
+    name: 'Draw',
+    algorithm: REMAINING.draw,
+    category: CAT.IO,
+    summary: 'Draw draws entire mountain ranges in the shape you choose.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'stub',
+  },
+
+  {
+    name: 'LineNoise',
+    algorithm: REMAINING.lineNoise,
+    category: CAT.PRIM,
+    summary: 'LineNoise is a geometry generator that creates sets of lines which can be distorted and used with other noises and fractals to produce layered ridges.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Unreal',
+    algorithm: REMAINING.unreal,
+    category: CAT.IO,
+    summary: 'Exports terrain data in Unreal-friendly resolutions, formats, and naming conventions.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'stub',
+  },
+
+  {
+    name: 'Debris',
+    algorithm: REMAINING.debris,
+    category: CAT.MASK,
+    summary: 'Simulates loose debris across the terrain surface to create broken rocky accumulation.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Input 2', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }], outputs: [MASK('Output')],
+    note: 'model',
+  },
+
+  {
+    name: 'TileInput',
+    algorithm: REMAINING.tileInput,
+    category: CAT.IO,
+    summary: 'Reads a set of tiles for 1:1 input into a tiled build, or combines it into a single input.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'stub',
+  },
+
+  {
+    name: 'Mixer',
+    algorithm: REMAINING.mixer,
+    category: CAT.COMB,
+    summary: 'Mixer allows layer-based manipulation of color textures and contains in-built masking.',
+    inputs: [{ name: 'Base', kind: 'color' }, { name: 'Layer 1', kind: 'color' }, { name: 'Layer 2', kind: 'color' }, { name: 'Layer 3', kind: 'color' }, { name: 'Layer 4', kind: 'color' }, { name: 'Layer 5', kind: 'color' }], outputs: [OUT_C()],
+    note: 'model',
+  },
+
+  {
+    name: 'TextureBase',
+    algorithm: REMAINING.textureBase,
+    category: CAT.PRIM,
+    summary: 'Texture uses multiple factors (such as chaos, slopes, flow zones, and other geological features) to create a texture mask for any color node to create a texture map. Can be used by itself, or combined with other data maps and selectors.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Input 2', kind: 'height' }], outputs: [MASK('Output')],
+    note: 'model',
+  },
+
+  {
+    name: 'IceFloe',
+    algorithm: REMAINING.iceFloe,
+    category: CAT.SHAPE,
+    summary: 'Icefloe creates flat plates of ice inside a water body.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Input 2', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }], outputs: [MASK('Output')],
+    note: 'model',
+  },
+
+  {
+    name: 'WaterColor',
+    algorithm: REMAINING.waterColor,
+    category: CAT.FX,
+    summary: 'Colorizes water bodies using palette-based shallow and deep water tones.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Accumulation', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }, { name: 'Mask 3', kind: 'height' }], outputs: [OUT_C()],
+    note: 'model',
+    params: {
+      'Shallow': { d: [0.22, 0.55, 0.62, 1] },
+      'Deep': { d: [0.02, 0.12, 0.28, 1] },
+    },
+  },
+
+  {
+    name: 'Shrubs',
+    algorithm: REMAINING.shrubs,
+    category: CAT.MASK,
+    summary: 'Adds low vegetation or shrub-like surface growth across the terrain.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Input 2', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }], outputs: [MASK('Output')],
+    note: 'model',
+  },
+
+  {
+    name: 'LightX',
+    algorithm: REMAINING.lightX,
+    category: CAT.FX,
+    summary: 'Creates a fully lit render using controllable sun, shadow, and ambient lighting.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Input 2', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }], outputs: [OUT_C()],
+    note: 'model',
+    params: {
+      'Sun Color': { d: [1, 0.96, 0.9, 1] },
+      'Ambient Color': { d: [0.45, 0.52, 0.62, 1] },
+    },
+  },
+
+  {
+    name: 'Wizard2',
+    algorithm: REMAINING.wizard2,
+    category: CAT.EROS,
+    summary: 'A simplified erosion wrapper that provides curated controls for shaping erosion depth, scale, and strength.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Anastomosis',
+    algorithm: REMAINING.anastomosis,
+    category: CAT.EROS,
+    summary: 'Anastomosis creates interconnected water flow based extractions, ranging from small pits to large river channels. It is useful for both terrains and textures.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Dusting',
+    algorithm: REMAINING.dusting,
+    category: CAT.MASK,
+    summary: 'Applies a thin dusting of snow or sediment over the terrain surface.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }, { name: 'Mask 3', kind: 'height' }], outputs: [MASK('Output')],
+    note: 'model',
+  },
+
+  {
+    name: 'SatMap',
+    algorithm: REMAINING.satMap,
+    category: CAT.FX,
+    summary: 'Generates terrain color from preset satellite-style palettes with controllable range and processing.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Input 2', kind: 'height' }], outputs: [OUT_C()],
+    note: 'approx',
+  },
+
+  {
+    name: 'DataExtractor',
+    algorithm: REMAINING.dataExtractor,
+    category: CAT.MASK,
+    summary: 'Extracts specific derived data such as boundaries, differences, or Modifier maps from an input.',
+    inputs: [{ name: 'Input 1', kind: 'height' }, { name: 'Input 2', kind: 'height' }, { name: 'Input 3', kind: 'height' }, { name: 'Input 4', kind: 'height' }, { name: 'Input 5', kind: 'height' }, { name: 'Input 6', kind: 'height' }], outputs: [MASK('Output')],
+    note: 'model',
+  },
+
+  {
+    name: 'Weathering',
+    algorithm: REMAINING.weathering,
+    category: CAT.FX,
+    summary: 'Creates weathered color or mask variation that simulates dirt, fading, and environmental wear.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_C()],
+    note: 'model',
+  },
+
+  {
+    name: 'Snowfield',
+    algorithm: REMAINING.snowfield,
+    category: CAT.MASK,
+    summary: 'Creates broad settled snow coverage across the terrain surface.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }], outputs: [MASK('Output')],
+    note: 'model',
+  },
+
+  {
+    name: 'MountainSide',
+    algorithm: REMAINING.mountainSide,
+    category: CAT.SHAPE,
+    summary: 'Generates a single mountain slope or mountainside formation.',
+    inputs: [], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'EasyErosion',
+    algorithm: REMAINING.easyErosion,
+    category: CAT.EROS,
+    summary: 'Provides a simplified erosion workflow for quickly adding natural erosion effects.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'Shade',
+    algorithm: REMAINING.shade,
+    category: CAT.FX,
+    summary: 'Produces a shaded terrain render based on lighting direction and surface relief.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_C()],
+    note: 'model',
+  },
+
+  {
+    name: 'LoopEnd',
+    algorithm: REMAINING.loopEnd,
+    category: CAT.COMB,
+    summary: 'Ends a Loop circuit. ',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'stub',
+  },
+
+  {
+    name: 'Splat',
+    algorithm: REMAINING.splat,
+    category: CAT.FX,
+    summary: 'Splat is similar to RGBMix, taking heightfield nodes and encoding them to the RGB channels of a color map, and providing properties to control the inputs.',
+    inputs: [{ name: 'R', kind: 'height' }, { name: 'G', kind: 'height' }, { name: 'B', kind: 'height' }], outputs: [OUT_C()],
+    note: 'approx',
+  },
+
+  {
+    name: 'Cartography',
+    algorithm: REMAINING.cartography,
+    category: CAT.FX,
+    summary: 'Cartography creates a topographical overlay for a map.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Water', kind: 'height' }, { name: 'Grid', kind: 'height' }], outputs: [OUT_C()],
+    note: 'model',
+  },
+
+  {
+    name: 'Heal',
+    algorithm: REMAINING.heal,
+    category: CAT.ADJ,
+    summary: 'Heal reconstructs damaged, low res, or 8-bit data with 16-bit, high resolution fidelity. It cleans up quantized images with extreme banding of any shape, and yields naturalistic terrain output.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'approx',
+  },
+
+  {
+    name: 'Rivers',
+    algorithm: REMAINING.rivers,
+    category: CAT.EROS,
+    summary: 'Rivers creates a realistic network of rivers with controllable headwaters.',
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }, { name: 'Mask 3', kind: 'height' }, { name: 'Mask 4', kind: 'height' }], outputs: [OUT_H()],
+    note: 'model',
+  },
+
+  {
+    name: 'ColorThreshold',
+    algorithm: REMAINING.colorThreshold,
+    category: CAT.MASK,
+    summary: 'Creates a greyscale mask from a specified color range.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [MASK('Output')],
+    note: 'approx',
+    params: {
+      'Start': { d: [0.35, 0.5, 0.35, 1] },
+    },
+  },
+
+  {
+    name: 'Whorl',
+    algorithm: REMAINING.whorl,
+    category: CAT.WARP,
+    summary: 'Whorl applies multiple vortex-like distortions across the terrain to create large-scale warping. Very useful for creating massive landscapes without a patterning in the noise and for creating slightly surreal or alien landscapes.',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'approx',
+  },
+
 ];
 
 /* ================================================================== index + schema merge */

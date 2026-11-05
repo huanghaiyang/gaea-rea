@@ -21,7 +21,7 @@ const N = 256;
 const C = N / 2;
 
 const grid = [];
-for (let p = 0.1; p <= 2.001; p += 0.1) grid.push(+p.toFixed(2));
+for (let p = 0.05; p <= 2.001; p += 0.05) grid.push(+p.toFixed(2));
 for (let p = 2.25; p <= 8.001; p += 0.25) grid.push(+p.toFixed(2));
 for (let p = 8.5; p <= 16.001; p += 0.5) grid.push(+p.toFixed(2));
 for (let p = 17; p <= 32.001; p += 1) grid.push(+p.toFixed(0));

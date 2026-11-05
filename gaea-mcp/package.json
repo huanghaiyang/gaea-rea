@@ -1,0 +1,8 @@
+{
+  "name": "@local/gaea-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MCP server driving the real Gaea 2 desktop application (UI Automation + screenshots + node catalog)",
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } }
+}

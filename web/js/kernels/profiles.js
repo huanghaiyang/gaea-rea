@@ -19,6 +19,7 @@ import {
 import { smoothedMedianBlur, maskBlend, autolevel, equalize, grayscale, shiftClamp } from '../kernel/gaea-combine.js';
 import { mosaicRepeat, mosaicSeamless } from '../kernel/gaea-mosaic.js';
 import { combinerTranspose, combinerEmbed, combinerInsert } from '../kernel/gaea-filter.js';
+import { cartographerContours } from '../kernel/gaea-cartographer.js';
 import { getCurvature, CURVATURE_TYPE } from '../kernel/gaea-aspect.js';
 
 function P(params, name, dflt) {
@@ -408,4 +409,27 @@ export function gaeaSharpen(ctx) {
     out = graphicEQ(src.data, size, [1, 1, 1, 1, 1, 1, 1 + amount]);
   }
   return outField(size, out);
+}
+
+/* ================================================================== Cartography */
+
+/**
+ * Contours — `Cartographer.Contours(input, Count, Subdivision, Accuracy, LineIntensity, SubIntensity, LineThickness)`.
+ * The piecewise maths is ported from the shipped helper and every part is oracle-verified (Terrace,
+ * GetCurvature, DilateCross, percent blur); the node keeps only the first (contours) output.
+ */
+export function gaeaContours(ctx) {
+  const { size } = ctx;
+  const src = inOr(ctx, 0);
+  const out = cartographerContours(
+    src.data,
+    size,
+    Math.max(2, N(ctx.params, 'Count', 36) | 0),
+    Math.max(2, N(ctx.params, 'Subdivision', 6) | 0),
+    N(ctx.params, 'Accuracy', 0.7),
+    N(ctx.params, 'Line Intensity', 1),
+    N(ctx.params, 'Sub Intensity', 0.25),
+    Math.max(1, N(ctx.params, 'Line Thickness', 1) | 0),
+  );
+  return outField(size, out.contours);
 }

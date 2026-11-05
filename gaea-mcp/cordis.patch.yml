@@ -1,0 +1,17 @@
+# Connects the Gaea desktop-automation MCP server to the Harness profile (serverName: gaea).
+#
+# The server is a plain Node stdio MCP process in this workspace; it shells out to tools/gaea-win.ps1
+# for Win32/UI Automation. Absolute paths keep it resolvable from any session in this profile.
+- insert:
+    - id: gaea-mcp
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: gaea
+        transport: stdio
+        command: 'C:\Program Files\nodejs\node.exe'
+        args:
+          - 'D:\sgames\gaea-rea\gaea-mcp\server.mjs'
+        env:
+          GAEA_WORKSPACE: 'D:\sgames\gaea-rea'
+          GAEA_DIR: 'D:\Gaea 2'
+        failOnStartupError: true

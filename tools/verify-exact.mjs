@@ -23,6 +23,9 @@ import { mapBlur, mapBlurPercent } from '../web/js/kernel/gaea-blur.js';
 import { graphicEQ, soil2 } from '../web/js/kernel/gaea-exact.js';
 import { filterProcess, combinerTranspose, combinerEmbed, combinerInsert, FILTER_MODE } from '../web/js/kernel/gaea-filter.js';
 import { getCurvature, getThreshold, CURVATURE_TYPE } from '../web/js/kernel/gaea-aspect.js';
+import { profileTerrace } from '../web/js/kernel/gaea-terrace.js';
+import { dilateCross } from '../web/js/kernel/gaea-morphology.js';
+import { cartographerContours } from '../web/js/kernel/gaea-cartographer.js';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '..');
 const PROBE = path.join(ROOT, 'tools', 'gaea-probe', 'bin', 'Release', 'net8.0', 'gaea-probe.dll');
@@ -33,6 +36,7 @@ const f32 = (v) => ({ t: 'f32', v });
 const i32 = (v) => ({ t: 'i32', v });
 const bool = (v) => ({ t: 'bool', v });
 const enm = (v) => ({ t: 'enum', v });
+const f32arr = (v) => ({ t: 'f32arr', v: Array.from(v) });
 
 const gens = {
   gradientX: (n) => Float32Array.from({ length: n * n }, (_, i) => (i % n) / (n - 1)),
@@ -411,6 +415,66 @@ for (const n of [64]) {
   }
 }
 
+// ---------------------------------------------------------------- Profiles.Terrace / PRNG
+{
+  const n = 64;
+  const input = gens.hills(n);
+  const combos = [
+    [6, 1, 0.5, 1, 0, false],
+    [6, 0, 0.5, 1, 7, false],
+    [8, 0.3, 0.8, 0.7, 42, false],
+    [6, 0.5, 0.2, 1, 42, true],
+  ];
+  for (const [num, uniformity, steepness, intensity, seed, forceZero] of combos) {
+    const key = 'Terrace/64/' + num + '/' + uniformity + '/' + steepness + '/' + intensity + '/' + seed + '/' + forceZero;
+    push(
+      key,
+      {
+        assembly: 'Gaea.Nodes.dll', type: 'Profiles', method: 'Terrace',
+        args: [mapArg(input, n), i32(num), f32(uniformity), f32(steepness), f32(intensity), i32(seed), bool(forceZero)],
+      },
+      () => ({ data: profileTerrace(input, num, uniformity, steepness, intensity, seed, forceZero) }),
+      { tol: 2e-5 },
+    );
+  }
+}
+
+// ---------------------------------------------------------------- Morphology.DilateCross
+{
+  const n = 32;
+  const input = gens.hills(n);
+  for (const k of [1, 2, 3]) {
+    push(
+      'DilateCross/32/' + k,
+      { assembly: 'Gaea.Nodes.dll', type: 'Morphology', method: 'DilateCross', new: true, args: [f32arr(Array.from(input)), i32(n), f32(k)] },
+      () => ({ data: dilateCross(input, n, k) }),
+      { tol: 1e-6 },
+    );
+  }
+}
+
+// ---------------------------------------------------------------- Cartographer.Contours
+{
+  const n = 32;
+  const input = gens.hills(n);
+  const combos = [
+    [8, 2, 0.7, 1, 0.25, 1],
+    [5, 3, 0.4, 0.8, 0.5, 2],
+    [12, 2, 0.9, 1, 0.25, 3],
+  ];
+  for (const [count, subdiv, accuracy, lineI, subI, thickness] of combos) {
+    push(
+      'Contours/32/' + [count, subdiv, accuracy, lineI, subI, thickness].join('/'),
+      {
+        assembly: 'Gaea.Nodes.dll', type: 'Cartographer', method: 'Contours',
+        args: [mapArg(input, n), i32(count), i32(subdiv), f32(accuracy), f32(lineI), f32(subI), i32(thickness)],
+      },
+      () => ({ data: cartographerContours(input, n, count, subdiv, accuracy, lineI, subI, thickness).contours }),
+      { tol: 1e-5, tuple: 0, known: 'Cartographer.Contours: tiny-radius (<=0.5px) native blur is still modelled, and terrace bands amplify that error' },
+    );
+  }
+}
+
 // ---------------------------------------------------------------- execute
 const specPath = path.join(ROOT, 'tools', 'oracle-spec-exact.json');
 const outPath = path.join(ROOT, 'evidence', 'oracle-exact.json');
@@ -439,6 +503,8 @@ const expectOf = (got, expect) => {
 
 for (const c of cases) {
   let got = res.calls[c.label];
+  if (got && got.t === 'f32arr') got = { t: 'map', data: got.data };
+  if (got && got.t === 'tuple') got = got.items[c.tuple ?? 0];
   if (got && got.t === 'maps') got = got.items && got.items[0];
   if (!got || got.t !== 'map') {
     console.error(`MISSING ${c.label}: ${JSON.stringify(got).slice(0, 120)}`);
@@ -482,6 +548,7 @@ if (knownGaps) {
   console.log('  ' + knownLabels.join(', '));
 }
 process.exit(fails === 0 ? 0 : 1);
+
 
 
 
