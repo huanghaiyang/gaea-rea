@@ -160,9 +160,9 @@ Generated from `js/registry.js` by `tools/gen_web_impl_table.py`:
 | `Constant` | `constant` | PRIM | exact |
 | `DotNoise` | `dotNoise` | PRIM | approx |
 | `MultiFractal` | `multiFractal` | PRIM | approx |
-| `Perlin` | `perlinNode` | PRIM | approx |
+| `Perlin` | `perlinNode` | PRIM | exact (warp approximate) |
 | `Ridge` | `ridgeNode` | PRIM | approx |
-| `Voronoi` | `voronoi` | PRIM | approx |
+| `Voronoi` | `voronoi` | PRIM | exact (warp approximate) |
 | `Canyon` | `canyon` | SHAPE | approx |
 | `Cracks` | `cracks` | SHAPE | model |
 | `Crater` | `crater` | SHAPE | model |
@@ -189,11 +189,11 @@ Generated from `js/registry.js` by `tools/gen_web_impl_table.py`:
 | `Constant` | **exact** | Flat height or flat colour. Nothing to reconstruct. |
 | `File` | **stub** | Emits a deterministic placeholder pattern derived from the requested filename so a graph containing it still evaluates, and shows a `stub` badge. No decoder: Gaea `.terrain`, 16-bit RAW and EXR are not implemented. This is the one node where doing nothing is the deliberate choice. |
 | `MultiFractal` | approx | Fractal sum over Perlin gradient noise with lattice-period wrapping (so results tile seamlessly). Mapping: `Size` → lattice frequency (`Size × 4` cycles across the field); `FractalGain` → persistence (`gain = min(0.9, 0.15 + 0.75 × FractalGain)`); `Octaves` direct or derived from `Size` under `AutoOctaves`; `VariationContrast` → value gamma; `Smoothness` blends toward a coarser octave set; `VariationType` blends a secondary value-noise fractal; `Perturb` = None/Simple/Complex performs a 2–3 octave domain perturbation using `WarpStrength`/`WarpComplexity`/`WarpRoughness`/`WarpAttenuation`; `Rotation`/`Anisotropy`/`OffsetX`/`OffsetY` transform the sampling space; `Bias` shifts the result; `EdgeSmoothing` feathers the frame. **All 22 fractal flavours from the IL vocabulary** (Standard, Billow, Ridged, Swiss, Jordan, Sawtooth, Heterogeneous, Hybrid, Multi, Power, Cliff, Erosion, Erosion2, Sine, Square, Random, …) are implemented, but several are standard-variant reconstructions of flavours whose exact mix is proprietary — treat the non-basic ones as an approximation inside an approximation. |
-| `Perlin` | approx | Explicit fBm with `Gain`, `Scale`, `Octaves`, axis scaling (`ScaleX`/`ScaleY` up to 100), and a `Complex` warp stage. The IL's `Clamp` is realised as the final clamp to `[0,1]`. |
+| `Perlin` | exact (warp approximate) | Ported from the shipped FastNoiseSIMD scalar Perlin: Gaea's private `RawNoise.Perlin` (hash/fade/16-entry gradient table, per-octave seed/frequency/amplitude stacking, `1-abs` billow and its inversion) is reproduced to float32 precision, verified against 13 probe grids. `Scale` is the raw 0–1 control; `ScaleX`/`ScaleY` are axis scales; `WarpType` Simple/Complex is a structural port that is **not** numerically validated. |
 | `Ridge` | approx | Ridged multifractal built from `1 - abs(noise)` raised to `Definition`, with the octave count derived from `Scale` because Gaea exposes none for this node. |
 | `Cellular` | approx | 2D Worley over a 3×3 neighbourhood. Metrics Manhattan / Chebyshev / Minkowski; `MetricMorph` blends toward Euclidean; `Anisotropy` + `CoordinateAxesJitter` + `CAJClustering` deform the cell space; `Density` scales the feature count. The five `DistanceFunction` values are standard: `Hash` = per-cell identity, `DistanceInv` = 1/(1+F1²·6), `Distance2Inv` = 1/(1+F2²·6), `DistanceDiff` = (F2−F1)·1.6, `DistanceToEdge` = F1·1.35. **Those multiplicative constants are free parameters**; Gaea's are unknown. |
 | `Cellular3D` | approx | The same search over a 27-cell 3D neighbourhood with independent X/Y/Z jitter and scale. `NormalizeInput` narrows the Z sweep. |
-| `Voronoi` | approx | Voronoi cells with the 8 `Form` outputs. **The C/N/R/P/A/S/M/D semantics are Gaea-internal and undocumented**, so they are reconstructed from standard Voronoi quantities: C = per-cell constant, N = F1, R = F2−F1, P = 1/(1+F1²), A = F1·F2, S = sharpened F1, M = max(F1,F2), D = per-cell random mixed by `Clamp`. This is the largest interpretive leap in the noise family — **if one node disagrees with Gaea, start here.** |
+| `Voronoi` | exact (warp approximate) | Ported from Gaea's `RawNoise.Voronoi` / FastNoiseSIMD cellular. `Form` maps to the recovered return types: C = cell value, N = noise lookup, R = F1, P = F2, A = F1+F2, S = F2−F1, M = F1·F2, D = F1÷F2; output is sampled as `0.5 + 0.5·v`. Euclidean/Manhattan/Natural distances and the 3-D unit-jitter sites match Gaea's grids to ~2e-5 (25 probe cases). `Scale` is the raw 0–1 control, `X` is inverted for the offset, `Gain` is inert (Gaea never forwards it), the grid is normalised to `[0,1]` before `Clamp < 1` multiplies it, and a connected `In` input multiplies the mask. Warp Simple/Complex is structural only; form N is not implemented. |
 | `DotNoise` | approx | Layered jittered lattices of `Dot`/`Square` footprints accumulated with `Multiplier` decay per iteration, then robustly normalised to `[0,1]`. Gaea's accumulation and `BlendMode` semantics were not recovered; this is a rebuild from the parameter surface. Note the IL's `Size` is a `Float2` whose recovered min/max are inverted (`min 0.6, max 0.0001`), so that entry is rejected and the registry range is used. |
 
 ### 5.2 Distortion
@@ -386,7 +386,9 @@ web integrity checks. `tools/gen_web_impl_table.py` regenerates the table in §4
 3. **Curve editing is not exposed.** The `Curve Spline` / `Gradient Data` / `Synth Data` list
    parameters are not editable, so `Curve` and `Recurve` fall back to the identity spline unless
    a spline is supplied programmatically. A UI gap, not an algorithm gap.
-4. **`Voronoi` `Form` mapping is interpretive** (§5.1).
+4. **`Voronoi` `Form` mapping is recovered, not interpretive:** the node calls the private
+   `RawNoise.Voronoi`/FastNoiseSIMD cellular path, so C/N/R/P/A/S/M/D mean CellValue / NoiseLookup /
+   F1 / F2 / F1+F2 / F2−F1 / F1·F2 / F1÷F2 (see §5.1 and `docs/HANDOFF.md` §7.1.1).
 5. **Duplicated parameter labels in the vendor dump** (`Perlin` has two `Type` and two
    `Octaves`; `Erosion2` has three `Discharge Angle`) are kept once, first occurrence wins. The
    second meanings are unreachable through the UI. This is a vendor flattening artefact, recorded

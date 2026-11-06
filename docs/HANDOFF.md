@@ -209,6 +209,38 @@ tools/probe-range.mjs           探 Normalize/Autolevel/clamp 语义
 下一步是用同一 oracle 对 `RawNoise.Voronoi`(`SetNoiseType(7)`、cellular lookup)取金值,
 再决定是否先绕过扰动接线 Voronoi。
 
+#### 7.1.1 状态(已完成 Voronoi/Cellular 标量内核)
+
+`web/js/kernel/fastnoise.js` 已移植 FastNoiseSIMD 的标量 Cellular,`Voronoi` 节点
+(`generators.js` → `voronoi`)已改接 `fnVoronoiGrid`。用 oracle 对 `RawNoise.Voronoi`
+取 25 组 16²/64² 网格(三种距离函数、八种 Form、jitter 0/0.45、多种 seed、四个方向的一格偏移、
+非整数波长),逐值误差 ≤ 2.2e-5,金值固化在 `web/tests/gaea-voronoi-test.mjs`。
+
+已确认的事实:
+
+* DLL 内枚举顺序与上游 FastNoiseSIMD 不同:`WhiteNoise = 6`、`Cellular = 7`(故 `SetNoiseType(7)`);
+* Cellular hash **没有** Perlin 的 `(h>>>13)^h` 折叠:`h = ((seed ^ 1619x ^ 31337y ^ 6971z)^3) * 60493`;
+* `ValCoord3D = h / 2^31`(有符号 int 直接重解释,范围 [-1,1));Form C 返回 `0.5 + 0.5*ValCoord(最近单元)`;
+* 抖动点是**单位向量 × Jitter**:方向由 hash 的三段 10 bit `(h&1023)/511.5-1`、`((h>>>10)&1023)/511.5-1`、
+  `((h>>>20)&1023)/511.5-1` 归一化;实测 `|p| = Jitter`(jitter 0.45 时中心距离² 恒为 0.2025);
+* 距离:Euclidean `dx²+dy²+dz²`,Manhattan `|dx|+|dy|+|dz|`,Natural `(|dx|+|dy|+|dz|)·(dx²+dy²+dz²)`;
+* Form → ReturnType:`C→0`、`N→7`、`R→1`、`P→2`、`A→3`、`S→4`、`M→5`、`D→6`;
+  `R=d1`、`P=d2`、`A=d1+d2`、`S=d2-d1`、`M=d1·d2`、`D=d1/d2`;采样后统一 `0.5+0.5*v`(可 >1);
+* 采样 frame 与 Perlin 相同,但频率是 `Scale*0.01*(512/R)`(不是 `1-Scale`),`SetAxisScales(W,Z,1)`;
+* 节点 `Build`:`Noises.Voronoi(res, Scale, Function, Form, Gain, WarpType, Frequency, Amplitude,
+  WarpOctaves, Seed, 1-X, Y, ScaleX, ScaleY, Jitter)`;`Gain` 未传入 `RawNoise`(无效),
+  `Clamp < 1` 时整体乘 `Clamp`。节点默认 `Scale=0.5、Jitter=0.45、Form=P、WarpType=Complex、
+  Frequency=0.05、Amplitude=0.5、WarpOctaves=14、X=Y=0.5`。
+
+**仍未解决**:
+
+* Form C 在 jitter ≥ 0.85 时,恢复出的方向公式与 Gaea 的差值足以翻转"最近单元"的**近似平局**
+  (jitter=1 的 16² 网格中 256 个像素错 1 个,最大误差 0.13);距离类输出不受影响。
+* Form N(NoiseLookup)需要 PerlinFractal lookup 频率(节点设为 `Scale*(512/R)`),尚未实现。
+* Warp Simple/Complex 与 Perlin 同源,仍是结构移植,未做金值校验。
+* 节点层还有两个混淆后处理(`\ueb77\uf21d\ue961()`、`\ueb77\uf21d\ue95f()`),按"归一化到 [0,1]"
+  建模(先归一化再乘 `Clamp`,与反编译里的调用顺序一致);若后续发现它们不是归一化需要再校正。
+
 ### 7.2 原生 blur(已大体解决,边缘仍为模型)
 
 `Map.Blur` 是 P/Invoke,但它的行为已经测出来了:

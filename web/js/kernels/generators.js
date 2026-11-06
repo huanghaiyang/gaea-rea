@@ -11,7 +11,9 @@ import {
   perlin2, value2, perlin3, value3, worley2, worleySurface, fractalSum,
 } from '../kernel/noise.js';
 import { hash2f, mix32, makeRng } from '../kernel/hash.js';
-import { fnPerlinGrid, FN_FRACTAL } from '../kernel/fastnoise.js';
+import {
+  fnPerlinGrid, fnVoronoiGrid, FN_FRACTAL, FN_CELLULAR_RETURN, FN_CELLULAR_DISTANCE,
+} from '../kernel/fastnoise.js';
 import {
   createField, clamp01, lerp, smoothstep, stats, radialFalloffMask, linearGradientMask,
 } from '../kernel/field.js';
@@ -391,65 +393,71 @@ export function cellular3d(ctx) {
 /* ------------------------------------------------------------------ Voronoi */
 
 /**
- * Voronoi — cell noise with 8 output forms (C N R P A S M D) plus optional simple/complex warp.
- * The Form semantics are Gaea-internal and undocumented; the mapping implemented here is a
- * REASONABLE APPROXIMATION (documented in IMPLEMENTATION-NOTES.md):
- *   C = flat cell colour, N = F1 distance, R = F2-F1 edge distance, P = 1/(1+F1^2),
- *   A = F1*F2, S = smoothed cell (cellular F1 processed by Gain), M = max(F1, F2),
- *   D = per-cell random with "Clamp" as the density control.
+ * Voronoi — the Gaea node wraps RawNoise.Voronoi, i.e. FastNoiseSIMD cellular noise.
+ *
+ * The node's Build call is
+ *   Noises.Voronoi(res, Scale, Function, Form, Gain, (int)WarpType, Frequency, Amplitude,
+ *                  WarpOctaves, Seed, 1 - X, Y, ScaleX, ScaleY, Jitter)
+ * so:
+ *   - Scale is the raw 0..1 control (not a percentage); freq = Scale*0.01*(512/size);
+ *   - X is inverted for the offset, Y is not;
+ *   - ScaleX/ScaleY are axis scales (SetAxisScales), not extra frequency;
+ *   - Gain is accepted by the wrapper but never reaches RawNoise (no effect), and Clamp
+ *     simply multiplies the result when below 1.
+ *
+ * Form maps to FastNoise cellular return types (see fnCellular3). Warp uses FastNoise's
+ * perturbation; its structure is ported but not numerically validated.
  */
 export function voronoi(ctx) {
   const { size, params, seed } = ctx;
-  const scale = Math.max(0.5, P(params, 'Scale', 50));
-  const jitter = clamp01(P(params, 'Jitter', 1));
-  const fn = P(params, 'Function', 'Euclidean');
-  const form = P(params, 'Form', 'C');
-  const gain = P(params, 'Gain', 1);
-  const clampV = clamp01(P(params, 'Clamp', 0.5));
-  const warpType = P(params, 'Type', 'None');
-  const wfreq = P(params, 'Frequency', 1);
-  const wamp = clamp01(P(params, 'Amplitude', 0));
-  const woct = Math.max(1, P(params, 'Octaves', 2) | 0);
-  const sx = P(params, 'Scale X', 1), sy = P(params, 'Scale Y', 1);
-  const ox = P(params, 'X', 0), oy = P(params, 'Y', 0);
+  const rawScale = P(params, 'Scale', 0.5);
+  const scale = rawScale > 1 ? rawScale / 100 : rawScale; // tolerate pre-0.5.0 project values
+  const jitter = clamp01(P(params, 'Jitter', 0.45));
+  const fnName = P(params, 'Function', 'Euclidean');
+  const form = P(params, 'Form', 'P');
+  const warp = P(params, 'Type', 'Complex');
+  const frequency = P(params, 'Frequency', 0.05);
+  const amplitude = clamp01(P(params, 'Amplitude', 0.5));
+  const warpOctaves = Math.max(1, P(params, 'Octaves', 14) | 0);
+  const scaleX = P(params, 'Scale X', 1), scaleY = P(params, 'Scale Y', 1);
+  const ox = 1 - P(params, 'X', 0.5), oy = P(params, 'Y', 0.5);
+  const clampV = P(params, 'Clamp', 1);
 
-  const freq = Math.max(0.5, (scale / 100) * 6);
-  const period = Math.max(1, Math.round(freq));
-  const metric = fn === 'Manhattan' ? 'manhattan' : 'euclid';
-  const doWarp = wamp > 0 && warpType !== 'None';
+  const distanceFunction = fnName === 'Manhattan' ? FN_CELLULAR_DISTANCE.MANHATTAN
+    : fnName === 'Natural' ? FN_CELLULAR_DISTANCE.NATURAL
+      : FN_CELLULAR_DISTANCE.EUCLIDEAN;
+  const returnType = FORM_RETURN[form] ?? FN_CELLULAR_RETURN.DISTANCE2;
+
+  const grid = fnVoronoiGrid({
+    size, scale, jitter, distanceFunction, returnType, seed,
+    warp, frequency, amplitude, warpOctaves,
+    scaleX, scaleY, offsetX: ox, offsetY: oy,
+  });
 
   const f = createField(size, 'height');
   const d = f.data;
-  const inv = 1 / size;
 
-  for (let y = 0; y < size; y++) {
-    const v0 = ((y + 0.5) * inv - 0.5 + oy * 0.01) * sy;
-    for (let x = 0; x < size; x++) {
-      const u0 = ((x + 0.5) * inv - 0.5 + ox * 0.01) * sx;
-      let u = u0, v = v0;
-      if (doWarp) {
-        const wx = fractalSum(perlin2, u0 * freq * wfreq, v0 * freq * wfreq, seed ^ 0x31, woct, 2, 0.5, 'Standard', period);
-        const wy = fractalSum(perlin2, u0 * freq * wfreq + 21.1, v0 * freq * wfreq - 9.4, seed ^ 0x32, woct, 2, 0.5, 'Standard', period);
-        u += wx * wamp * 0.25;
-        v += wy * wamp * 0.25;
-      }
-      const w = worley2(u * freq, v * freq, seed, { jitter, metric, morph: 0 });
-      let out;
-      switch (form) {
-        case 'N': out = clamp01(w.f1); break;
-        case 'R': out = clamp01((w.f2 - w.f1) * 1.5); break;
-        case 'P': out = 1 / (1 + w.f1 * w.f1 * 6); break;
-        case 'A': out = clamp01(w.f1 * w.f2 * 4); break;
-        case 'S': out = clamp01(Math.pow(clamp01(w.f1), 1 + gain) * 1.3); break;
-        case 'M': out = clamp01(Math.max(w.f1, w.f2) * 1.1); break;
-        case 'D': out = clamp01(((w.id >>> 8) & 0xffff) / 65535 * (1 - clampV) + clampV * 0.5); break;
-        case 'C': default: out = ((w.id >>> 12) & 0xff) / 255; break;
-      }
-      d[y * size + x] = clamp01(out);
-    }
-  }
+  // Gaea's node normalises the sampler output before touching Clamp:
+  //   Noises.Voronoi(...).<normalise>().<normalise>();
+  //   if (Clamp < 1) map *= Clamp;
+  let lo = Infinity, hi = -Infinity;
+  for (let i = 0; i < d.length; i++) { const v = grid[i]; if (v < lo) lo = v; if (v > hi) hi = v; }
+  const span = hi - lo;
+  const mul = (clampV < 1 ? clampV : 1) / (span > 0 ? span : 1);
+  for (let i = 0; i < d.length; i++) d[i] = (grid[i] - lo) * mul;
   return f;
 }
+
+const FORM_RETURN = {
+  C: FN_CELLULAR_RETURN.CELL,
+  N: FN_CELLULAR_RETURN.NOISE,
+  R: FN_CELLULAR_RETURN.DISTANCE,
+  P: FN_CELLULAR_RETURN.DISTANCE2,
+  A: FN_CELLULAR_RETURN.ADD,
+  S: FN_CELLULAR_RETURN.SUB,
+  M: FN_CELLULAR_RETURN.MUL,
+  D: FN_CELLULAR_RETURN.DIV,
+};
 
 /* ------------------------------------------------------------------ DotNoise */
 
