@@ -1409,7 +1409,8 @@ export const NODES = [
     algorithm: REMAINING.hillify,
     category: CAT.EROS,
     summary: 'Softens and reshapes terrain into smoother, hill-like forms.',
-    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    inputs: [{ name: 'Input', kind: 'height' }],
+    outputs: [OUT_H(), MASK('Wear')],
     note: 'model',
   },
 
@@ -1418,7 +1419,8 @@ export const NODES = [
     algorithm: REMAINING.stratify,
     category: CAT.SHAPE,
     summary: 'Stratify creates broken strata or rock layers on the terrain in a non-linear fashion, producing a robust, realistic formation.',
-    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    inputs: [{ name: 'Input', kind: 'height' }],
+    outputs: [OUT_H(), MASK('Terraces')],
     note: 'model',
   },
 
@@ -1517,7 +1519,8 @@ export const NODES = [
     algorithm: REMAINING.stones,
     category: CAT.SHAPE,
     summary: 'Scatters stones or small rock forms across the surface.',
-    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    inputs: [{ name: 'Input', kind: 'height' }],
+    outputs: [OUT_H(), MASK('Difference')],
     note: 'model',
   },
 
@@ -1652,16 +1655,20 @@ export const NODES = [
     algorithm: REMAINING.scree,
     category: CAT.SHAPE,
     summary: 'Creates accumulations of loose rock fragments scattered across slopes and terrain edges.',
-    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask', kind: 'height' }], outputs: [OUT_H()],
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask', kind: 'height' }],
+    outputs: [OUT_H(), MASK('Difference')],
     note: 'model',
   },
 
   {
     name: 'Reseed',
+    // `reseed: true` switches the evaluator to Gaea's clone-and-rebuild semantics instead of
+    // calling the (now unused) kernel. The kernel is kept as a plain field-level fallback.
+    reseed: true,
     algorithm: REMAINING.reseed,
     category: CAT.COMB,
     summary: 'Re-randomizes an upstream procedural node by overriding or refreshing its seed behavior.',
-    inputs: [], outputs: [OUT_H()],
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
     note: 'approx',
   },
 
@@ -1800,8 +1807,8 @@ export const NODES = [
     algorithm: REMAINING.synth,
     category: CAT.PRIM,
     summary: 'Synth takes a bitmap image (photo or artwork) and converts it to CLUT map that can be used with a texture mask to colorize your terrain.',
-    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
-    note: 'model',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_C()],
+    note: 'approx',
   },
 
   {
@@ -2021,7 +2028,7 @@ export const NODES = [
     category: CAT.MASK,
     summary: 'Adds low vegetation or shrub-like surface growth across the terrain.',
     inputs: [{ name: 'Input', kind: 'height' }, { name: 'Input 2', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }], outputs: [MASK('Output')],
-    note: 'model',
+    note: 'approx',
   },
 
   {
@@ -2150,7 +2157,8 @@ export const NODES = [
     algorithm: REMAINING.cartography,
     category: CAT.FX,
     summary: 'Cartography creates a topographical overlay for a map.',
-    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Water', kind: 'height' }, { name: 'Grid', kind: 'height' }], outputs: [OUT_C()],
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Water', kind: 'height' }, { name: 'Grid', kind: 'height' }],
+    outputs: [OUT_C(), MASK('Contours'), MASK('Water'), MASK('Grid')],
     note: 'model',
   },
 
@@ -2168,7 +2176,8 @@ export const NODES = [
     algorithm: REMAINING.rivers,
     category: CAT.EROS,
     summary: 'Rivers creates a realistic network of rivers with controllable headwaters.',
-    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }, { name: 'Mask 3', kind: 'height' }, { name: 'Mask 4', kind: 'height' }], outputs: [OUT_H()],
+    inputs: [{ name: 'Input', kind: 'height' }, { name: 'Mask 1', kind: 'height' }, { name: 'Mask 2', kind: 'height' }, { name: 'Mask 3', kind: 'height' }, { name: 'Mask 4', kind: 'height' }],
+    outputs: [OUT_H(), MASK('Rivers'), MASK('Flow')],
     note: 'model',
   },
 

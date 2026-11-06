@@ -25,6 +25,7 @@ import {
 } from '../kernel/gaea-fields.js';
 import { profileTerrace } from '../kernel/gaea-terrace.js';
 import { cartographerContours } from '../kernel/gaea-cartographer.js';
+import { mapBlur } from '../kernel/gaea-blur.js';
 import { flowAccumulation } from '../kernels/erosion.js';
 import { occlusion } from '../kernels/features.js';
 import { fileStub } from '../kernels/generators.js';
@@ -111,6 +112,66 @@ function hillshadeAt(data, size, x, y, azimuthDeg, elevationDeg, scale = 4) {
   const lz = Math.sin(el);
   const dot = (nx / len) * lx + (ny / len) * ly + (nz / len) * lz;
   return clamp01(0.5 + dot * 0.5);
+}
+
+/**
+ * `Noises.Perlin` 的场级包装。反编译签名：
+ *   Perlin(res, frequency, octaves, gain, PerlinType, seed, warpType, warpFreq, warpAmount,
+ *          warpOctaves, axisX, axisY, offsetX, offsetY)
+ * 这里保留分形叠加 + 域扭曲（warpType 2）的结构；具体哈希仍来自本项目的 perlin2，
+ * 因此是 model 而不是逐值复刻。
+ */
+function noisesPerlin(u, v, freq, octaves, gain, seed, warpFreq = 0.05, warpAmount = 0.5, warpOctaves = 10) {
+  if (warpAmount <= 0) {
+    return fractalSum(perlin2, u * freq, v * freq, seed, octaves, 2, gain, 'Standard') * 0.5 + 0.5;
+  }
+  // warpFreq 是 FastNoise 的「每像素步长」；0.05 ≈ 场宽的 2 个周期。
+  const wf = Math.max(0.5, warpFreq * 40);
+  const wx = fractalSum(perlin2, u * wf, v * wf, seed + 71, warpOctaves, 2, 0.5, 'Standard');
+  const wy = fractalSum(perlin2, u * wf + 3.7, v * wf + 8.1, seed + 97, warpOctaves, 2, 0.5, 'Standard');
+  const sx = u + (wx - 0.5) * warpAmount * 0.5;
+  const sy = v + (wy - 0.5) * warpAmount * 0.5;
+  return fractalSum(perlin2, sx * freq, sy * freq, seed, octaves, 2, gain, 'Standard') * 0.5 + 0.5;
+}
+
+/**
+ * `Landscapes.Craterfield` 的近似实现。
+ *
+ * 反编译调用形如：
+ *   `1f - Landscapes.Craterfield(1f - map, res, scale, density, height, 0f, 0f, seed)`
+ * 即把输入取反，铺上碗形凹陷 + 隆起环形山，再取反回来。Stones / Scree 都靠这个循环
+ * 叠加多轮（Scree 的 Density 就是轮数）。
+ *
+ * 这里用 Worley 单元中心作为坑心：`r = f1 / cell`，坑内 `bowl = (1 - r)^2` 向下挖，
+ * 坑缘在 `r ≈ 0.55..0.85` 处抬起。density 决定每个单元里出现坑的概率。
+ */
+function craterfield(src, size, scale, density, height, seed) {
+  // Scale 参数在 Gaea 里是 clamp(0.001, 0.02) 的小数；映射到 3..40 个单元/场宽。
+  const s = clamp(Number.isFinite(scale) ? scale : 0.01, 0.001, 0.02);
+  const freq = 3 + ((s - 0.001) / 0.019) * 37;
+  const cells = Math.max(2, freq);
+  const out = new Float32Array(size * size);
+  const dens = clamp(density, 0, 1);
+  const amp = clamp(height, 0, 2);
+  const inv = 1 / size;
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const i = y * size + x;
+      const w = worley2((x + 0.5) * inv * cells, (y + 0.5) * inv * cells, seed, { jitter: 0.85 });
+      const cellHash = ((w.id >>> 8) & 1023) / 1023;
+      if (cellHash > dens) { out[i] = src[i]; continue; }
+      const radius = 0.32 + ((w.id >>> 18) & 255) / 255 * 0.28; // 坑半径（单元单位）
+      const r = w.f1;
+      if (r >= radius * 1.6) { out[i] = src[i]; continue; }
+      // 碗形下挖 + 环形抬升
+      const bowl = r < radius ? Math.pow(1 - r / radius, 2) : 0;
+      const rimT = (r - radius) / (radius * 0.6);
+      const rim = rimT > 0 && rimT < 1 ? Math.pow(1 - Math.abs(rimT - 0.5) * 2, 2) : 0;
+      const delta = (rim * 0.55 - bowl) * amp * 0.12;
+      out[i] = clamp01(src[i] + delta);
+    }
+  }
+  return out;
 }
 
 /** 迭代式洼地填充：把局部低点抬到相邻可排水的水平。 */
@@ -242,13 +303,13 @@ export function shatter(ctx) {
   return f;
 }
 
-/** VariableBlur：按局部起伏混合原图与高斯模糊。 */
+/** VariableBlur：按局部起伏混合原图与原生 blur（核来自实测 LUT）。 */
 export function variableBlur(ctx) {
   const { size, params } = ctx;
   const src = inOr(ctx, 0);
   const radius = clamp(NUM(params, 'Radius', 0.01), 0, 1);
-  const px = Math.max(1, Math.round(radius * size * 3));
-  const blurred = gaussianBlur(src, px);
+  const px = Math.max(1, radius * size * 4);
+  const blurred = { size, channel: 'height', channels: 1, data: mapBlur(src.data, size, px) };
   const out = createField(size, 'height');
   for (let i = 0; i < out.data.length; i++) {
     const t = clamp01(Math.abs(src.data[i] - 0.5) * 2.4);
@@ -283,12 +344,18 @@ export function gridNode(ctx) {
   return f;
 }
 
-/** Hillify：低频丘陵 + 热力蠕变；Surface 决定是否平滑。 */
+/**
+ * Hillify：对输入高度做蠕变（热力侵蚀）+ 低频丘陵重塑。
+ * Gaea 的 `Erosions.Hillify(in, Coverage, Creep, Surface, Seed)` 返回 (height, wear)；
+ * 第二个输出在这里取 `|out - in|`，语义与原生 wear 图一致（哪里被搬动了）。
+ */
 export function hillify(ctx) {
   const { size, params, seed } = ctx;
+  const src = inOr(ctx, 0, 0.5);
   const coverage = clamp01(NUM(params, 'Coverage', 0.5));
   const creep = ENUM(params, 'Creep', 'Moderate');
   const surface = ENUM(params, 'Surface', 'Smooth');
+
   const f = createField(size, 'height');
   const d = f.data;
   const inv = 1 / size;
@@ -296,25 +363,32 @@ export function hillify(ctx) {
     const v = (y + 0.5) * inv;
     for (let x = 0; x < size; x++) {
       const u = (x + 0.5) * inv;
-      let n = fractalSum(perlin2, u * 3.2, v * 3.2, seed, 6, 2, 0.5, 'Standard') * 0.5 + 0.5;
-      n += (value2(u * 8, v * 8, seed + 5) - 0.5) * 0.25;
-      d[y * size + x] = clamp01(lerp(0.5, n, coverage));
+      const i = y * size + x;
+      const hills = fractalSum(perlin2, u * 3.2, v * 3.2, seed, 6, 2, 0.5, 'Standard') * 0.5 + 0.5;
+      // Coverage 越大，越多地形被重塑成丘陵；保留一部分原始高度，避免输入被完全丢弃。
+      d[i] = clamp01(lerp(src.data[i], hills, coverage * 0.85));
     }
   }
-  let h = d;
+
   const steps = creep === 'Aggressive' ? 14 : 5;
-  h = thermalPass(h, size, steps, Math.max(0.002, 0.12 * (1 - coverage)), 0, 0, 0);
-  const out = createField(size, 'height');
+  let h = thermalPass(d, size, steps, Math.max(0.002, 0.12 * (1 - coverage)), 0, 0, 0);
   if (surface === 'Smooth') {
-    const b = gaussianBlur(outField(size, h), Math.max(1, Math.round(size * 0.004)));
-    out.data.set(b.data);
-  } else {
-    out.data.set(h);
+    h = mapBlur(h, size, Math.max(1, size * 0.004));
   }
-  return out;
+
+  const out = createField(size, 'height');
+  const wear = createField(size, 'mask');
+  for (let i = 0; i < out.data.length; i++) {
+    out.data[i] = clamp01(h[i]);
+    wear.data[i] = Math.abs(out.data[i] - src.data[i]);
+  }
+  return [out, wear];
 }
 
-/** Stratify：分层阶地 + 倾斜。 */
+/**
+ * Stratify：分层阶地 + 倾斜。Gaea 的 `Profiles.ComplexTerraces` 返回
+ * `[height, terraces]`，第二个输出在这里用阶地化前后的差值表示。
+ */
 export function stratify(ctx) {
   const { size, params, seed } = ctx;
   const spacing = clamp(NUM(params, 'Spacing', 0.1), 0, 1);
@@ -337,13 +411,15 @@ export function stratify(ctx) {
   }
   const terraced = profileTerrace(d, Math.max(2, octaves), 1 - spacing, intensity, 1, seed, false);
   const out = createField(size, 'height');
+  const terraces = createField(size, 'mask');
   const grad = linearGradient(size, size * 0.5, size * 0.5, size, dir, EDGE_CLIP);
   for (let i = 0; i < out.data.length; i++) {
     let v = terraced[i] + (grad[i] - 0.5) * tilt * 0.35 * (1 - Math.abs(shape) * 0.6);
     if (shape < 0) v = lerp(v, 1 - v, -shape * 0.5);
     out.data[i] = clamp01(v);
+    terraces.data[i] = clamp01(Math.abs(out.data[i] - d[i]) * 2);
   }
-  return out;
+  return [out, terraces];
 }
 
 /** Island：径向岛屿遮罩 + 海岸噪声。 */
@@ -683,30 +759,28 @@ export function waveShine(ctx) {
   return f;
 }
 
-/** Stones：高度场上散布的石块。 */
+/**
+ * Stones：与 Gaea 一致，用 `1 - Craterfield(1 - map)` 在高度场上叠加石块/坑洼，
+ * 第二个输出是 `Combiner.Difference(out, in)`（差异遮罩）。
+ */
 export function stones(ctx) {
   const { size, params, seed } = ctx;
   const src = inOr(ctx, 0, 0.5);
   const scale = clamp01(NUM(params, 'Scale', 0.6));
   const height = clamp(NUM(params, 'Height', 1), 0.0001, 3);
   const density = clamp(NUM(params, 'Density', 0.5), 0.0001, 1);
-  const f = createField(size, 'height');
-  f.data.set(src.data);
-  const freq = 4 + scale * 24;
-  const radius = 0.22 + scale * 0.35;
-  const inv = 1 / size;
-  for (let y = 0; y < size; y++) {
-    const v = (y + 0.5) * inv;
-    for (let x = 0; x < size; x++) {
-      const u = (x + 0.5) * inv;
-      const w = worley2(u * freq, v * freq, seed, { jitter: 0.9, density });
-      if (w.f1 < radius) {
-        const bump = Math.pow(1 - w.f1 / radius, 2) * height * 0.25;
-        f.data[y * size + x] = clamp01(f.data[y * size + x] + bump);
-      }
-    }
+
+  const inverted = new Float32Array(src.data.length);
+  for (let i = 0; i < inverted.length; i++) inverted[i] = 1 - src.data[i];
+  const crater = craterfield(inverted, size, 0.001 + scale * 0.019, density, height * 2, seed);
+
+  const out = createField(size, 'height');
+  const diff = createField(size, 'mask');
+  for (let i = 0; i < out.data.length; i++) {
+    out.data[i] = clamp01(1 - crater[i]);
+    diff.data[i] = Math.abs(out.data[i] - src.data[i]);
   }
-  return f;
+  return [out, diff];
 }
 
 /** HydroFix：洼地填充 + 下切修正。 */
@@ -818,7 +892,7 @@ export function groundTexture(ctx) {
     const v = (y + 0.5) * inv;
     for (let x = 0; x < size; x++) {
       const u = (x + 0.5) * inv;
-      let n = fractalSum(perlin2, u * freq, v * freq, seed, oct, 2.1, 0.55, 'Standard') * 0.5 + 0.5;
+      let n = noisesPerlin(u, v, freq, oct, 0.55, seed);
       n = Math.pow(clamp01(n + density * 0.15), method === 'Harsh' ? 0.6 : 1);
       const mask = smoothstep(1 - coverage, 1, n);
       d[y * size + x] = clamp01(mask * strength + n * (1 - strength) * 0.35);
@@ -1088,46 +1162,63 @@ export function mathX(ctx) {
   return f;
 }
 
-/** Scree：在陡坡下缘堆积碎石。 */
+/**
+ * Scree：Gaea 的流程是「多轮 Craterfield 叠加」再由 Flow2 汇流遮罩控制堆积位置。
+ * Density 是轮数（Int32 1..5），Edge/Spread 控制汇流阈值，最后用 `Masking.Mask` 混合。
+ * 第二个输出是 `Combiner.Difference(out, in)`。
+ */
 export function scree(ctx) {
   const { size, params, seed } = ctx;
   const src = inOr(ctx, 0, 0.5);
-  const maskIn = ctx.input(1);
-  const scale = clamp(NUM(params, 'Scale', 0.5), 0.05, 1);
-  const density = clamp(NUM(params, 'Density', 0.5), 0, 1);
-  const height = clamp(NUM(params, 'Height', 0.5), 0, 1);
-  const f = createField(size, 'height');
-  f.data.set(src.data);
-  const slope = slopeMagnitude(src);
-  const inv = 1 / size;
-  const freq = 8 + scale * 30;
-  for (let y = 0; y < size; y++) {
-    const v = (y + 0.5) * inv;
-    for (let x = 0; x < size; x++) {
-      const i = y * size + x;
-      const sl = smoothstep(0.35, 0.85, slope.data[i]);
-      const w = worley2((x / size) * freq, v * freq, seed, { jitter: 0.9, density });
-      const pile = Math.max(0, 1 - w.f1 * 3) * sl;
-      let add = pile * height * 0.12;
-      if (maskIn) add *= clamp01(toScalar(maskIn).data[i]);
-      f.data[i] = clamp01(f.data[i] + add);
-    }
+  const precipIn = ctx.input(1);
+  const scale = clamp01(NUM(params, 'Scale', 0.6));
+  const density = clamp(NUM(params, 'Density', 1) | 0, 1, 5);
+  const height = clamp(NUM(params, 'Height', 1), 0.0001, 3);
+  const spread = clamp(NUM(params, 'Spread', 0), -1, 1);
+  const edge = clamp01(NUM(params, 'Edge', 0.4));
+
+  const crateScale = 0.001 + scale * 0.019;
+  let piled = new Float32Array(src.data);
+  for (let i = 0; i < density; i++) {
+    const inverted = new Float32Array(size * size);
+    for (let k = 0; k < inverted.length; k++) inverted[k] = 1 - piled[k];
+    const c = craterfield(inverted, size, crateScale, 0.4, height * 2, seed + i);
+    for (let k = 0; k < piled.length; k++) piled[k] = clamp01(1 - c[k]);
   }
-  return f;
+
+  // Flow2(map, precip, 1, Edge, Seed) 的近似：汇流量归一化后按 Spread 阈值化。
+  const precip = precipIn ? toScalar(precipIn).data : null;
+  const { acc } = flowAccumulation(src.data, size);
+  let maxAcc = 1e-9;
+  for (let i = 0; i < acc.length; i++) if (acc[i] > maxAcc) maxAcc = acc[i];
+  const inflow = new Float32Array(size * size);
+  const start = clamp01(edge * 0.5 + Math.max(0, spread) * 0.4);
+  for (let i = 0; i < inflow.length; i++) {
+    let f = Math.pow(acc[i] / maxAcc, 0.45);
+    if (precip) f *= clamp01(precip[i]);
+    inflow[i] = clamp01((f - start) / Math.max(1e-6, 1 - start));
+  }
+
+  const out = createField(size, 'height');
+  const diff = createField(size, 'mask');
+  const m0 = Math.max(0, 1 - spread);
+  for (let i = 0; i < out.data.length; i++) {
+    const m = inflow[i] * m0;
+    out.data[i] = clamp01(src.data[i] * (1 - m) + piled[i] * m);
+    diff.data[i] = Math.abs(out.data[i] - src.data[i]);
+  }
+  return [out, diff];
 }
 
-/** Reseed：Gaea 上层重播种节点；此处在场级别生成新的噪声底。 */
+/**
+ * Reseed：Gaea 只做 `Data.Copy`（克隆上游并在克隆上写入新 Seed）。
+ * 真正的重播种在 evaluator 层完成（`entry.reseed` 分支），这里仅作为无图上下文时的
+ * 字段级回退：原样复制输入，而不是凭空生成新噪声。
+ */
 export function reseed(ctx) {
-  const { size, seed } = ctx;
-  const f = createField(size, 'height');
-  const inv = 1 / size;
-  for (let y = 0; y < size; y++) {
-    const v = (y + 0.5) * inv;
-    for (let x = 0; x < size; x++) {
-      const u = (x + 0.5) * inv;
-      f.data[y * size + x] = clamp01(fractalSum(perlin2, u * 5, v * 5, seed, 5, 2, 0.5, 'Standard') * 0.5 + 0.5);
-    }
-  }
+  const src = inOr(ctx, 0, 0.5);
+  const f = createField(src.size, src.channel || 'height');
+  f.data.set(src.data);
   return f;
 }
 
@@ -1459,36 +1550,68 @@ export function uplift(ctx) {
   return f;
 }
 
-/** Synth：由采样点插值出的分形合成场。 */
+/**
+ * Synth：Gaea 的做法是用 `RebuildFromUnsortedData` 把散点重建成 1D 色带，
+ * 再用输入高度图 `Interpolate` 采样，输出是 COLOR（不是高度）。
+ *
+ * 这里用同样结构的合成点集：每个采样点给出 (位置 W, R, G, B)，按高度排序后线性插值。
+ * `Fuzzy` 抖动采样点位置，`Offset` 平移查询高度。
+ */
 export function synth(ctx) {
   const { size, params, seed } = ctx;
-  // Samples 是 Enum（_8.._2048），去掉下划线后转成采样点数。
   const sampleKey = ENUM(params, 'Samples', '_128');
   const samples = clamp(Number(String(sampleKey).replace('_', '')) || 128, 8, 2048);
-  const f = createField(size, 'height');
-  const inv = 1 / size;
+  const fuzzy = clamp01(NUM(params, 'Fuzzy', 0));
+  const offset = clamp01(NUM(params, 'Offset', 0));
+
+  // 1) 构造 (h, r, g, b) 散点并按 h 排序
   const pts = [];
   for (let i = 0; i < samples; i++) {
-    const x = hash2f(i * 3 + 1, i * 5 + 2, seed) * size;
-    const y = hash2f(i * 7 + 3, i * 11 + 4, seed + 1) * size;
-    const h = hash2f(i * 13 + 5, i * 17 + 6, seed + 2);
-    pts.push([x, y, h]);
+    const base = (i + 0.5) / samples;
+    const h = clamp01(base + (hash2f(i * 5 + 1, i * 7 + 3, seed) - 0.5) * fuzzy * 0.5);
+    const r = clamp01(0.5 + 0.5 * value2(h * 6, seed * 0.01, seed + 11));
+    const g = clamp01(0.5 + 0.5 * value2(h * 9, 3.7 + seed * 0.01, seed + 22));
+    const b = clamp01(0.5 + 0.5 * value2(h * 12, 8.1 + seed * 0.01, seed + 33));
+    pts.push([h, r, g, b]);
   }
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      let sum = 0, wsum = 0;
-      for (let p = 0; p < pts.length; p++) {
-        const d = (x - pts[p][0]) * (x - pts[p][0]) + (y - pts[p][1]) * (y - pts[p][1]);
-        const w = 1 / (1 + d * 0.002);
-        sum += pts[p][2] * w;
-        wsum += w;
+  pts.sort((a, b) => a[0] - b[0]);
+
+  const lookup = (t) => {
+    const h = clamp01(t);
+    if (h <= pts[0][0]) return pts[0];
+    if (h >= pts[pts.length - 1][0]) return pts[pts.length - 1];
+    let lo = 0, hi = pts.length - 1;
+    while (hi - lo > 1) {
+      const mid = (lo + hi) >> 1;
+      if (pts[mid][0] <= h) lo = mid; else hi = mid;
+    }
+    const a = pts[lo], b = pts[hi];
+    const span = b[0] - a[0] || 1;
+    const k = (h - a[0]) / span;
+    return [h, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k, a[3] + (b[3] - a[3]) * k];
+  };
+
+  // 2) 以输入高度（或程序化底）驱动色带
+  const src = ctx.input(0);
+  const height = new Float32Array(size * size);
+  if (src) height.set(inOr(ctx, 0, 0.5).data);
+  else {
+    const inv = 1 / size;
+    for (let y = 0; y < size; y++) {
+      const v = (y + 0.5) * inv;
+      for (let x = 0; x < size; x++) {
+        const u = (x + 0.5) * inv;
+        height[y * size + x] = clamp01(fractalSum(perlin2, u * 5, v * 5, seed, 5, 2, 0.5, 'Standard') * 0.5 + 0.5);
       }
-      let h = sum / (wsum || 1);
-      h += fractalSum(perlin2, (x * inv) * 8, (y * inv) * 8, seed, 3, 2, 0.5, 'Standard') * 0.15;
-      f.data[y * size + x] = clamp01(h);
     }
   }
-  return f;
+
+  const out = colorField(size);
+  for (let i = 0; i < height.length; i++) {
+    const rgb = lookup(clamp01(height[i] + offset));
+    writeRGB(out, i, rgb[1], rgb[2], rgb[3]);
+  }
+  return out;
 }
 
 /** MacroPort：宏端口直通。 */
@@ -1628,14 +1751,49 @@ export function colorErosion(ctx) {
   let maxAcc = 1;
   for (let i = 0; i < acc.length; i++) maxAcc = Math.max(maxAcc, acc[i]);
   if (colorIn && colorIn.channels >= 3) {
-    for (let i = 0; i < out.data.length; i++) {
+    // `ColorTransport.Simulation` 的近似：沿最陡下降方向把颜色向下游搬运。
+    // 汇流越大的格子搬运越多，Color Hold 越大保留的原色越多。
+    const dirX = new Float32Array(size * size);
+    const dirY = new Float32Array(size * size);
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const i = y * size + x;
+        const [gx, gy] = gradientAt(height.data, size, x, y);
+        const len = Math.sqrt(gx * gx + gy * gy);
+        if (len > 1e-9) { dirX[i] = -gx / len; dirY[i] = -gy / len; }
+      }
+    }
+    const steps = Math.max(1, Math.round(1 + transport * 10));
+    let cr = new Float32Array(size * size);
+    let cg = new Float32Array(size * size);
+    let cb = new Float32Array(size * size);
+    for (let i = 0; i < size * size; i++) {
+      cr[i] = colorIn.data[i * 4]; cg[i] = colorIn.data[i * 4 + 1]; cb[i] = colorIn.data[i * 4 + 2];
+    }
+    for (let s = 0; s < steps; s++) {
+      const nr = new Float32Array(size * size), ng = new Float32Array(size * size), nb = new Float32Array(size * size);
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const i = y * size + x;
+          // 上游采样：沿水流反方向
+          const ux = x - dirX[i] * 1.4, uy = y - dirY[i] * 1.4;
+          const flow = Math.pow(acc[i] / maxAcc, 0.4);
+          const take = clamp01(flow * sediment * 0.55);
+          nr[i] = lerp(cr[i], sampleBilinear(cr, size, ux, uy, 0), take);
+          ng[i] = lerp(cg[i], sampleBilinear(cg, size, ux, uy, 0), take);
+          nb[i] = lerp(cb[i], sampleBilinear(cb, size, ux, uy, 0), take);
+        }
+      }
+      cr = nr; cg = ng; cb = nb;
+    }
+    for (let i = 0; i < size * size; i++) {
       const flow = Math.pow(acc[i] / maxAcc, 0.4);
-      const dark = 1 - flow * transport * 0.45;
+      const dark = 1 - flow * transport * 0.35;
       const lift = 1 + flow * sediment * 0.2;
       const mix = lerp(1, blend, hold * 0.3);
-      out.data[i * 4] = clamp01(colorIn.data[i * 4] * dark * lift * mix);
-      out.data[i * 4 + 1] = clamp01(colorIn.data[i * 4 + 1] * dark * lift * mix);
-      out.data[i * 4 + 2] = clamp01(colorIn.data[i * 4 + 2] * dark * lift * mix);
+      out.data[i * 4] = clamp01(cr[i] * dark * lift * mix);
+      out.data[i * 4 + 1] = clamp01(cg[i] * dark * lift * mix);
+      out.data[i * 4 + 2] = clamp01(cb[i] * dark * lift * mix);
       out.data[i * 4 + 3] = 1;
     }
   } else {
@@ -2024,31 +2182,120 @@ export function waterColor(ctx) {
   return out;
 }
 
-/** Shrubs：灌木分布遮罩（比 Trees 更宽松、更低矮）。 */
+/**
+ * Shrubs：Gaea 是「坡度/海拔筛选 → 多尺度分布噪声 → 水体/树木避让 → 边缘模糊/裁切」的
+ * scatter 管线。这里按同样的阶段组织，Count 决定目标覆盖率。
+ */
 export function shrubs(ctx) {
   const { size, params, seed } = ctx;
   const src = inOr(ctx, 0, 0.5);
-  const maskIn = ctx.input(1);
-  const health = clamp01(NUM(params, 'Health', 0.5));
-  const spread = clamp01(NUM(params, 'Spread', 0.1));
-  const random = clamp01(NUM(params, 'Random', 0.5));
+  const waterMask = ctx.input(1);
+  const treeMask = ctx.input(2);
+  const customMask = ctx.input(3);
+
+  const count = clamp(NUM(params, 'Count in Thousands', 200), 10, 1000);
+  const shape = ENUM(params, 'Shape', 'Point');
+  const health = clamp01(NUM(params, 'Health', 0.8));
+  const spread = clamp(NUM(params, 'Spread', 0.8), 0.0001, 1);
+  const random = clamp01(NUM(params, 'Random', 0));
+  const chaos = clamp01(NUM(params, 'Chaos', 0.5));
+  const blurEdges = clamp01(NUM(params, 'Blur Edges', 0));
+  const trim = clamp01(NUM(params, 'Trim', 0.1));
+  const customInfluence = clamp01(NUM(params, 'Custom Influence', 0));
+  const seekWater = ENUM(params, 'Seek Water', 'Seek') === 'Seek';
+  const avoidTrees = ENUM(params, 'Avoid Trees', 'None');
   const slopePair = F2(params, 'Slope', [0, 0.4]);
+  const slopeFall = clamp(NUM(params, 'Slope Falloff', 10), 0, 90);
   const altPair = F2(params, 'Altitude', [0.05, 0.8]);
-  const f = createField(size, 'mask');
+  const altFall = clamp(NUM(params, 'Altitude Falloff', 1), 0, 1);
+
   const slope = slopeMagnitude(src);
   const inv = 1 / size;
-  const sMax = slopePair[1] > 0 ? slopePair[1] / 90 : 0.7;
-  for (let i = 0; i < f.data.length; i++) {
-    const x = i % size, y = (i / size) | 0;
-    const p = perlin2((x / size) * (5 + spread * 20), (y / size) * (5 + spread * 20), seed) * 0.5 + 0.5;
-    const patch = smoothstep(0.9 - spread, 1.1 - spread, p);
-    let m = patch * smoothstep(sMax + 0.2, 0.2, slope.data[i]);
-    m *= smoothstep(altPair[0] || 0.05, (altPair[0] || 0.05) + 0.05, src.data[i]);
-    m *= smoothstep(altPair[1] || 0.8, (altPair[1] || 0.8) - 0.05, src.data[i]);
-    if (maskIn) m *= clamp01(toScalar(maskIn).data[i]);
-    f.data[i] = clamp01(m * health * (0.6 + random * 0.4));
+  // 目标覆盖率：200k 默认 -> 约 0.55；Count 越大越密。
+  const target = clamp(0.12 + (count / 1000) * 0.55, 0.05, 0.95) * health;
+
+  const distribution = createField(size, 'mask');
+  const baseFreq = 4 + spread * 26;
+  const shapeFreq = shape === 'Point' ? 1.6 : shape === 'Big' ? 0.75 : 0.5;
+  const noiseAt = (u, v, f) => {
+    let n = fractalSum(perlin2, u * f, v * f, seed, 4, 2, 0.5, 'Standard') * 0.5 + 0.5;
+    n = lerp(n, value2(u * f * 3, v * f * 3, seed + 7), random);
+    n = lerp(n, clamp01(n * 1.8 - 0.35), chaos);
+    return clamp01(n);
+  };
+
+  let minV = 1, maxV = 0;
+  for (let y = 0; y < size; y++) {
+    const v = (y + 0.5) * inv;
+    for (let x = 0; x < size; x++) {
+      const u = (x + 0.5) * inv;
+      const i = y * size + x;
+      const n = noiseAt(u, v, baseFreq * shapeFreq);
+      distribution.data[i] = n;
+      if (n < minV) minV = n;
+      if (n > maxV) maxV = n;
+    }
   }
-  return f;
+  // 按覆盖面阈值化：保留最密集的 target 比例。
+  const hist = new Uint32Array(256);
+  for (let i = 0; i < distribution.data.length; i++) {
+    hist[Math.min(255, Math.max(0, Math.round(((distribution.data[i] - minV) / (maxV - minV || 1)) * 255)))]++;
+  }
+  let cut = 0, acc = 0;
+  const cutoff = distribution.data.length * target;
+  for (let b = 255; b >= 0; b--) { acc += hist[b]; if (acc >= cutoff) { cut = b / 255; break; } }
+
+  const out = createField(size, 'mask');
+  for (let y = 0; y < size; y++) {
+    const v = (y + 0.5) * inv;
+    for (let x = 0; x < size; x++) {
+      const i = y * size + x;
+      const u = (x + 0.5) * inv;
+      const norm = (distribution.data[i] - minV) / (maxV - minV || 1);
+      let m = smoothstep(cut * 0.92, Math.min(1, cut + 0.08), norm);
+
+      // 坡度范围（度）
+      const sl = Math.atan(slope.data[i]) * 180 / Math.PI;
+      const s0 = Math.min(slopePair[0], slopePair[1]);
+      const s1 = Math.max(slopePair[0], slopePair[1]);
+      m *= smoothstep(s0 - slopeFall, s0 + 0.01, sl) * smoothstep(s1 + slopeFall, s1 - 0.01, sl);
+
+      // 海拔范围
+      const a0 = Math.min(altPair[0], altPair[1]);
+      const a1 = Math.max(altPair[0], altPair[1]);
+      m *= smoothstep(a0 - altFall, a0 + altFall * 0.1 + 1e-6, src.data[i])
+        * smoothstep(a1 + altFall, a1 - altFall * 0.1 - 1e-6, src.data[i]);
+
+      if (waterMask) {
+        const w = clamp01(toScalar(waterMask).data[i]);
+        m *= seekWater ? w : 1 - w;
+      }
+      if (treeMask) {
+        const t = clamp01(toScalar(treeMask).data[i]);
+        if (avoidTrees === 'Previous') m *= 1 - t;
+        else if (avoidTrees === 'All') m *= 1 - t * 0.75;
+      }
+      if (customMask && customInfluence > 0) {
+        const c = clamp01(toScalar(customMask).data[i]);
+        m = lerp(m, m * c, customInfluence);
+      }
+      // 边缘裁切
+      if (trim > 0) {
+        const edge = Math.min(u, v, 1 - u, 1 - v) * 2;
+        m *= smoothstep(0, trim, edge);
+      }
+      out.data[i] = clamp01(m);
+    }
+  }
+
+  if (blurEdges > 0) {
+    const r = Math.max(1, blurEdges * size * 0.02);
+    const blurred = mapBlur(out.data, size, r);
+    for (let i = 0; i < out.data.length; i++) {
+      out.data[i] = clamp01(lerp(out.data[i], blurred[i], blurEdges));
+    }
+  }
+  return out;
 }
 
 /** LightX：基于高度/可选法线的渲染光照色。 */
@@ -2602,6 +2849,9 @@ export function cartography(ctx) {
   const shoreHi = 0.5 - 0.05 / boundaryThickness;
 
   const out = colorField(size);
+  const contourOut = createField(size, 'mask');
+  const waterOut = createField(size, 'mask');
+  const gridOut = createField(size, 'mask');
   const spacing = size / gridCount;
   const gridStrength = (gridInt[0] + gridInt[1]) * 0.5;
   for (let y = 0; y < size; y++) {
@@ -2625,6 +2875,8 @@ export function cartography(ctx) {
 
       // 陆地等高线：水体处淡出。
       const ll = clamp01(landLines[i]) * (1 - w);
+      contourOut.data[i] = clamp01(ll + (waterLines ? clamp01(waterLines[i]) * 0.35 : 0));
+      waterOut.data[i] = w;
       r += ll * 0.45; g += ll * 0.45; b += ll * 0.45;
 
       // 海岸线。
@@ -2654,6 +2906,7 @@ export function cartography(ctx) {
         const k = gm * gridStrength * 0.5;
         r = lerp(r, 0.95, k); g = lerp(g, 0.95, k); b = lerp(b, 0.95, k);
       }
+      gridOut.data[i] = gm;
 
       // Trim：压暗图幅边缘。
       if (trim > 0) {
@@ -2664,26 +2917,72 @@ export function cartography(ctx) {
       writeRGB(out, i, r, g, b);
     }
   }
-  return out;
+  // Gaea 的 Cartography 会提交多个图层端口；这里返回可直接连线的四种结果。
+  return [out, contourOut, waterOut, gridOut];
 }
 
-/** Heal：重建被量化/低分辨率破坏的高度场，消除条带。 */
+/**
+ * 星状小波（à trous）去噪，对应 Gaea 的 `MagickImage.WaveletDenoise(Percentage)`。
+ * B3 样条核 [1,4,6,4,1]/16，逐层洞填充（step = 2^level），对细节层做软阈值后重建。
+ * 这是对 ImageMagick 小波的近似：保留边缘、压掉 8-bit 量化台阶与细碎噪声。
+ */
+function waveletDenoise(src, size, passes, recon) {
+  const K = [1 / 16, 4 / 16, 6 / 16, 4 / 16, 1 / 16];
+  let cur = Float32Array.from(src);
+  // Reconstruction 0..1 -> 细节层软阈值。ImageMagick 的 Percentage 是按 quantum 范围的，
+  // 但星状小波的细节系数尺度远小于 1，因此这里按经验系数 0.08 映射，越大去噪越强。
+  const threshold = clamp(recon * 0.08, 0, 1);
+
+  const blurLevel = (data, step) => {
+    const tmp = new Float32Array(data.length);
+    const out = new Float32Array(data.length);
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        let s = 0;
+        for (let k = -2; k <= 2; k++) {
+          const xx = Math.min(size - 1, Math.max(0, x + k * step));
+          s += data[y * size + xx] * K[k + 2];
+        }
+        tmp[y * size + x] = s;
+      }
+    }
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        let s = 0;
+        for (let k = -2; k <= 2; k++) {
+          const yy = Math.min(size - 1, Math.max(0, y + k * step));
+          s += tmp[yy * size + x] * K[k + 2];
+        }
+        out[y * size + x] = s;
+      }
+    }
+    return out;
+  };
+
+  for (let p = 0; p < passes; p++) {
+    for (let level = 0; level < 4; level++) {
+      const smooth = blurLevel(cur, 1 << level);
+      for (let i = 0; i < cur.length; i++) {
+        const detail = cur[i] - smooth[i];
+        const mag = Math.abs(detail);
+        const shrunk = mag <= threshold ? 0 : (detail > 0 ? mag - threshold : threshold - mag);
+        cur[i] = smooth[i] + shrunk;
+      }
+    }
+  }
+  return cur;
+}
+
+/** Heal：重建被量化/低分辨率破坏的高度场。 */
 export function heal(ctx) {
   const { size, params } = ctx;
   const src = inOr(ctx, 0, 0.5);
   const reconstruction = clamp01(NUM(params, 'Reconstruction', 0.3));
   const passes = clamp(NUM(params, 'Passes', 1) | 0, 1, 10);
 
+  const denoised = waveletDenoise(src.data, size, passes, reconstruction);
   const f = createField(size, 'height');
-  f.data.set(src.data);
-  // 逐轮"模糊 + 回混"：模糊抹平 8-bit 阶梯，回混保留原始地形大形。
-  for (let p = 0; p < passes; p++) {
-    const radius = Math.max(1, Math.round(size * 0.0015 * (1 + reconstruction * 6)));
-    const blurred = gaussianBlur(f, radius);
-    for (let i = 0; i < f.data.length; i++) {
-      f.data[i] = lerp(f.data[i], blurred.data[i], reconstruction);
-    }
-  }
+  for (let i = 0; i < f.data.length; i++) f.data[i] = clamp01(denoised[i]);
   return f;
 }
 
@@ -2717,10 +3016,12 @@ export function rivers(ctx) {
   const valley = gaussianBlur(riverF, Math.max(1, Math.round(size * 0.01 * valleyScale)));
 
   const f = createField(size, 'height');
+  const flowOut = createField(size, 'mask');
   const md = maskIn ? toScalar(maskIn).data : null;
   for (let i = 0; i < f.data.length; i++) {
     const river = clamp01(riverF.data[i]);
     const valleyM = clamp01(valley.data[i]);
+    flowOut.data[i] = Math.pow(acc[i] / maxAcc, 0.45);
     let h = height.data[i];
     h -= valleyM * water * 0.06;                    // 谷地整体下切
     h -= river * (0.04 + depth * 0.22);             // 河床
@@ -2729,10 +3030,15 @@ export function rivers(ctx) {
     if (md) h = lerp(height.data[i], h, clamp01(md[i]));
     f.data[i] = clamp01(h);
   }
-  return f;
+  // Gaea 在 Rivers 上提交多个端口；这里给出高度、河道与水流量三个可直接连线的输出。
+  return [f, riverF, flowOut];
 }
 
-/** ColorThreshold：按与指定颜色的距离生成遮罩。 */
+/**
+ * ColorThreshold：Gaea 的 Build 是 ImageMagick 管线——
+ * `Alpha(Set) → Transparent(Start, Falloff%) → Separate(Alpha) → Negate`。
+ * 也就是「颜色距离 ≤ Falloff 的像素为 1，其余为 0」的硬阈值遮罩，不是软过渡。
+ */
 export function colorThreshold(ctx) {
   const { size, params } = ctx;
   const input = ctx.input(0);
@@ -2740,21 +3046,20 @@ export function colorThreshold(ctx) {
   const falloff = clamp(NUM(params, 'Falloff', 0.2), 0.0001, 1);
   const f = createField(size, 'mask');
   if (input && input.channels >= 3) {
-    // 颜色输入：用 RGB 欧氏距离，Falloff 为软阈值宽度。
     for (let i = 0; i < f.data.length; i++) {
       const dr = input.data[i * 4] - start[0];
       const dg = input.data[i * 4 + 1] - start[1];
       const db = input.data[i * 4 + 2] - start[2];
+      // ImageMagick 的 fuzz 距离是 RGB 空间的欧氏距离（各通道等权）。
       const dist = Math.sqrt(dr * dr + dg * dg + db * db) / Math.sqrt(3);
-      f.data[i] = clamp01(1 - smoothstep(0, falloff, dist));
+      f.data[i] = dist <= falloff ? 1 : 0;
     }
     return f;
   }
-  // 标量输入：退化为按亮度距离。
   const src = inOr(ctx, 0, 0.5);
   const target = (start[0] + start[1] + start[2]) / 3;
   for (let i = 0; i < f.data.length; i++) {
-    f.data[i] = clamp01(1 - smoothstep(0, falloff, Math.abs(src.data[i] - target)));
+    f.data[i] = Math.abs(src.data[i] - target) <= falloff ? 1 : 0;
   }
   return f;
 }
