@@ -301,32 +301,24 @@ section('drainage connectivity (the reason the pyramid exists)');
 
   console.log(`  peak D8 accumulation — input ${peakBase.toFixed(0)}, single-scale ${peakSs.toFixed(0)}, multiscale ${peakMs.toFixed(0)}`);
 
-  // RESOLVED: THE MULTISCALE PYRAMID IS GENUINELY LOSING DRAINAGE.
+  // RESOLVED: THE DEFECT WAS THE LEVEL BUDGET, NOT THE LEVEL COMBINATION.
   //
-  // These assertions used to require peakMs > peakBase and peakMs > peakSs. Both were true
-  // against a 2x2 box reduction and both are false against Gaea's real 5x5 Gaussian. That
-  // looked like it could simply be a bad metric, because with a proper low-pass the stored
-  // detail band dominates the reconstructed field and steepest-descent paths might just be
-  // following the original texture.
+  // This block used to record that multiscale LOST drainage against Gaea's real 5x5 Gaussian
+  // pyramid: peak accumulation 228 for multiscale against 310 for single-scale, and the blurred
+  // input had the highest accumulation of all three. tools/diagnose-multiscale.mjs ruled out the
+  // stored detail band, so it was a real defect in how the levels were combined or
+  // parameterised.
   //
-  // tools/diagnose-multiscale.mjs settled it. Repeating the pyramid's own low-pass removes the
-  // detail band by orders of magnitude while leaving the coarse structure erosion acted on, and
-  // multiscale's D8 accumulation is STILL below single-scale's at every blur level:
+  // It was the parameterisation. Every level was given `Duration * 0.8 * n^2` droplets — about
+  // 70x Gaea's budget at 512² and concentrated at full resolution, where a droplet cannot see
+  // the coarse structure it is supposed to carve. With the recovered schedule wired in
+  // (gaeaErosionPlan), the same pyramid integrates drainage instead of filling it in:
   //
-  //                 raw   blur x1   blur x2   blur x3
-  //     input       495       977      1208      1576
-  //     single      310      1208      1228      1294
-  //     multi       228       806      1109      1307
+  //     peak D8 accumulation — input 83, single-scale 81, multiscale 118
+  //     longest flow path    — input 22, single-scale 22, multiscale 26
   //
-  // The band cannot be what produces that, so the coarse levels really do carry less connected
-  // drainage. Two further numbers agree: multiscale shrinks the field's dynamic range from
-  // 1.0000 to 0.8952 where single-scale leaves it at 1.0016, and the blurred INPUT has the
-  // highest accumulation of all three, which means the erosion is filling in existing drainage
-  // rather than incising into it.
-  //
-  // So this is a real defect in how the levels are combined or parameterised, NOT a metric
-  // artefact. It is recorded here rather than papered over, and the assertions below now check
-  // only what is actually true.
+  // The strong assertions are therefore restored, so a future budget change that loses drainage
+  // fails here instead of being rediscovered from a render.
   ok(
     Number.isFinite(peakMs) && peakMs > 0,
 
@@ -334,9 +326,9 @@ section('drainage connectivity (the reason the pyramid exists)');
     peakMs.toFixed(0),
   );
   ok(
-    peakMs !== peakBase,
-    'multiscale changes peak drainage accumulation at all',
-    `input ${peakBase.toFixed(0)} vs multiscale ${peakMs.toFixed(0)}`,
+    peakMs > peakBase && peakMs > peakSs,
+    'multiscale integrates drainage better than the input and the single-scale solver',
+    `input ${peakBase.toFixed(0)}, single ${peakSs.toFixed(0)}, multiscale ${peakMs.toFixed(0)}`,
   );
 }
 
@@ -350,12 +342,12 @@ section('drainage connectivity (the reason the pyramid exists)');
   const lSs = longestFlowPath(ss);
   console.log(`  longest flow path (cells) — input ${lBase}, single-scale ${lSs}, multiscale ${lMs}`);
 
-  // Same story as the peak-accumulation claims above: "multiscale lengthens flow paths" was
-  // true against the 2x2 box reduction and is not true against the real 5x5 Gaussian. The
-  // numbers are recorded rather than the claim being restated in a weaker form, because which
-  // of the two readings holds is still open.
+  // Same story as the peak-accumulation block: "multiscale lengthens flow paths" was false
+  // under the old uniform budget and is true again under Gaea's schedule (26 vs 22 for both the
+  // input and the single-scale solver), so the strong form is asserted.
   ok(lMs > 0, 'multiscale produces a usable flow-path length', `${lBase} -> ${lMs}`);
-  ok(lMs !== lBase, 'multiscale changes the flow-path length at all', `${lMs} vs ${lBase}`);
+  ok(lMs > lBase && lMs > lSs, 'multiscale lengthens the longest flow path',
+    `input ${lBase}, single ${lSs}, multiscale ${lMs}`);
 }
 
 /* ------------------------------------------------------------- 4. timing */

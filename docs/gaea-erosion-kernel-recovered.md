@@ -318,16 +318,37 @@ particle count is `(width * height) >> 8`, taken inside the driver — 512 bytes
 
 The formulas live in `web/js/kernels/erosion.js` as `gaeaErosionScaleRemap`,
 `gaeaPyramidDepth`, `gaeaPyramidDepthExact`, `gaeaDropletsPerIteration`, `gaeaDetailScale`,
-`gaeaLevelCurve` and `gaeaLevelIterations`, with the constants exported, and are pinned by
-`web/tests/gaea-erosion-schedule-test.mjs` (55 assertions).
+`gaeaLevelCurve`, `gaeaLevelIterations` and `gaeaErosionPlan`, with the constants exported, and
+are pinned by `web/tests/gaea-erosion-schedule-test.mjs` (55 assertions) and
+`web/tests/gaea-erosion-schedule-stress-test.mjs` (18).
 
-They are **not wired into the solver yet**, deliberately. The current
-`hydraulicDropletMultiscale` budget is `Duration * 0.8 * n²` droplets per level; Gaea's is
-`(n² >> 8) * ceil(curve * Duration)` — about two orders of magnitude fewer at 512² with
-`Duration = 10`, because each Gaea iteration also runs the full relaxation and flow passes.
-Swapping the budget without a reference render to validate against would turn a solver whose
-output has been measured and tuned into an unmeasured one, so the recovered schedule stays a
-tested model until the level index mapping and the world-size input are pinned.
+**The schedule is now wired into `hydraulicDropletMultiscale`.** `gaeaErosionPlan()` is the
+single source of truth: the solver builds the level list from it and reads each level's droplet
+count straight out of the plan. Three points of contact:
+
+- `Duration` and `Erosion Scale` are read **raw**. `gaeaDial` no longer feeds the pyramid; it
+  survives only for the `Duration === 0` early-out and for the droplet brush radius.
+- terrain width is `ctx.terrainWidth ?? TERRAIN_HEIGHT_M` (800 m, square). This is the one
+  remaining modelling choice, recorded as an open question below.
+- the pyramid stops at 16 cells, because `(n*n) >> 8` is zero below that.
+
+Measured on the 128² fixture:
+
+| | input | single-scale | multiscale (wired) |
+| --- | --- | --- | --- |
+| peak D8 accumulation | 83 | 81 | **118** |
+| longest flow path | 22 | 22 | **26** |
+
+The old solver measured peak 228 against single-scale 310 on the same fixture, which is what
+flagged the defect. It was the budget, not the level combination: spending
+`Duration * 0.8 * n²` droplets per level concentrated all the work at full resolution, where a
+droplet cannot see the coarse structure. At 512² the old budget was 104,858 droplets per level;
+the schedule spends 1,505 across the whole pyramid, about 70× less.
+
+What that does **not** fix: the per-droplet rates (capacity, deposit, evaporate, brush) are
+still this build's constants. With Gaea's budget in place the measured mean loss is 0.0401 at
+`Duration = 1` and 0.0357 at `Duration = 200` — non-monotone, because extra droplets also
+deposit. Closing that is the next layer of work, not a scheduling problem.
 
 ## The driver's own constants, and the pass map
 
@@ -553,13 +574,16 @@ ulps and still look right.
   the code does with them. The three angle fields `0xd4`/`0xdc`/`0xe4` are matched to
   Suspended/Bed/Coarse load only by the order the results are stored and the parameters'
   declared ranges — that mapping is inferred, not proven.
-- **Which physical end of the pyramid the curve's level index names.** The schedule calls the
-  curve once per level with indices running from `depth - 1` down to 0, but nothing yet says
-  whether index 0 is the full-resolution level or the coarsest one. Wiring the schedule
-  requires settling that.
+- **Which physical end of the pyramid the curve's level index names.** Resolved by taking the
+  literal reading of `FUN_1801f24f0`: the base (full-resolution) level is built first and gets
+  index `depth - 1`, each halving decrements it, and the coarsest level lands at 0. That is why
+  the finest level gets the fewest iterations and the coarse levels the full plateau — the
+  allocation that makes sense when the droplet budget per iteration grows as `n²`. The
+  consequence is measurable and now covered by the multiscale test, but it is still an
+  inference, not a value read out of the driver.
 - **How `Erosion Scale` maps to the app's world units.** The binary uses `0xa0` directly; this
-  build has two candidate sources (`graph.build.worldSize`, default 60, and the internal
-  `TERRAIN_HEIGHT_M = 800`) and no ground truth for which one Gaea would call terrain width.
+  build now defaults to `TERRAIN_HEIGHT_M = 800` (square terrain) and accepts `ctx.terrainWidth`
+  as an override. There is still no ground truth for which number Gaea would call terrain width.
 - **Whether `FUN_1801f35f0` is thermal, hydraulic, or the shaping pass.** It is reached
   from pass 3 of the erosion driver, so it is part of erosion, but its role is inferred from
   its shape, not named.

@@ -188,6 +188,27 @@ tools/probe-range.mjs           探 Normalize/Autolevel/clamp 语义
 **做法建议**:先 oracle `RawNoise.Perlin` 的小分辨率输出,逆向出 hash/梯度/插值;
 再实现 JS;再 `verify-exact` 加 20+ 用例。这是接下来投入产出比最高的一块。
 
+#### 7.1 状态(已完成 Perlin 标量内核)
+
+`web/js/kernel/fastnoise.js` 已移植 FastNoiseSIMD 的标量 Perlin,`Perlin` 节点
+(`generators.js` → `perlinNode`)已改接该内核。用 `tools/gaea-probe` 对
+`RawNoise.Perlin` 取了 13 组 16² 网格(不同 Scale/Seed/Octaves/Gain/Type/轴缩放),
+逐值误差 ≤ 3e-7,金值固化在 `web/tests/gaea-fastnoise-test.mjs`。
+
+已确认的事实:
+
+* hash `seed ^ 1619x ^ 31337y ^ 6971z`,再 `h*h*h*60493`、`(h>>>13)^h`;
+* 五阶 fade、三线性 lerp、16 项梯度表(12–15 项由 oracle 逐格解出);
+* 每倍频 `seed+i`、`f*=2`、`amp*=gain`,末乘 `1/Σgain^i`;billow `2|n|-1`,ridged 取其负;
+* 坐标 `((i,y)/R + offset*wavelength/R - 0.5)*R`,频率 `(1-Scale)*0.01*(512/R)`,
+  `offset = (X, Y)` 以噪声空间单位相加;节点层 Ridged = 反转 Billowy。
+
+**仍未解决**:`WarpType Simple/Complex` 的梯度扰动。试过三轴独立 Perlin、Value、
+最近格点梯度、z 偏移以及 perturbFrequency/幅度扫描,误差始终 ≥ 0.30,故只做结构移植,
+`Perlin` 节点标注为 "exact (warp approximate)",测试对 Warp 只断言确定性/有限/非退化。
+下一步是用同一 oracle 对 `RawNoise.Voronoi`(`SetNoiseType(7)`、cellular lookup)取金值,
+再决定是否先绕过扰动接线 Voronoi。
+
 ### 7.2 原生 blur(已大体解决,边缘仍为模型)
 
 `Map.Blur` 是 P/Invoke,但它的行为已经测出来了:

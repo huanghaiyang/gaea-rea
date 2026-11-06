@@ -712,6 +712,52 @@ export function gaeaDropletsPerIteration(width, height) {
 }
 
 /**
+ * The whole per-level work plan, i.e. what `FUN_1801f24f0` computes before the driver runs.
+ *
+ * Returns one entry per level, ordered from the full-resolution base (`k = 0`) to the coarsest.
+ * This is the single source of truth for the solver and for the tests: the droplet budget is
+ * `(n*n)>>8` per iteration, the iteration count is `ceil(curve(level) * Duration)`, and the
+ * curve index counts DOWN from the base (`depth - 1 - k`), which is the order the binary
+ * computes the level budgets in.
+ *
+ * Two departures from the binary, both deliberate:
+ *   - the pyramid stops at 16 cells. Below that `(n*n)>>8` is zero, so a level would iterate
+ *     without ever starting a droplet.
+ *   - a level with a positive iteration count but zero rounded droplets gets one, so a level is
+ *     never reconstructed without having been touched. `Duration = 0` stays at zero.
+ *
+ * @param {object} o
+ * @param {number} o.size         grid width in pixels (the grid is square here)
+ * @param {number} o.erosionScale raw `Erosion Scale`, in world units
+ * @param {number} o.terrainWidth terrain width in the same world units
+ * @param {number} o.duration     raw `Duration`, an iteration count
+ * @returns {{depth: number, depthExact: number, plan: Array<{n: number, curveLevel: number,
+ *   iterations: number, droplets: number}>}}
+ */
+export function gaeaErosionPlan({ size, erosionScale, terrainWidth, duration }) {
+  const depthExact = gaeaPyramidDepthExact({ erosionScale, terrainWidth, width: size });
+  const depth = gaeaPyramidDepth({ erosionScale, terrainWidth, width: size });
+
+  let count = 1;
+  for (let s = size; count < depth && (s >> 1) >= 16; s >>= 1) count++;
+
+  const plan = [];
+  let n = size;
+  for (let k = 0; k < count; k++) {
+    const curveLevel = Math.max(0, depth - 1 - k);
+    const iterations = gaeaLevelIterations(curveLevel, duration, { levelCount: depthExact });
+    plan.push({
+      n,
+      curveLevel,
+      iterations,
+      droplets: iterations > 0 ? Math.max(1, gaeaDropletsPerIteration(n, n) * iterations) : 0,
+    });
+    n >>= 1;
+  }
+  return { depth, depthExact, plan };
+}
+
+/**
  * `Shape Detail Scale` -> the per-level detail frequency.
  *
  *     shapeDetailScale == 0 ? 100.0 : sqrt(1 / shapeDetailScale)
@@ -841,16 +887,16 @@ export const GAEA_EROSION_RANGES = {
  *
  * THESE ARE MODEL CHOICES, NOT GAEA'S FORMULAS. Gaea's own schedule has since been recovered
  * (`gaeaErosionScaleRemap`, `gaeaPyramidDepth`, `gaeaDropletsPerIteration`,
- * `gaeaLevelIterations` above): `Duration` is an iteration count, not a droplet count, and the
- * droplet budget is fixed at one per 256 cells. This dial remains because the solver below has
- * not been rewired onto that schedule yet; it is calibrated to reproduce this build's previous
- * behaviour at the catalogue defaults while opening up Gaea's full input range:
+ * `gaeaLevelIterations`, `gaeaErosionPlan` above) and `hydraulicDropletMultiscale` now runs on
+ * it. This dial survives only for what is still this build's own calibration:
  *
- *   Duration      linear by 1/20. The catalogue default 10 then yields the same droplet
- *                 budget the old 0..1 dial gave at 0.5. Gaea's ceiling of 200 reaches 10x.
- *   Erosion Scale logarithmic over three decades. 1..20000 is too wide for a linear map to
- *                 be usable; log puts the default 1000 at 0.697, which rounds to the same
- *                 brush radius (3 cells) the old 0..1 dial gave at 0.5.
+ *   Duration      linear by 1/20. The pyramid budget no longer uses it — the raw value is an
+ *                 iteration count — so the only remaining consumer is the `Duration === 0`
+ *                 early-out.
+ *   Erosion Scale logarithmic over three decades. The pyramid depth uses the raw world length;
+ *                 what is left here is the droplet brush radius in cells, which Gaea derives
+ *                 from internal units we have not recovered. 1000 -> 0.697 keeps the 3-cell
+ *                 brush the old 0..1 dial gave at 0.5.
  *   everything else, including the three discharge angles, passes through clamped to 0..1.
  */
 export function gaeaDial(name, value) {
@@ -1407,8 +1453,22 @@ export function hydraulicDropletMultiscale(ctx) {
   const h = fieldToMetres(src, size);
   if (!enable || noErosion || duration <= 0) return metresToField(h, size);
 
+  // ---- Gaea's schedule, wired in as the level budget -------------------------------------
+  //
+  // `gaeaDial` above is deliberately NOT used for these two inputs: it maps Duration to a
+  // 0..1 droplet coefficient and Erosion Scale to a brush index, which is the behaviour this
+  // replaces. The schedule wants the raw parameter values. `Erosion Scale` is a world length,
+  // so it is divided by the terrain width before it means anything; the app's terrain is
+  // TERRAIN_HEIGHT_M tall and treated as square, and `ctx.terrainWidth` overrides that.
+  const gaeaDuration = Math.max(0, P(params, 'Duration', 10));
+  const gaeaScale = P(params, 'Erosion Scale', 1000);
+  const terrainWidth = ctx.terrainWidth ?? TERRAIN_HEIGHT_M;
+  const { plan } = gaeaErosionPlan({
+    size, erosionScale: gaeaScale, terrainWidth, duration: gaeaDuration,
+  });
+  const levels = plan.length;
+
   const rng = makeRng(seed);
-  const levels = pyramidLevelsFor(size);
   const { fine, sizes, lap } = buildPyramid(h, size, levels);
 
   const inertia = 0.05;
@@ -1426,17 +1486,9 @@ export function hydraulicDropletMultiscale(ctx) {
   const last = fine.length - 1;
   for (let k = last; k >= 0; k--) {
     const n = sizes[k];
-    // Every level gets the same droplets-per-cell density as the single-scale solver
-    // (duration * 0.8). A taper towards the fine levels was tried first and measurably
-    // failed: it cut total droplet-steps per cell to about 60% of the single-scale
-    // solver, so the pyramid did LESS erosion work than the thing it replaced and the
-    // drainage came out no more integrated (peak accumulation 82 vs 83). Uniform
-    // density costs only the geometric series, about 1.33x, and keeps each level
-    // properly eroded.
-    const droplets = Math.max(
-      2000,
-      Math.min(2_000_000, Math.round(duration * 0.8 * n * n)),
-    );
+    // Gaea's per-level budget, computed once by [gaeaErosionPlan] from the recovered schedule:
+    // `(w*h)>>8` droplets for each of `ceil(curve(level)*Duration)` iterations.
+    const { droplets } = plan[k];
     // A droplet must be able to cross a good part of its own level, because at the
     // coarsest scale that reach IS the feature. The single-scale bound (0.35*size) was
     // deliberately short to keep channels crisp; here it would forbid long valleys.

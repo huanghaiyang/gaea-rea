@@ -11,6 +11,7 @@ import {
   perlin2, value2, perlin3, value3, worley2, worleySurface, fractalSum,
 } from '../kernel/noise.js';
 import { hash2f, mix32, makeRng } from '../kernel/hash.js';
+import { fnPerlinGrid, FN_FRACTAL } from '../kernel/fastnoise.js';
 import {
   createField, clamp01, lerp, smoothstep, stats, radialFalloffMask, linearGradientMask,
 } from '../kernel/field.js';
@@ -199,46 +200,56 @@ export function multiFractal(ctx) {
 
 /* ------------------------------------------------------------------ Perlin */
 
-/** Perlin — straightforward fBm/ridged/billowy with explicit Gain and Height. */
+/**
+ * Perlin — Gaea's Perlin node, backed by the recovered FastNoiseSIMD kernel.
+ *
+ * The parameter reading and coordinate frame follow `RawNoise.Perlin` in the shipped
+ * assembly: Scale is 0..1 (the binary inverts it), the lattice is
+ * `((i,y) * 1/size - 0.5) * size`, and Frequency is `(1-Scale)*0.01*(512/size)`.
+ * WarpType None is bit-exact against Gaea to float32 rounding (see
+ * web/tests/gaea-fastnoise-test.mjs); Simple/Complex use a structural port that is not
+ * yet numerically validated.
+ */
 export function perlinNode(ctx) {
   const { size, params, seed } = ctx;
   const type = P(params, 'Type', 'FBM');
-  const scale = Math.max(0.5, P(params, 'Scale', 100));
-  const octaves = Math.max(1, Math.min(24, P(params, 'Octaves', 6) | 0));
-  const gain = Math.max(0.05, Math.min(0.95, P(params, 'Gain', 0.5)));
+  const scale = P(params, 'Scale', 0.5);
+  const octaves = Math.max(1, Math.min(14, P(params, 'Octaves', 10) | 0));
+  const gain = Math.max(0, Math.min(1, P(params, 'Gain', 0.5)));
   const height = P(params, 'Height', 1);
-  const warpType = P(params, 'Type', 'None'); // duplicate label: second block = warp Type
-  const freqW = P(params, 'Frequency', 1);
-  const ampW = P(params, 'Amplitude', 0);
-  const warpOct = Math.max(1, P(params, 'Octaves', 3) | 0);
+  const warp = P(params, 'Warp', 'Complex');
+  const frequency = P(params, 'Frequency', 0.05);
+  const amplitude = P(params, 'Amplitude', 0.5);
+  const warpOctaves = Math.max(1, P(params, 'Warp Octaves', 10) | 0);
   const sx = P(params, 'Scale X', 1), sy = P(params, 'Scale Y', 1);
-  const ox = P(params, 'X', 0), oy = P(params, 'Y', 0);
+  const x = P(params, 'X', 0), y = P(params, 'Y', 0);
 
-  // NOTE: nodes.json contains two params literally named "Type" and two named "Octaves" for
-  // Perlin (a vendor flattening artefact). The catalog keeps both; last-write-wins here, which
-  // matches how the flattening lost the section context. Documented in IMPLEMENTATION-NOTES.md.
-  const fractalType = type === 'Ridged' ? 'Ridged' : type === 'Billowy' ? 'Billow' : 'Standard';
-  const freq = Math.max(0.25, (scale / 100) * 4);
-  const period = Math.max(1, Math.round(freq));
-  const doWarp = ampW > 0 && (warpType === 'Simple' || warpType === 'Complex');
+  const fractalType = type === 'Ridged' ? FN_FRACTAL.RIDGED
+    : type === 'Billowy' ? FN_FRACTAL.BILLOW : FN_FRACTAL.FBM;
+  const seedParam = P(params, 'Seed', seed ?? 0) | 0;
+
+  const raw = fnPerlinGrid({
+    size,
+    scale,
+    octaves,
+    gain,
+    fractalType,
+    seed: seedParam,
+    warp,
+    frequency,
+    amplitude,
+    warpOctaves,
+    scaleX: sx,
+    scaleY: sy,
+    // Gaea's node passes `new Vector2(X, Y)` into RawNoise.Perlin, where the offset is in
+    // noise-space units (it is multiplied by the wavelength and then by the frequency).
+    offsetX: x,
+    offsetY: y,
+  });
 
   const f = createField(size, 'height');
   const d = f.data;
-  const inv = 1 / size;
-  for (let y = 0; y < size; y++) {
-    const v = ((y + 0.5) * inv - 0.5 + oy * 0.01) * sy;
-    for (let x = 0; x < size; x++) {
-      const u = ((x + 0.5) * inv - 0.5 + ox * 0.01) * sx;
-      let nx = u * freq, ny = v * freq;
-      if (doWarp) {
-        const wx = fractalSum(perlin2, u * freq * freqW, v * freq * freqW, seed ^ 0x77, warpOct, 2, 0.5, 'Standard', period);
-        const wy = fractalSum(perlin2, u * freq * freqW + 13.3, v * freq * freqW - 7.7, seed ^ 0x88, warpOct, 2, 0.5, 'Standard', period);
-        nx += wx * ampW; ny += wy * ampW;
-      }
-      const val = fractalSum(perlin2, nx, ny, seed, octaves, 2, gain, fractalType, period);
-      d[y * size + x] = clamp01((val * 0.5 + 0.5) * height);
-    }
-  }
+  for (let i = 0; i < d.length; i++) d[i] = clamp01((raw[i] * 0.5 + 0.5) * height);
   return f;
 }
 
