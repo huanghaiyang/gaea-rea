@@ -559,6 +559,264 @@ export function gaeaDepositionThresholds(params) {
 
 /* ---------------------------------------------------- discharge angles (end) */
 
+/* ------------------------------------ Gaea's erosion schedule (FUN_1801f24f0, recovered) */
+
+/**
+ * The schedule — how many levels, how many droplets, how many iterations — transcribed from
+ * `FUN_1801f24f0` in `Gaea.Native.dll`. This is the piece earlier versions of this file marked
+ * "not recovered" and replaced with a hand-tuned linear taper, so the numbers below supersede
+ * that taper wherever they are used.
+ *
+ * WHAT THE BINARY ACTUALLY DOES
+ *
+ *   1. `Erosion Scale` is renormalised against the terrain's real width before anything else
+ *      uses it, with a soft knee at a ratio of 0.2.
+ *   2. Pyramid depth is `ceil(sqrt(0.5 * scale * width / terrainWidth))`, clamped to 31.
+ *      Each level is exactly HALF the previous one (`FUN_1801efe80` does `>> 1` on both axes),
+ *      so this is an octave pyramid, not a fixed-by-resolution one.
+ *   3. Droplets per iteration are FIXED by resolution: `(width * height) >> 8`, i.e. one
+ *      droplet per 256 cells. `Duration` does not enter here at all.
+ *   4. `Duration` sets iterations instead: level k runs
+ *      `ceil(curve(k) * Duration)` iterations, through the exponential-ramp curve below.
+ *
+ * `curve` is `FUN_1801f0350`. It is called four times per level, and the arguments are NOT
+ * uniform: each call differs in threshold, rate and exponent, and the results drive different
+ * quantities. The call sites in the driver `FUN_1801f1350` set them in registers, which is why
+ * the decompiler alone could not attribute them; the disassembly could, and the four sets are
+ * recorded in {@link GAEA_LEVEL_CURVES}. Only the first one — the iteration count — is consumed
+ * by this file. The other three feed the relaxation slope (`0x12c`/`0x130`/`0x134`) and are
+ * listed so the next port does not have to rediscover them.
+ */
+
+/** `0x40200000` — threshold for the iteration-count curve (call site 1). */
+export const K_CURVE_THRESHOLD = 2.5;
+
+/** `0x3f400000` — rate for the iteration-count curve (call site 1). */
+export const K_CURVE_RATE = 0.75;
+
+/** `0x3f000000` — exponent for the iteration-count curve (call site 1). */
+export const K_CURVE_EXPO = 0.5;
+
+/**
+ * The four `FUN_1801f0350` call sites, exactly as the driver sets their registers.
+ *
+ * Register evidence (all four share `level = [rbx+0x110]` and `t = [rbx+0x114]`):
+ *
+ *   1. `xmm2 = 2.5 (0x180356320)  xmm3 = 0.75 (0x18035623c)  stack = 0.5  (0x180356210)`
+ *   2. `xmm2 = 1.0                xmm3 = 1.2  (0x1803562a8)  stack = 0.6  (0x180356220)`
+ *   3. `xmm2 = 1.0 (carried)      xmm3 = 10.0 (0x180356354)  stack = 0.4  (0x180356204)`
+ *   4. `xmm2 = 0.0                xmm3 = 10.0 (0x180356354)  stack = 2.0  (0x1803562f8)`
+ *
+ * Only call 1 passes `flag = 1`; the others pass 0. Results: 1 -> iterations, 2 -> `[0x12c]`
+ * scaled by `Downcutting`, 3 -> `[0x130]`, 4 -> `[0x134] = max(1, curve)`.
+ */
+export const GAEA_LEVEL_CURVES = Object.freeze({
+  iterations: Object.freeze({ thr: 2.5, rate: 0.75, expo: 0.5, flag: 1 }),
+  downcutting: Object.freeze({ thr: 1.0, rate: 1.2, expo: 0.6, flag: 0 }),
+  shape: Object.freeze({ thr: 1.0, rate: 10.0, expo: 0.4, flag: 0 }),
+  slope: Object.freeze({ thr: 0.0, rate: 10.0, expo: 2.0, flag: 0 }),
+});
+
+/** `0x3e4ccccd` at the remap site — the ratio below which `Erosion Scale` is left alone. */
+export const K_SCALE_RATIO_KNEE = Math.fround(0.2);
+
+/** `0x40c00000` — slope of the soft knee above {@link K_SCALE_RATIO_KNEE}. */
+export const K_SCALE_RATIO_GAIN = 6.0;
+
+/** `0x3e2aaaab` — `float32(1/6)`, the saturation height of the knee. */
+export const K_SCALE_RATIO_CURVE = Math.fround(1 / 6);
+
+/** `>> 8`: one droplet per 256 cells, per iteration. */
+export const K_DROPLET_CELL_SHIFT = 8;
+
+/** The level count is clamped to this by the caller (`0x1f`). */
+export const K_PYRAMID_LEVEL_CAP = 31;
+
+/** `0x42c80000` — the `Shape Detail Scale == 0` fallback in the binary. */
+export const K_DETAIL_SCALE_FALLBACK = 100.0;
+
+/**
+ * `Erosion Scale` renormalised against the terrain width.
+ *
+ *     r = scale / terrainWidth
+ *     if (r > 0.2) r = (1 - 1 / ((r - 0.2) * 6 + 1)) * (1/6) + 0.2
+ *     return r * terrainWidth
+ *
+ * The inner curve is a saturating rational: it is identity at 0.2, has slope 1 there, and
+ * approaches `0.2 + 1/6` from below, so a very large `Erosion Scale` cannot run away with the
+ * pyramid depth. Below the knee the value passes through unchanged.
+ *
+ * @param {number} erosionScale  the node parameter, in Gaea's units
+ * @param {number} terrainWidth  the terrain's width in the same units as `erosionScale`
+ * @returns {number} the scale the rest of the schedule uses
+ */
+export function gaeaErosionScaleRemap(erosionScale, terrainWidth) {
+  if (!(terrainWidth > 0)) return erosionScale;
+  const ratio = erosionScale / terrainWidth;
+  if (!(ratio > K_SCALE_RATIO_KNEE)) return erosionScale;
+  const curved =
+    (1 - 1 / ((ratio - K_SCALE_RATIO_KNEE) * K_SCALE_RATIO_GAIN + 1)) * K_SCALE_RATIO_CURVE
+    + K_SCALE_RATIO_KNEE;
+  return curved * terrainWidth;
+}
+
+/**
+ * `ceil(sqrt(0.5 * scale * width / terrainWidth))`, clamped to `[1, 31]`.
+ *
+ * Note the divisor is `terrainWidth / width` — the real-world size of one pixel. The same
+ * `Erosion Scale` therefore yields FEWER levels on a wider terrain and more on a narrow one,
+ * because a wider terrain makes each pixel span more world units. That is the behaviour a
+ * resolution-independent pyramid needs and the fixed table this file used previously could not
+ * express.
+ *
+ * @param {object} o
+ * @param {number} o.erosionScale  raw parameter value (remapped internally)
+ * @param {number} o.terrainWidth  terrain width in world units
+ * @param {number} o.width         grid width in pixels
+ * @returns {number} level count, at least 1
+ */
+export function gaeaPyramidDepth({ erosionScale, terrainWidth, width }) {
+  const raw = gaeaPyramidDepthExact({ erosionScale, terrainWidth, width });
+  const levels = Math.ceil(raw);
+  if (!Number.isFinite(levels) || levels < 1) return 1;
+  return Math.min(K_PYRAMID_LEVEL_CAP, levels);
+}
+
+/**
+ * The same expression WITHOUT the `ceil`, i.e. the `[rbx+0x114]` float the curve receives as
+ * its `t` argument. Exported because {@link gaeaLevelIterations} needs the unrounded value to
+ * reproduce the finest level's weight.
+ *
+ * @param {object} o  same fields as {@link gaeaPyramidDepth}
+ * @returns {number} the raw sqrt, or 0 for degenerate geometry
+ */
+export function gaeaPyramidDepthExact({ erosionScale, terrainWidth, width }) {
+  const scale = gaeaErosionScaleRemap(erosionScale, terrainWidth);
+  const pixelsPerUnit = terrainWidth / width;
+  if (!(pixelsPerUnit > 0) || !Number.isFinite(pixelsPerUnit)) return 0;
+  const raw = Math.sqrt((scale * 0.5) / pixelsPerUnit);
+  return Number.isFinite(raw) ? raw : 0;
+}
+
+/**
+ * Droplets started per iteration: one per 256 cells.
+ *
+ * The shift is on the integer product, not on a float, so it rounds down for non-multiples.
+ *
+ * @param {number} width
+ * @param {number} height
+ * @returns {number}
+ */
+export function gaeaDropletsPerIteration(width, height) {
+  return (Math.trunc(width) * Math.trunc(height)) >> K_DROPLET_CELL_SHIFT;
+}
+
+/**
+ * `Shape Detail Scale` -> the per-level detail frequency.
+ *
+ *     shapeDetailScale == 0 ? 100.0 : sqrt(1 / shapeDetailScale)
+ *
+ * A zero value is not a division-by-zero guard in the usual sense: the binary substitutes a
+ * large fallback, i.e. "maximum detail", rather than falling back to 1.
+ *
+ * @param {number} shapeDetailScale
+ * @returns {number}
+ */
+export function gaeaDetailScale(shapeDetailScale) {
+  if (!(shapeDetailScale > 0)) return K_DETAIL_SCALE_FALLBACK;
+  return Math.sqrt(1 / shapeDetailScale);
+}
+
+/**
+ * `FUN_1801f0350` — the per-level multiplier curve.
+ *
+ *     t = input (the LEVEL COUNT as a float, not the level index)
+ *     if (t < 1) t = exp(t - 1)
+ *     r = floor(t);  u = (t - r) == 0 ? 1 : t - r
+ *     v = max(0, (level - (1 - u)) - thr)
+ *     res = (exp(-v * rate) - 1) / rate + v
+ *     if (level > 0 || flag == 0) u = 1
+ *     return expo ** res * u
+ *
+ * Two details are easy to get backwards and both are pinned by the disassembly:
+ *
+ *   - `t` is the SECOND float argument, and every call site loads it from `[rbx+0x114]`, the
+ *     unrounded `sqrt` that produced the level count. It is not the level index; the level
+ *     index is the first (integer) argument.
+ *   - the `u = 1` branch fires when `level > 0` OR `flag == 0`, but it is applied only to the
+ *     FINAL multiply. The gate `v` is computed first and still uses the fractional `u`, so a
+ *     level whose index is slightly below `thr + (1 - frac(t))` stays at exactly 1 rather than
+ *     switching on at `level > thr`. The disassembly is unambiguous: the branch writes XMM8
+ *     after `res * log(expo)` and before the closing `exp`.
+ *
+ * `res` is a softplus-shaped ramp: the `1/rate` terms cancel at `v = 0`, so it is anchored,
+ * and it grows linearly once `v` is well above zero. `v` gates on `thr`, which is what makes
+ * the lower levels contribute nothing until the level index clears the threshold.
+ *
+ * @param {number} level  integer level index (the binary passes an int)
+ * @param {object} [o]
+ * @param {number} [o.t]    the level count as a float; defaults to `level`
+ * @param {number} [o.thr]
+ * @param {number} [o.rate] must be non-zero
+ * @param {number} [o.expo]
+ * @param {number} [o.flag]
+ * @returns {number}
+ */
+export function gaeaLevelCurve(level, {
+  t = level,
+  thr = K_CURVE_THRESHOLD,
+  rate = K_CURVE_RATE,
+  expo = K_CURVE_EXPO,
+  flag = 1,
+} = {}) {
+  let x = t;
+  if (x < 1) x = Math.exp(x - 1);
+  const whole = Math.floor(x);
+  const fraction = x - whole;
+  let u = fraction === 0 ? 1 : fraction;
+
+  const v = Math.max(0, (level - (1 - u)) - thr);
+  const res = (Math.exp(-v * rate) - 1) / rate + v;
+
+  if (level > 0 || flag === 0) u = 1;
+  return Math.pow(expo, res) * u;
+}
+
+/**
+ * Iterations for one pyramid level: `ceil(curve(level) * duration)`.
+ *
+ * This is the driver `FUN_1801f1350`'s loop bound, and the same expression `FUN_1801f24f0`
+ * sums over the levels to estimate total work. `Duration` multiplies a level-dependent weight;
+ * it never sets the droplet count.
+ *
+ * The curve's `t` argument is the unrounded pyramid depth, so it must be supplied whenever the
+ * caller knows it. When it is omitted the function falls back to `t = level`, which is only
+ * correct for level 1 and above (where `u` is forced to 1 anyway, so `t` stops mattering).
+ *
+ * @param {number} level
+ * @param {number} duration
+ * @param {object} [o]
+ * @param {number} [o.levelCount]  unrounded depth, i.e. the `sqrt` before `ceil`
+ * @param {number} [o.thr]
+ * @param {number} [o.rate]
+ * @param {number} [o.expo]
+ * @param {number} [o.flag]
+ * @returns {number} at least 0
+ */
+export function gaeaLevelIterations(level, duration, {
+  levelCount,
+  thr = K_CURVE_THRESHOLD,
+  rate = K_CURVE_RATE,
+  expo = K_CURVE_EXPO,
+  flag = 1,
+} = {}) {
+  const w = gaeaLevelCurve(level, { t: levelCount ?? level, thr, rate, expo, flag });
+  const n = Math.ceil(w * duration);
+  return n > 0 ? n : 0;
+}
+
+/* ------------------------------------------------ erosion schedule (end) */
+
 /* ------------------------------------------- Gaea's real parameter ranges and scaling */
 
 /**
@@ -581,10 +839,12 @@ export const GAEA_EROSION_RANGES = {
 /**
  * How values arriving in Gaea's units become the 0..1 dials this solver works in.
  *
- * THESE ARE MODEL CHOICES, NOT GAEA'S FORMULAS. Gaea's own mapping from `Duration` to a
- * droplet count lives in the native kernel and has not been recovered, so what follows is
- * calibrated to reproduce this build's previous behaviour at the catalogue defaults while
- * opening up Gaea's full input range:
+ * THESE ARE MODEL CHOICES, NOT GAEA'S FORMULAS. Gaea's own schedule has since been recovered
+ * (`gaeaErosionScaleRemap`, `gaeaPyramidDepth`, `gaeaDropletsPerIteration`,
+ * `gaeaLevelIterations` above): `Duration` is an iteration count, not a droplet count, and the
+ * droplet budget is fixed at one per 256 cells. This dial remains because the solver below has
+ * not been rewired onto that schedule yet; it is calibrated to reproduce this build's previous
+ * behaviour at the catalogue defaults while opening up Gaea's full input range:
  *
  *   Duration      linear by 1/20. The catalogue default 10 then yields the same droplet
  *                 budget the old 0..1 dial gave at 0.5. Gaea's ceiling of 200 reaches 10x.
@@ -617,7 +877,9 @@ export function gaeaDial(name, value) {
  * deposits it when it does not. This is the standard published formulation; the Gaea parameter
  * names are mapped onto it as follows (see IMPLEMENTATION-NOTES.md):
  *
- *   Duration        -> droplet count = Duration * 0.8 * size^2
+ *   Duration        -> droplet count = Duration * 0.8 * size^2   (model choice; Gaea actually
+ *                      runs `ceil(curve(level) * Duration)` iterations of `(w*h) >> 8`
+ *                      droplets — see the recovered schedule above)
  *   Downcutting     -> erosion rate multiplier
  *   Erosion Scale   -> erosion brush radius (1..4 cells)
  *   Suspended Load  -> sediment capacity constant

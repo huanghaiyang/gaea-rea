@@ -212,9 +212,122 @@ Established:
   across the whole range: the fractional part `u` acts as an interpolation factor and is
   forced to 1 at level ≤ 0.
 
-What is still missing: `thr`, `rate` and `expo` are **arguments**, not literals. Mapping them
-to `Duration`/`Downcutting`/`Shape`/… requires reading the four call sites in
-`FUN_1801f1350` and the stores into the `params` struct, which has not been done.
+`thr`, `rate` and `expo` are **arguments**, not literals. The four call sites have since been
+read out of the driver's disassembly; their register values are recorded in the next section.
+
+## The schedule — `FUN_1801f24f0`, recovered
+
+`FUN_1801f24f0` (1737 bytes) runs once per erosion pass, before the iteration driver. It turns
+the node parameters into the pyramid depth, the per-level iteration counts and three cached
+tangents. The expressions below are read from `disasm_00000001801f24f0.txt`, not from the
+decompiler, because the decompiler loses the XMM register assignments that say which argument
+is which. Every constant was decoded from `.rdata` bytes and then as float32.
+
+### 1. `Erosion Scale` is renormalised against terrain width
+
+```c
+float tw    = *(float *)(params + 0xa0);   // terrain width, world units
+float scale = *(float *)(params + 0xa8);   // Erosion Scale
+float r = scale / tw;
+if (r > 0.2f)
+    r = (1.0f - 1.0f / ((r - 0.2f) * 6.0f + 1.0f)) * (1.0f / 6.0f) + 0.2f;
+*(float *)(params + 0xa8) = r * tw;       // written back over the parameter
+```
+
+`0x1803561e4` = **0.2f**, `0x180356348` = **6.0f**, `0x1803561d8` = **float32(1/6)**. The curve
+is identity below the knee, has slope 1 at it, and saturates at `0.2 + 1/6`, so a huge
+`Erosion Scale` cannot run away with the pyramid. The saturation is a real behaviour, not a
+safety clamp bolted on afterwards: the parameter itself is rewritten.
+
+### 2. `NoErosion` disables downcutting
+
+`if (*(char *)(params + 0xf4) != 0) *(int *)(params + 0xbc) = 0;` — `0xf4` is `NoErosion`,
+`0xbc` is `Downcutting`. `0xb4` and `0xc0` are zeroed unconditionally as transient
+accumulators.
+
+### 3. Three angle tangents are cached
+
+Fields `0xd4`, `0xdc` and `0xe4` hold discharge angles in **degrees**:
+
+```c
+*(float *)(params + 0x120) = tanf(*(float *)(params + 0xd4) / 180.0f * PI);   // Suspended
+*(float *)(params + 0x124) = tanf(*(float *)(params + 0xdc) / 180.0f * PI);   // Bed
+*(float *)(params + 0x128) = tanf(*(float *)(params + 0xe4) / 180.0f * PI);   // Coarse
+```
+
+`0x180356398` = **180.0f**, `0x180356334` = **float32(π) = 3.14159274**. The store order is
+`0xdc -> 0x124`, `0xe4 -> 0x128`, `0xd4 -> 0x120`.
+
+### 4. The mask flag
+
+`*(char *)(params + 0x138) = (*(uint64 *)(firstLevel + 0x58) != 0);` One byte, read later in
+the same function to pick which pair of workers the driver runs.
+
+### 5. Pyramid depth
+
+```c
+float raw = sqrtf((0.5f * remappedScale) / (terrainWidth / gridWidth));
+*(float *)(params + 0x114) = raw;
+*(int   *)(params + 0x10c) = (int)ceilf(raw);
+```
+
+`0x180356210` = **0.5f**, `gridWidth` is `*(int *)(params + 0x98)`. The rounding is
+`vroundss` with immediate `0x2`, i.e. round toward +infinity — **ceil**, not round-to-nearest.
+Because the divisor is the world size of one pixel, the same `Erosion Scale` yields FEWER
+levels on a wider terrain.
+
+### 6. Detail scale
+
+`*(float *)(params + 0x118) = (shapeDetail == 0) ? 100.0f : sqrtf(1.0f / shapeDetail);`
+`0x180356390` = **100.0f**. A zero is not a `1.0` fallback; it means maximum detail.
+
+### 7. Iterations per level
+
+The curve is called with `t = [0x114]` (the UNROUNDED depth), not with the level index, and
+the result is multiplied by `Duration` at `[0xb0]`:
+
+```c
+int n = (int)ceilf(FUN_1801f0350(level, t, 2.5f, 0.75f, 0.5f, 1) * Duration);
+```
+
+The call before the level-building loop passes `level = depth - 1`; the loop that allocates
+levels `i = 1 .. depth-1` passes `level = depth - 1 - i`; after it, `[0x108] = depth - 1`,
+`[0x110] = 0` and the driver is entered. Which physical end of the pyramid each index names is
+NOT yet pinned — see the open questions at the end of this document.
+
+The four call sites, decoded from their register/stack arguments:
+
+| # | `thr` (XMM2) | `rate` (XMM3) | `expo` (stack) | `flag` | result |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 2.5 (`0x40200000`) | 0.75 (`0x3f400000`) | 0.5 (`0x3f000000`) | 1 | iteration count |
+| 2 | 1.0 (`0x3f800000`) | 1.2 (`0x3f99999a`) | 0.6 (`0x3f19999a`) | 0 | `[0x12c]`, scaled by Downcutting |
+| 3 | 1.0 (carried) | 10.0 (`0x41200000`) | 0.4 (`0x3ecccccd`) | 0 | `[0x130]` |
+| 4 | 0.0 | 10.0 (`0x41200000`) | 2.0 (`0x40000000`) | 0 | `[0x134] = max(1, curve)` |
+
+Only call 1 passes `flag = 1`, which is why only call 1 keeps the fractional `u` at level 0;
+calls 2–4 force `u = 1` everywhere. This is the call this build implements.
+
+### 8. Progress accounting is not the droplet budget
+
+Each level's estimate `width * height * n` is converted to double, accumulated at `[0x48]`, and
+`[0x50] = [0x48] * [0x58]`. That is the progress-bar denominator. The actual per-iteration
+particle count is `(width * height) >> 8`, taken inside the driver — 512 bytes per particle
+(`0x200`), the same stride as the seeding code.
+
+### Implementation status
+
+The formulas live in `web/js/kernels/erosion.js` as `gaeaErosionScaleRemap`,
+`gaeaPyramidDepth`, `gaeaPyramidDepthExact`, `gaeaDropletsPerIteration`, `gaeaDetailScale`,
+`gaeaLevelCurve` and `gaeaLevelIterations`, with the constants exported, and are pinned by
+`web/tests/gaea-erosion-schedule-test.mjs` (55 assertions).
+
+They are **not wired into the solver yet**, deliberately. The current
+`hydraulicDropletMultiscale` budget is `Duration * 0.8 * n²` droplets per level; Gaea's is
+`(n² >> 8) * ceil(curve * Duration)` — about two orders of magnitude fewer at 512² with
+`Duration = 10`, because each Gaea iteration also runs the full relaxation and flow passes.
+Swapping the budget without a reference render to validate against would turn a solver whose
+output has been measured and tuned into an unmeasured one, so the recovered schedule stays a
+tested model until the level index mapping and the world-size input are pinned.
 
 ## The driver's own constants, and the pass map
 
@@ -434,9 +547,19 @@ ulps and still look right.
 
 ## What is NOT established, stated plainly
 
-- **Which named parameter each constant is.** They are read from the flat `.rdata` pool, so
-  the mapping from a constant to `Duration`/`Downcutting`/`Shape`/… requires reading the
-  caller that stores into `params`, which has not been done.
+- **Which named parameter each field is, beyond the ones named above.** `0xa0` (terrain width),
+  `0xa8` (Erosion Scale), `0x98` (grid width), `0xb0` (Duration), `0xbc` (Downcutting),
+  `0xcc` (Shape Detail Scale), `0xf4` (NoErosion) and `0x138` (mask flag) are pinned by what
+  the code does with them. The three angle fields `0xd4`/`0xdc`/`0xe4` are matched to
+  Suspended/Bed/Coarse load only by the order the results are stored and the parameters'
+  declared ranges — that mapping is inferred, not proven.
+- **Which physical end of the pyramid the curve's level index names.** The schedule calls the
+  curve once per level with indices running from `depth - 1` down to 0, but nothing yet says
+  whether index 0 is the full-resolution level or the coarsest one. Wiring the schedule
+  requires settling that.
+- **How `Erosion Scale` maps to the app's world units.** The binary uses `0xa0` directly; this
+  build has two candidate sources (`graph.build.worldSize`, default 60, and the internal
+  `TERRAIN_HEIGHT_M = 800`) and no ground truth for which one Gaea would call terrain width.
 - **Whether `FUN_1801f35f0` is thermal, hydraulic, or the shaping pass.** It is reached
   from pass 3 of the erosion driver, so it is part of erosion, but its role is inferred from
   its shape, not named.

@@ -97,3 +97,7 @@ evidence/oracle-*.json
 evidence/oracle-blurgrid.json
 
 .learn/
+
+# Ghidra project created by tools/ghidra/*.java. Rebuildable from a local Gaea install and
+# hundreds of MB per indexed binary; the extracted evidence lives in evidence/ (ignored above).
+ghidra-proj/

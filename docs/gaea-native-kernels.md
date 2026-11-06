@@ -54,8 +54,10 @@ faithful reproduction of Gaea's *shading* is also within reach, not just its ero
 
 925 bytes. It is the **allocator and dispatcher**, not the algorithm:
 
-- `allocSize = width * height * 0x50` — so **`Particle` is 80 bytes** per cell.
-  A floor of `0x4000000` (64 MB) is applied.
+- `allocSize = width * height * 0x50`. **This is not the particle stride.** An earlier version
+  of this document read it as 80 bytes per cell; `FUN_1801f1ed0` copies particles at
+  `0x200` = 512 bytes each, and `0x50` sizes a different buffer. See
+  `gaea-erosion-kernel-recovered.md`. A floor of `0x4000000` (64 MB) is applied.
 - Memory is obtained through a **function-pointer table** in `param_8[0..7]`, stored into
   globals `PTR_FUN_1803fc6a0` … `PTR_FUN_1803fc6d8`. Gaea's native kernels take their
   allocator and free/memset hooks from the caller rather than linking the CRT directly.
@@ -95,9 +97,22 @@ simply present, in the clear, in the native image:
 | `0x3f000000` | **0.5** | |
 | `0x3f800000` | **1.0** | |
 
-The 180/π pair sitting next to `tanf` is consistent with droplet headings being computed as
-angles; 1/6 and 0.001 look like step and epsilon terms. Pinning each to a parameter still
-requires reading the code around it, which is the next step rather than a conclusion.
+All of these have since been pinned to an expression, not merely to a plausible role:
+
+| Literal | Use |
+| --- | --- |
+| 180.0 + π | `tanf(angle_degrees / 180 * π)` for the three cached discharge-angle tangents |
+| 0.2, 6.0, 1/6 | the `Erosion Scale` remap knee, gain and saturation height |
+| 2.5, 0.75, 0.5 | `(thr, rate, expo)` of the iteration-count curve |
+| 100.0 | the `Shape Detail Scale == 0` fallback |
+| 0.5 | the `0.5f * scale` term inside the pyramid-depth square root |
+| 0.001 | the per-iteration time-step accumulator |
+| 1.0 | the baseline the curve's `u` blend falls back to |
+
+The full schedule — pyramid depth, droplet budget, iterations per level and the order the
+levels are built and entered — is written up in `gaea-erosion-kernel-recovered.md`, with the
+implemented helpers in `web/js/kernels/erosion.js` and their assertions in
+`web/tests/gaea-erosion-schedule-test.mjs`.
 
 ## Method and limits
 
