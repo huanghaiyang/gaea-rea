@@ -21,7 +21,7 @@ import {
   schemaFor, setParam, resetParams, state, algorithmOf, version, snapshot, bus,
 } from '../stores/app.js';
 import { evaluator } from '../stores/session.js';
-import { t, term, paramLabel, option as i18nOption } from '@js/i18n.js';
+import { t, term, paramLabel, desc, option as i18nOption } from '@js/i18n.js';
 
 /*
  * The state this panel shows, computed HERE from the shared plain `state` object.
@@ -98,10 +98,15 @@ const rows = computed(() => {
       key,
       spec,
       value,
-      label: spec.label || spec.name || key,
-      // ONLY a real per-parameter hint. `description` is the node's own text and belongs with the
-      // node; showing it here put a screenful of source above the sliders.
-      hint: spec.hint || '',
+      // `spec.label` is only ever set by a registry override, and no override sets one today, so
+      // this is normally the catalogue's parameter name ("Erosion Scale") — which is exactly the
+      // key the term dictionary uses for parameter labels. It has to go through paramLabel();
+      // the raw name is English-only.
+      label: paramLabel(spec.label || spec.name || key),
+      // ONLY a real per-parameter hint: `description` is the node's own text and would put a
+      // screenful of prose above the sliders. Hints are authored in English; `desc` translates
+      // the ones the dictionary carries and passes the rest through unchanged.
+      hint: desc(spec.hint || ''),
       kind,
       options: kind === 'select' ? optionsFor(spec, value) : null,
       min: spec.min,
@@ -248,7 +253,7 @@ const AXES = ['X', 'Y', 'Z', 'W'];
             </label>
 
             <span class="param-value">
-              {{ row.kind === 'check' ? (row.value ? 'on' : 'off') : row.value }}
+              {{ row.kind === 'check' ? (row.value ? t('param.on', 'on') : t('param.off', 'off')) : row.value }}
             </span>
 
             <div class="param-control">
