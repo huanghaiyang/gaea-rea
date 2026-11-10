@@ -103,15 +103,46 @@ export const byCategory = computed(() => {
 /** The graph itself, as Vue tracks it. */
 export const graph = computed(() => state.graph);
 
+/** Port counts from the catalogue, with the same one-port default the canvas uses. */
+function portCounts(name) {
+  const entry = NODES.find((e) => e.name === resolveName(name));
+  return {
+    inputs: entry && entry.inputs ? entry.inputs.length : 1,
+    outputs: entry && entry.outputs ? entry.outputs.length : 1,
+  };
+}
+
+/**
+ * Node box, sized to hold its ports.
+ *
+ * A fixed 30px box cannot hold the six ports some nodes have at 10px spacing: the
+ * outer ones fell outside the body, so an edge visibly ended in mid-air below the
+ * node. Only nodes that need it grow taller; `portOffset` keeps the stack centred
+ * on the node's vertical midpoint, which is what the edge endpoints use too.
+ */
+export function nodeBox(name) {
+  const { inputs, outputs } = portCounts(name);
+  const ports = Math.max(inputs, outputs);
+  const h = ports <= 2 ? NODE_H : (ports - 1) * PORT_GAP + PORT_PAD * 2;
+  return { w: NODE_W, h, inputs, outputs };
+}
+
+/** Vertical offset of port `index` among `count`, relative to the node's centre. */
+export function portOffset(index, count) {
+  return count > 1 ? (index - (count - 1) / 2) * PORT_GAP : 0;
+}
+
 /** Nodes with everything the canvas needs, resolved once per change rather than per node. */
 export const viewNodes = computed(() => {
   version.value;      // depend on the bridge; see `version`
   return (state.graph.nodes || []).map((n) => {
-  const entry = NODES.find((e) => e.name === resolveName(n.name));
+  const box = nodeBox(n.name);
   return {
     ...n,
-    inputs: entry && entry.inputs ? entry.inputs.length : 1,
-    outputs: entry && entry.outputs ? entry.outputs.length : 1,
+    w: box.w,
+    h: box.h,
+    inputs: box.inputs,
+    outputs: box.outputs,
     implemented: rawIsImplemented(n.name),
     selected: state.selected === n.id,
   };
@@ -126,17 +157,27 @@ export const viewNodes = computed(() => {
  */
 export const viewEdges = computed(() => {
   version.value;      // depend on the bridge; see `version`
-  const byId = new Map((state.graph.nodes || []).map((n) => [n.id, n]));
+  const nodes = state.graph.nodes || [];
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const boxes = new Map(nodes.map((n) => [n.id, nodeBox(n.name)]));
   return (state.graph.edges || []).map((e) => {
     const from = byId.get(e.from);
     const to = byId.get(e.to);
     if (!from || !to) return null;
+    const fb = boxes.get(e.from);
+    const tb = boxes.get(e.to);
+    // Clamp the port index: a graph saved before an output was removed must not
+    // draw its edge past the node's last port.
+    const fp = Math.min(Math.max(e.fromPort || 0, 0), Math.max(0, fb.outputs - 1));
+    const tp = Math.min(Math.max(e.toPort || 0, 0), Math.max(0, tb.inputs - 1));
     return {
       id: e.id,
-      x1: from.x + NODE_W,
-      y1: from.y + NODE_H / 2 + (e.fromPort || 0) * PORT_GAP,
+      fromPort: fp,
+      toPort: tp,
+      x1: from.x + fb.w,
+      y1: from.y + fb.h / 2 + portOffset(fp, fb.outputs),
       x2: to.x,
-      y2: to.y + NODE_H / 2 + (e.toPort || 0) * PORT_GAP,
+      y2: to.y + tb.h / 2 + portOffset(tp, tb.inputs),
     };
   }).filter(Boolean);
 });
@@ -149,6 +190,8 @@ function resolveName(name) {
 export const NODE_W = 108;
 export const NODE_H = 30;
 export const PORT_GAP = 10;
+/** Vertical padding above/below the outermost port when a node has to grow. */
+export const PORT_PAD = 9;
 
 /* ----------------------------------------------------------------- selection -- */
 

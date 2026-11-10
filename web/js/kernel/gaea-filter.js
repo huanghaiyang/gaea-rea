@@ -33,34 +33,25 @@ export function measureDC(data) {
 }
 
 /**
- * `\ueb77\uf21d\ue95f(this Map)` — the "Drop" operator: subtract `min(1, dataMin)` and clamp the
- * remainder to `1 - min`. On a 0..1 ramp it is the identity; on a raised field it re-bases to 0.
+ * `\ueb77\uf21d\ue95f(this Map)` — the "Drop" operator: subtract `min(1, dataMin)`, treat inputs above
+ * 1 as 1, then clamp the remainder to [0, 1]. On a 0..1 ramp it is the identity; on a raised field it
+ * re-bases to 0. The upper clamp is 1 (not `1 - min`), which only shows on fields that go negative
+ * after an offset — `Combiner.Embed` with Extend does exactly that.
  */
 export function mapDrop(data) {
   const { min } = minMax(data);
   const base = Math.min(1, min);
   const out = new Float32Array(data.length);
-  const span = 1 - base;
   for (let i = 0; i < data.length; i++) {
-    let v = data[i] - base;
+    let v = Math.min(data[i], 1) - base;
     if (v < 0) v = 0;
-    else if (v > span) v = span;
+    else if (v > 1) v = 1;
     out[i] = v;
   }
   return out;
 }
 
-/** `\ueb77\uf21d\ue95d(this Map)` — horizontal mirror (NOT invert; they coincide only on a ramp). */
-export function mapFlipX(data, N) {
-  const out = new Float32Array(data.length);
-  for (let y = 0; y < N; y++) {
-    const base = y * N;
-    for (let x = 0; x < N; x++) out[base + x] = data[base + (N - 1 - x)];
-  }
-  return out;
-}
-
-/** `\ueb77\uf21d\ue95d(this Map)` — invert. */
+/** `\ueb77\uf21d\ue95d(this Map)` — invert (`Vector<float>.One - v`). */
 export function mapInvert(data) {
   const out = new Float32Array(data.length);
   for (let i = 0; i < data.length; i++) out[i] = 1 - data[i];
@@ -147,14 +138,20 @@ export function combinerTranspose(ground, reference, N, amount) {
 /**
  * `Combiner.Embed(a, b, ratio, extend)` — inset the reference as a raised/offset plateau.
  *
- * Measured order: horizontal-mirror the reference, shift it so its min sits at 0, optionally scale it
- * up with Extend, subtract `ratio` of it from the terrain, then raise the result so its min is 0.
- * The trailing raise is the engine's no-arg `\ueb77\uf21d\ue95e`, which is "if min < 0, subtract min",
- * NOT the `Drop` operator (an earlier attempt used Drop and missed by up to 0.9).
+ * Measured order: invert the reference (`\ueb77\uf21d\ue95d` = `Vector<float>.One - v`), shift it so
+ * its min sits at 0, optionally scale it up with Extend, subtract `ratio` of it from the terrain,
+ * then raise the result so its min is 0.
+ *
+ * The invert is NOT a horizontal mirror. On the horizontal ramp this test used to feed in, the two
+ * operations are mathematically identical, which is why the mismatch went unnoticed; on any other
+ * field they differ completely.
+ *
+ * The trailing raise is the engine's no-arg `\ueb77\uf21d\ue95e`: "if min < 0, subtract min",
+ * NOT unconditional `Drop`.
  */
 export function combinerEmbed(a, b, N, ratio = 1, extend = 0) {
   const num = extend - 0.1;
-  let m = mapFlipX(b, N);
+  let m = mapInvert(b);
   const s0 = minMax(m);
   m = shiftClamp(m, s0.min, 1);
   if (num > 0) {
@@ -164,11 +161,8 @@ export function combinerEmbed(a, b, N, ratio = 1, extend = 0) {
   const out = new Float32Array(a.length);
   for (let i = 0; i < out.length; i++) out[i] = a[i] - m[i] * ratio;
   const s = minMax(out);
-  if (s.min < 0) {
-    const { min } = s;
-    for (let i = 0; i < out.length; i++) out[i] -= min;
-  }
-  return out;
+  // no-arg `ue95e`：只有 min < 0 时才走 Drop（Drop 自己会把结果夹在 [0,1]）。
+  return s.min < 0 ? mapDrop(out) : out;
 }
 
 /**

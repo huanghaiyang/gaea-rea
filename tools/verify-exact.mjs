@@ -359,12 +359,15 @@ for (const n of [64]) {
       { tol: 5e-3 },
     );
   }
+  // Embed 的第二个输入必须是**非对称**场：水平渐变在"反相"和"水平镜像"下完全相同，
+  // 用它测试会让这两个截然不同的操作同时通过（曾经掩盖过 Combiner.Embed 的 invert 误读）。
+  const bEmbed = gens.noiseish(n);
   for (const [ratio, ext] of [[0.5, 0], [1, 0.4]]) {
     push(
       'CombinerEmbed/64/' + ratio + '/' + ext,
-      { assembly: 'Gaea.Nodes.dll', type: 'Combiner', method: 'Embed', args: [mapArg(a, n), mapArg(b, n), f32(ratio), f32(ext)] },
-      () => ({ data: combinerEmbed(a, b, n, ratio, ext) }),
-      { known: 'Combiner.Embed body still disagrees with the shipped output; see HANDOFF 7.4' },
+      { assembly: 'Gaea.Nodes.dll', type: 'Combiner', method: 'Embed', args: [mapArg(a, n), mapArg(bEmbed, n), f32(ratio), f32(ext)] },
+      () => ({ data: combinerEmbed(a, bEmbed, n, ratio, ext) }),
+      { tol: 5e-3 },
     );
   }
   for (const [ratio, thr, flat, bnd] of [[1, 0.4, 0, 0.3], [0.6, 0.6, 0.4, 0.2]]) {

@@ -19,7 +19,7 @@
  */
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
 import {
-  state, viewNodes, viewEdges, selectNode, NODE_W, NODE_H,
+  state, viewNodes, viewEdges, selectNode, nodeBox, portOffset,
 } from '../stores/app.js';
 import { t, term } from '@js/i18n.js';
 // The mutations are performed here, not requested over the bus. `GraphEditor` used to own them,
@@ -27,6 +27,7 @@ import { t, term } from '@js/i18n.js';
 // the SVG rendered, and nothing ever appeared.
 import { bus, snapshot, state as rawState } from '@js/state.js';
 import { addNode, removeNode, connect } from '@js/graph.js';
+import { validateConnection } from '@js/connect-rules.js';
 
 /** Pan and zoom, in one object so a single assignment moves the view. */
 const view = ref({ x: 40, y: 30, k: 1 });
@@ -93,20 +94,72 @@ function onPortDown(ev, node, port) {
   if (ev.button !== 0) return;
   ev.stopPropagation();
   const w = toWorld(ev.clientX, ev.clientY);
-  linking.value = { nodeId: node.id, port, x: w.x, y: w.y };
+  // Track the PORT's centre, not the pointer: the rubber band has to start on the dot
+  // it was pulled from. The old code stored the pointer position and the template then
+  // added NODE_W to it, so the preview started a whole node-width to the right of the
+  // cursor instead of on the source port.
+  linking.value = {
+    nodeId: node.id,
+    port,
+    x: node.x + node.w,
+    y: node.y + node.h / 2 + portOffset(port, node.outputs),
+  };
   pointer.value = w;
   capture(svg.value, ev.pointerId);
+}
+
+/** Input port under a world point, for completing a link on pointer-up. */
+function inputPortAt(wx, wy) {
+  const ns = viewNodes.value;
+  for (let i = ns.length - 1; i >= 0; i--) {
+    const n = ns[i];
+    for (let p = 0; p < n.inputs; p++) {
+      const py = n.y + n.h / 2 + portOffset(p, n.inputs);
+      if (Math.hypot(wx - n.x, wy - py) <= 9) return { nodeId: n.id, port: p };
+    }
+  }
+  return null;
+}
+
+/** Dropping on a node body connects to its first input, as before. */
+function nodeBodyAt(wx, wy) {
+  const ns = viewNodes.value;
+  for (let i = ns.length - 1; i >= 0; i--) {
+    const n = ns[i];
+    if (n.inputs > 0 && wx >= n.x && wx <= n.x + n.w && wy >= n.y && wy <= n.y + n.h) {
+      return { nodeId: n.id, port: 0 };
+    }
+  }
+  return null;
+}
+
+/** Complete the in-progress link onto `toPort` of `nodeId`. */
+function finishLink(nodeId, port) {
+  const from = linking.value;
+  if (!from) return;
+  // Shared rules with the legacy editor: self, port range, kind compatibility and cycles.
+  // An illegal drop refuses the edge and says why instead of silently doing nothing.
+  const verdict = validateConnection(state.graph, from.nodeId, nodeId, port, from.port);
+  if (!verdict.ok) {
+    status.value = verdict.reason;
+    linking.value = null;
+    return;
+  }
+  // `connect` enforces one edge per input port, matching Gaea: connecting to an occupied input
+  // replaces what was there rather than stacking. The snapshot goes first so the change is undoable.
+  snapshot();
+  const edge = connect(state.graph, from.nodeId, nodeId, port, from.port);
+  if (edge) {
+    bus.emit('graph:changed', { reason: 'connect' });
+    status.value = '';
+  }
+  linking.value = null;
 }
 
 function onInputPortUp(ev, node, port) {
   if (!linking.value) return;
   ev.stopPropagation();
-  // `connect` enforces one edge per input port, matching Gaea: connecting to an occupied input
-  // replaces what was there rather than stacking. The snapshot goes first so the change is undoable.
-  snapshot();
-  const edge = connect(state.graph, linking.value.nodeId, node.id, port, linking.value.port);
-  if (edge) bus.emit('graph:changed', { reason: 'connect' });
-  linking.value = null;
+  finishLink(node.id, port);
 }
 
 function onMove(ev) {
@@ -133,10 +186,25 @@ function onMove(ev) {
     }
     return;
   }
-  if (linking.value) linking.value = { ...linking.value, x: w.x, y: w.y };
+  if (linking.value) return;   // the rubber band follows `pointer`, set above
 }
 
-function onUp() {
+function onUp(ev) {
+  if (linking.value) {
+    // Pointer capture is held by the <svg>, so pointer-up is delivered here rather than
+    // to the input port under the cursor. Resolve the target from the same geometry the
+    // ports were drawn with; otherwise the gesture silently did nothing.
+    const w = toWorld(ev.clientX, ev.clientY);
+    const target = inputPortAt(w.x, w.y) || nodeBodyAt(w.x, w.y);
+    if (target) finishLink(target.nodeId, target.port);
+    linking.value = null;
+  }
+  dragNode.value = null;
+  pan.value = null;
+}
+
+/** A cancelled gesture must not connect anything. */
+function cancelGesture() {
   dragNode.value = null;
   pan.value = null;
   linking.value = null;
@@ -157,6 +225,21 @@ function onWheel(ev) {
   };
 }
 
+/** Bezier path for a resolved edge, with a horizontal reach that matches its span. */
+function edgePath(e) {
+  const dx = Math.max(24, Math.abs(e.x2 - e.x1) * 0.5);
+  return `M ${e.x1} ${e.y1} C ${e.x1 + dx} ${e.y1}, ${e.x2 - dx} ${e.y2}, ${e.x2} ${e.y2}`;
+}
+
+/** The link being dragged, from the source port to the cursor. */
+const linkPath = computed(() => {
+  const l = linking.value;
+  if (!l) return '';
+  const b = pointer.value;
+  const dx = Math.max(24, Math.abs(b.x - l.x) * 0.5);
+  return `M ${l.x} ${l.y} C ${l.x + dx} ${l.y}, ${b.x - dx} ${b.y}, ${b.x} ${b.y}`;
+});
+
 /** Frame every node, with a margin. */
 function frameAll() {
   const ns = state.graph.nodes || [];
@@ -165,8 +248,9 @@ function frameAll() {
   if (!ns.length) { view.value = { x: 40, y: 30, k: 1 }; return; }
   let x0 = Infinity; let y0 = Infinity; let x1 = -Infinity; let y1 = -Infinity;
   for (const n of ns) {
+    const box = nodeBox(n.name);
     x0 = Math.min(x0, n.x); y0 = Math.min(y0, n.y);
-    x1 = Math.max(x1, n.x + NODE_W); y1 = Math.max(y1, n.y + NODE_H);
+    x1 = Math.max(x1, n.x + box.w); y1 = Math.max(y1, n.y + box.h);
   }
   const pad = 40;
   const w = el.clientWidth || 800;
@@ -202,8 +286,9 @@ function onAdd(ev) {
   // A small stagger so repeated adds do not land exactly on top of each other, the same nudge
   // `GraphEditor.addNodeCenter` applied.
   const jitter = (state.graph.nodes.length % 5) * 14;
+  const box = nodeBox(name);
   snapshot();
-  const node = addNode(state.graph, name, c.x - NODE_W / 2 + jitter, c.y - NODE_H / 2 + jitter);
+  const node = addNode(state.graph, name, c.x - box.w / 2 + jitter, c.y - box.h / 2 + jitter);
   if (node) {
     selectNode(node.id);
     bus.emit('graph:changed', { reason: 'add' });
@@ -256,7 +341,7 @@ defineExpose({ frameAll, view });
     @pointerdown="onBackgroundDown"
     @pointermove="onMove"
     @pointerup="onUp"
-    @pointercancel="onUp"
+    @pointercancel="cancelGesture"
     @contextmenu.prevent
     @wheel="onWheel"
   >
@@ -267,14 +352,14 @@ defineExpose({ frameAll, view });
         v-for="e in viewEdges"
         :key="e.id"
         class="edge"
-        :d="`M ${e.x1} ${e.y1} C ${e.x1 + 40} ${e.y1}, ${e.x2 - 40} ${e.y2}, ${e.x2} ${e.y2}`"
+        :d="edgePath(e)"
       />
 
       <!-- The link being dragged, drawn from the source port to the cursor. -->
       <path
         v-if="linking"
         class="edge pending"
-        :d="`M ${linking.x + NODE_W} ${linking.y} C ${linking.x + NODE_W + 40} ${linking.y}, ${pointer.x - 40} ${pointer.y}, ${pointer.x} ${pointer.y}`"
+        :d="linkPath"
       />
 
       <g
@@ -284,26 +369,27 @@ defineExpose({ frameAll, view });
         :class="{ selected: n.selected, missing: !n.implemented }"
       >
         <rect
-          :x="n.x" :y="n.y" :width="NODE_W" :height="NODE_H" rx="5"
+          :x="n.x" :y="n.y" :width="n.w" :height="n.h" rx="5"
           @pointerdown="onNodeDown($event, n)"
         />
         <!-- Centred by `dominant-baseline`, NOT by a numeric offset. The first version did both:
              it set the baseline in CSS and added +4 to the y, so the label sat low. -->
         <text
-          :x="n.x + NODE_W / 2"
-          :y="n.y + NODE_H / 2"
+          :x="n.x + n.w / 2"
+          :y="n.y + n.h / 2"
           text-anchor="middle"
           dominant-baseline="central"
         >
           {{ n.name }}
         </text>
 
-        <!-- Output ports, on the right edge. -->
+        <!-- Output ports, on the right edge. `portOffset` centres the stack, so every dot
+             stays on the (possibly grown) body and agrees with the edge endpoints. -->
         <circle
           v-for="i in n.outputs" :key="`o${i}`"
           class="port out"
-          :cx="n.x + NODE_W"
-          :cy="n.y + NODE_H / 2 + (i - 1) * 10"
+          :cx="n.x + n.w"
+          :cy="n.y + n.h / 2 + portOffset(i - 1, n.outputs)"
           r="4"
           @pointerdown="onPortDown($event, n, i - 1)"
         />
@@ -312,7 +398,7 @@ defineExpose({ frameAll, view });
           v-for="i in n.inputs" :key="`i${i}`"
           class="port in"
           :cx="n.x"
-          :cy="n.y + NODE_H / 2 + (i - 1) * 10"
+          :cy="n.y + n.h / 2 + portOffset(i - 1, n.inputs)"
           r="4"
           @pointerup="onInputPortUp($event, n, i - 1)"
         />

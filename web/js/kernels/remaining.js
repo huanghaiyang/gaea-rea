@@ -21,15 +21,17 @@ import { perlin2, value2, worley2, fractalSum, ridged2 } from '../kernel/noise.j
 import { hash2f, mix32 } from '../kernel/hash.js';
 import { sampleBilinear } from '../kernel/coords.js';
 import {
-  linearGradient, applyHSL, EDGE_CLIP,
+  linearGradient, radialGradient, applyHSL, EDGE_CLIP, EDGE_MIRROR,
 } from '../kernel/gaea-fields.js';
 import { profileTerrace } from '../kernel/gaea-terrace.js';
 import { cartographerContours } from '../kernel/gaea-cartographer.js';
 import { mapBlur } from '../kernel/gaea-blur.js';
 import { blendPair, BLEND } from '../kernel/gaea-combine.js';
 import { exponentialCurveInPlace, graphicEQ } from '../kernel/gaea-exact.js';
+import { XorShift64Star } from '../kernel/gaea-random.js';
+import { mapDrop } from '../kernel/gaea-filter.js';
 import { fnPerlinGrid, fnFractalPerlin, fnVoronoiGrid } from '../kernel/fastnoise.js';
-import { flowAccumulation } from '../kernels/erosion.js';
+import { flowAccumulation, hydraulicDropletMultiscale } from '../kernels/erosion.js';
 import { occlusion } from '../kernels/features.js';
 import { fileStub } from '../kernels/generators.js';
 
@@ -1534,32 +1536,78 @@ export function varNode(ctx) {
   return f;
 }
 
-/** Volcano：锥形火山 + 火山口。 */
+/**
+ * `Erosions.PE(heightfield, null, 10, 0.25, 0, 1000, 1, 24, 0.5, 15, 0, 10, 0.2, 0.6, 0.8, Seed, 0, 0, false)[0]`
+ * 的包装。参数与原版固定实参一一对应。
+ */
+function volcanoErode(data, size, seedS) {
+  const src = createField(size, 'height');
+  src.data.set(data);
+  const out = hydraulicDropletMultiscale({
+    size,
+    seed: seedS,
+    params: {
+      Duration: 10,
+      Downcutting: 0.25,
+      'Erosion Scale': 1000,
+      'Suspended Load': 1,
+      'Bed Load': 0.5,
+      'Coarse Sediments': 0,
+      Shape: 0.2,
+      'Shape Sharpness': 0.6,
+      'Shape Detail Scale': 0.8,
+      DepositionBoost: 0,
+      ExtraDepositionBoost: 0,
+      NoErosion: false,
+    },
+    input: () => src,
+  });
+  return out && out.data ? out.data : null;
+}
+
+/**
+ * Volcano — 按反编译 `Volcano.Build()` 移植：
+ *   RadialGradient(N, N*X, N*Y, N*Scale*0.5, Height)
+ *   → Triangle(Mouth.lerp(0.2,0.6), symmetric=false)
+ *   → exp(Bulk) → Drop
+ *   → [Surface=Eroded] Min(FractalWarp 0.1/0.5 ridged) → PE 侵蚀
+ */
 export function volcano(ctx) {
   const { size, params, seed } = ctx;
   const scale = clamp(NUM(params, 'Scale', 1), 0.0001, 4);
   const height = clamp(NUM(params, 'Height', 1), 0.0001, 1);
   const mouth = clamp01(NUM(params, 'Mouth', 0.15));
   const bulk = clamp(NUM(params, 'Bulk', -0.2), -1, 1);
-  const surface = ENUM(params, 'Surface', 'Smooth');
+  const surface = ENUM(params, 'Surface', 'Eroded');
   const cx = clamp01(NUM(params, 'X', 0.5));
   const cy = clamp01(NUM(params, 'Y', 0.5));
-  const seedS = NUM(params, 'Seed', seed);
+  const seedS = NUM(params, 'Seed', seed) | 0;
+
+  let src = radialGradient(size, cx * size, cy * size, size * scale * 0.5, height);
+  const folds = 0.2 + mouth * 0.4; // Mouth.ue05d...ue0c7(0.2, 0.6)
+  for (let i = 0; i < src.length; i++) {
+    let t = src[i] * folds + 0.25;
+    t -= Math.floor(t);
+    src[i] = 1 - Math.abs(t * 2 - 1);
+  }
+  exponentialCurveInPlace(src, -10 * bulk);
+  src = mapDrop(src);
+
+  if (surface === 'Eroded') {
+    const w = fractalWarpVirtual(src, size, {
+      scale: 0.1, strength: 0.5, ridged: true, octaves: 12, roughness: 0.5,
+      iterations: 1, direction: 45, noiseSeed: seedS, edge: 0,
+    });
+    for (let i = 0; i < src.length; i++) src[i] = Math.min(src[i], w[i]);
+    const er = volcanoErode(src, size, seedS);
+    if (er) src = er;
+  }
+
   const f = createField(size, 'height');
-  const inv = 1 / size;
-  for (let y = 0; y < size; y++) {
-    const v = (y + 0.5) * inv;
-    for (let x = 0; x < size; x++) {
-      const u = (x + 0.5) * inv;
-      const r = Math.sqrt((u - cx) * (u - cx) + (v - cy) * (v - cy)) / (0.12 + scale * 0.35);
-      const cone = Math.max(0, 1 - r);
-      let h = Math.pow(cone, 1.15 - bulk * 0.5) * height;
-      const cpos = Math.max(0, 1 - r / (0.12 + mouth * 0.4));
-      h -= Math.pow(cpos, 2.2) * height * (0.3 + mouth);
-      const chaos = surface === 'Eroded' ? 0.22 : 0.06;
-      h += fractalSum(perlin2, u * 12, v * 12, seedS, 4, 2, 0.5, 'Standard') * chaos * 0.25 * cone;
-      f.data[y * size + x] = clamp01(h);
-    }
+  const inp = ctx.input(0);
+  const mask = inp ? toScalar(inp).data : null;
+  for (let i = 0; i < f.data.length; i++) {
+    f.data[i] = clamp01(mask ? src[i] * mask[i] : src[i]);
   }
   return f;
 }
@@ -1607,10 +1655,11 @@ function m2Map(n, scale, seedS) {
  * Voronoi F1 + 阶梯化 Perlin + 方向扭曲 + 第二次支架扭曲。
  * DirectionWarpF 用按地形图调制的定向位移近似。
  */
-function ridgeMap(n, scale, height, definition, seedS) {
+function ridgeMap(n, scale, height, definition, seedS, opts = {}) {
   const s = clamp(scale, 0, 1);
   const vor = fnVoronoiGrid({
     size: n, scale: 100 * (1 - s * 1.05), jitter: 0.45, returnType: 2, seed: seedS | 0,
+    scaleX: opts.scaleX ?? 1, scaleY: opts.scaleY ?? 1,
   });
   const p = perlinMap01({ size: n, scale: 0.75, octaves: 12, gain: 0.5, seed: (seedS + 1) | 0 });
   let terr = profileTerrace(p, 67, 0.6, 0.2, 0.8, (seedS + 2) | 0);
@@ -1637,6 +1686,17 @@ function ridgeMap(n, scale, height, definition, seedS) {
     iterations: 1, direction: 45, noiseSeed: (seedS + 4) | 0, edge: 1,
   });
   const out = new Float32Array(n * n);
+  if (opts.rawScale) {
+    // 原版：min(...).ue95c(0,Scale).ue95f() * Height —— 输出范围 [0, Scale*Height]
+    let mn = Infinity;
+    for (let i = 0; i < out.length; i++) {
+      const v = Math.min(map4[i], b[i]) * s;
+      out[i] = v;
+      if (v < mn) mn = v;
+    }
+    for (let i = 0; i < out.length; i++) out[i] = Math.max(0, out[i] - mn) * height;
+    return out;
+  }
   for (let i = 0; i < out.length; i++) {
     const v = Math.min(map4[i], b[i]);
     out[i] = Math.min(Math.max(v, 0), s);
@@ -1753,23 +1813,254 @@ export function meshify(ctx) {
   return cloneField(inOr(ctx, 0, 0.5));
 }
 
-/** Uplift：抬升/隆起作用。 */
+/* ------------------------------------------------------------------ FractalTerraces */
+
+/**
+ * `FractalTerraces.Process2` 的单点内核（反编译 47755-47922）。
+ *
+ * `shape_structural()` 在原文件里读的是两个从未赋值的字段（hs_coeff / vs_coeff），
+ * 按可读语义取恒等映射。其余逐行照搬：随机厚度、上下界点、八度插值与浊化。
+ */
+function terrace2Point(height, c) {
+  const num = (1 - c.thickness_randomness) * 0.5;
+  const num2 = height * c.spacing_inv;
+  let num3;
+  let num4 = Math.trunc(height * c.spacing_inv + 1000) - 999;
+  const point = { height: 0, position: 0, hash: 0 };
+  const point2 = { height: 0, position: 0, hash: 0 };
+  let num5;
+  do {
+    num4 -= 1;
+    point.hash = num4 & 255;
+    point2.hash = (num4 + 1) & 255;
+    point.height = num4;
+    point2.height = num4 + 1;
+    num5 = 1;
+    point.height += (c.rnd[point.hash += 11] / 255) * c.thickness_randomness + num;
+    point2.height += (c.rnd[point2.hash += 11] / 255) * c.thickness_randomness + num;
+    point.position = point.height;
+    point2.position = point2.height;
+  } while (num2 < point.position);
+
+  for (let i = 0; i < c.octaves; i++) {
+    num5 *= c.color_contrast;
+    num3 = (num2 - point.position) / (point2.position - point.position);
+    const num6 = (c.rnd[point.hash] / 255) * c.thickness_randomness + num;
+    let num7;
+    if (i < c.shape_micro_octave) {
+      num7 = (-2 * (c.rnd[point2.hash] / 255) + 1) * c.shape_m + c.shape;
+      num7 = clamp(num7, -1, 1);
+      num7 = num7 * c.hardness_randomness
+        + (1 - c.hardness_randomness) * (num3 < num6 ? c.shape_low : c.shape_high);
+    } else {
+      num7 = (-2 * (c.rnd[point2.hash] / 255) + 1) * c.shape_m2 + c.shape2;
+      num7 = clamp(num7, -1, 1);
+      num7 = num7 * c.hardness_randomness
+        + (1 - c.hardness_randomness) * (num3 < num6 ? c.shape_low2 : c.shape_high2);
+    }
+    const num8 = Math.min(num6, 1 - num6);
+    num7 = num7 < 0
+      ? num7 * (num6 * c.character + (1 - c.character) * num8)
+      : num7 * ((1 - num6) * c.character + (1 - c.character) * num8);
+    num7 *= c.intensity;
+    if (num3 < num6) {
+      point2.height = point.height + (point2.height - point.height) * (num6 + num7);
+      point2.position = point.position + (point2.position - point.position) * num6;
+      point2.hash = point.hash;
+    } else {
+      point.height += (point2.height - point.height) * (num6 + num7);
+      point.position += (point2.position - point.position) * num6;
+    }
+    point.hash = c.rnd[point.hash + 11];
+    point2.hash = c.rnd[point2.hash + 13];
+  }
+  num3 = point2.position > point.position
+    ? (num2 - point.position) / (point2.position - point.position)
+    : point.position;
+  return c.spacing * (point.height + (point2.height - point.height) * num3);
+}
+
+/** 把 data 从 [fromMin,fromMax] 线性重映射到 [toMin,toMax]（`ue95c` 5 参重载）。 */
+function remapRange(data, fromMin, fromMax, toMin, toMax) {
+  const k = (toMax - toMin) / (fromMax - fromMin || 1e-12);
+  for (let i = 0; i < data.length; i++) data[i] = toMin + (data[i] - fromMin) * k;
+  return data;
+}
+
+function dataMinMax(data) {
+  let mn = Infinity, mx = -Infinity;
+  for (let i = 0; i < data.length; i++) {
+    const v = data[i];
+    if (v < mn) mn = v;
+    if (v > mx) mx = v;
+  }
+  return [mn, mx];
+}
+
+/** `FractalTerraces.Process2` 的整图版本。 */
+function fractalTerracesProcess2(src, n, opt) {
+  const spacing = Math.max(opt.spacing, 0.001);
+  const c = {
+    color_contrast: 0.5 + 0.5 * opt.strataDetails,
+    intensity: opt.intensity,
+    shape: opt.shape,
+  };
+  c.shape_m = 2 - Math.abs(c.shape);
+  c.shape_low = 0.5 * Math.max(-1, c.shape * 2 - 1);
+  c.shape_high = 0.5 * Math.min(1, c.shape * 2 + 1);
+  c.shape2 = opt.shapeMicro < -1 ? opt.shape : opt.shapeMicro;
+  c.shape_m2 = 2 - Math.abs(c.shape2);
+  c.shape_low2 = 0.5 * Math.max(-1, c.shape2 * 2 - 1);
+  c.shape_high2 = 0.5 * Math.min(1, c.shape2 * 2 + 1);
+  c.shape_micro_octave = opt.shapeMicroOctave;
+  c.character = opt.character;
+  c.thickness_randomness = 1 - opt.thicknessUniformity;
+  c.hardness_randomness = 1 - opt.hardnessUniformity;
+  c.spacing = spacing;
+  c.spacing_inv = 1 / spacing;
+  c.octaves = opt.octaves;
+  c.rnd = new Uint8Array(512);
+  const rng = new XorShift64Star(opt.seed);
+  for (let i = 0; i < 512; i++) c.rnd[i] = rng.nextInt() & 255;
+
+  const out = new Float32Array(n * n);
+  for (let i = 0; i < out.length; i++) out[i] = terrace2Point(src[i], c);
+  const [minH, maxH] = dataMinMax(src);
+  const [minR, maxR] = dataMinMax(out);
+  remapRange(out, minR, maxR, minH, maxH);
+  return out;
+}
+
+/** `Profiles.FractalTerrace` 的 tilt=true 分支结构移植。 */
+function fractalTerraceMap(src, n, opt) {
+  const map3 = Float32Array.from(src);
+  let map4 = null;
+  if (opt.tilt) {
+    map4 = linearGradient(n, n / 2, n / 2, n, opt.direction, EDGE_MIRROR);
+    if (opt.tiltAmount !== 1) for (let i = 0; i < map4.length; i++) map4[i] *= opt.tiltAmount;
+    if (opt.warpAmount > 0) {
+      map4 = fractalWarpVirtual(map4, n, {
+        scale: opt.warpSize, strength: opt.warpAmount, octaves: 12, roughness: 0.5,
+        iterations: 1, direction: 45, noiseSeed: opt.tiltSeed, edge: 1,
+      });
+    }
+    for (let i = 0; i < map3.length; i++) map3[i] += map4[i];
+  }
+  const map5 = fractalTerracesProcess2(map3, n, {
+    spacing: opt.spacing,
+    octaves: opt.octaves,
+    intensity: opt.intensity,
+    seed: opt.seed,
+    shape: opt.shape,
+    shapeMicro: opt.shapeMicro ?? -2,
+    shapeMicroOctave: opt.shapeMicroOctave ?? 5,
+    character: opt.character ?? 0,
+    thicknessUniformity: opt.thicknessUniformity ?? 0,
+    hardnessUniformity: opt.hardnessUniformity ?? 0,
+    strataDetails: opt.strataDetails ?? 0.6,
+  });
+  if (map4) for (let i = 0; i < map5.length; i++) map5[i] -= map4[i];
+  // ProtectRange=false → ue95c(0,1) 是恒等映射
+  return map5;
+}
+
+/**
+ * `Profiles.ComplexTerraces`：三次 FractalTerrace 用同一个 XorShift 序列随机化，
+ * 逐步收紧 spacing / 旋转方向，最后按像素取 Min。
+ *
+ * 参数求值顺序必须与反编译源码一致，否则随机序列会错位。
+ */
+function complexTerracesMap(n, src, intensity, shape, spacing, tiltAmount, direction, octaves, seed) {
+  const rng = new XorShift64Star(seed);
+  const common = {
+    octaves, intensity, shape, seed, tilt: true,
+    shapeMicro: -2, shapeMicroOctave: 5, character: 0,
+    thicknessUniformity: 0, hardnessUniformity: 0, strataDetails: 0.6,
+    warpAmount: 0.33, warpSize: 0.33,
+  };
+  let dir = direction;
+
+  const a = fractalTerraceMap(src, n, {
+    ...common,
+    spacing,
+    tiltAmount: tiltAmount + rng.nextFloatRange(0.3, 0.6),
+    tiltSeed: rng.nextInt(),
+    direction: dir,
+  });
+
+  dir += rng.nextIntRange(5, 15);
+  const b = fractalTerraceMap(a, n, {
+    ...common,
+    spacing: spacing + spacing * rng.nextFloatRange(0.01, 0.2),
+    tiltAmount: tiltAmount + rng.nextFloatRange(0.3, 0.6),
+    tiltSeed: rng.nextInt(),
+    direction: dir,
+  });
+  const m = new Float32Array(n * n);
+  for (let i = 0; i < m.length; i++) m[i] = Math.min(a[i], b[i]);
+
+  // 第三次调用的具名实参按源码文本顺序求值：direction → spacing → tiltAmount → tiltSeed
+  const dir3 = dir + rng.nextIntRange(25, 45);
+  const spacing3 = spacing + spacing * rng.nextFloatRange(0.1, 0.4);
+  const tilt3 = tiltAmount + rng.nextFloatRange(0.3, 0.6);
+  const tiltSeed3 = rng.nextInt();
+  const c3 = fractalTerraceMap(m, n, {
+    ...common,
+    spacing: spacing3,
+    tiltAmount: tilt3,
+    tiltSeed: tiltSeed3,
+    direction: dir3,
+  });
+  for (let i = 0; i < m.length; i++) m[i] = Math.min(m[i], c3[i]);
+  return m;
+}
+
+/** `Landscapes.Uplift` 的单次 Pass。 */
+function upliftMap(n, scale, height, octaves, direction, seedS) {
+  // Ridge(res, 0.11 - Scale*0.1, Height+1.2, 0.3, Seed, ScaleX=0.0001, ScaleY=1)
+  const ridge = ridgeMap(n, 0.11 - scale * 0.1, height + 1.2, 0.3, seedS, {
+    scaleX: 0.0001, scaleY: 1, rawScale: true,
+  });
+  for (let i = 0; i < ridge.length; i++) ridge[i] = 0.1 + ridge[i] * 0.9; // ue95c(0.1, 1)
+  const ct = complexTerracesMap(
+    n, ridge, 0.5, 0.75, height, 0.3, direction + 178, octaves, seedS + 10,
+  );
+  // ue95e()：min < 0 时 Drop，否则不变
+  return dataMinMax(ct)[0] < 0 ? mapDrop(ct) : ct;
+}
+
+/**
+ * Uplift：`Res.GetUplift` 的多 Pass 版本。
+ *
+ * 单 Pass = ComplexTerraces(Ridge(...).remap(0.1,1), 0.5, 0.75, Height, 0.3, Direction+178,
+ * Octaves, Seed+10)[0].ue95e()；Passes>1 时每 Pass 用 XorShift 抖动方向后取 Max，
+ * 最后与输入（若连接）相乘。
+ */
 export function uplift(ctx) {
   const { size, params, seed } = ctx;
-  const scale = clamp(NUM(params, 'Scale', 0.5), 0.05, 1);
-  const height = clamp(NUM(params, 'Height', 0.5), 0.05, 2);
-  const direction = NUM(params, 'Direction', 0);
-  const f = createField(size, 'height');
-  const inv = 1 / size;
-  for (let y = 0; y < size; y++) {
-    const v = (y + 0.5) * inv;
-    for (let x = 0; x < size; x++) {
-      const u = (x + 0.5) * inv;
-      const [rx, ry] = rot(u, v, direction);
-      const ridge = fractalSum(perlin2, rx * (3 + scale * 7), ry * (2 + scale * 4), seed, 5, 2, 0.5, 'Ridged');
-      const center = Math.exp(-((u - 0.5) * (u - 0.5) + (v - 0.5) * (v - 0.5)) / 0.18);
-      f.data[y * size + x] = clamp01(0.5 + (ridge - 0.5) * height * center);
+  const passes = clamp(Math.round(NUM(params, 'Passes', 1)), 1, 10);
+  const scale = clamp01(NUM(params, 'Scale', 0.5));
+  const height = clamp(NUM(params, 'Height', 0.6), 0, 2);
+  const octaves = clamp(Math.round(NUM(params, 'Octaves', 10)), 2, 12);
+  const direction = clamp(Math.round(NUM(params, 'Direction', 0)), 0, 360);
+  const jitter = clamp01(NUM(params, 'Jitter', 0.5));
+  const seedS = NUM(params, 'Seed', seed) | 0;
+
+  const out = upliftMap(size, scale, height, octaves, direction, seedS);
+  if (passes > 1) {
+    const rng = new XorShift64Star(seedS);
+    for (let p = 1; p < passes; p++) {
+      const dir = direction + Math.trunc(90 * ((rng.nextFloat() - 0.5) * jitter));
+      const m = upliftMap(size, scale, height, octaves, dir, seedS + p);
+      for (let i = 0; i < out.length; i++) out[i] = Math.max(out[i], m[i]);
     }
+  }
+  // Commit(map, true, true) 只做 clamp，不做自动归一化
+  const f = createField(size, 'height');
+  const inp = ctx.input(0);
+  const mask = inp ? toScalar(inp).data : null;
+  for (let i = 0; i < f.data.length; i++) {
+    f.data[i] = clamp01(mask ? out[i] * mask[i] : out[i]);
   }
   return f;
 }

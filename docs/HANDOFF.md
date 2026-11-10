@@ -110,6 +110,8 @@ node tools/verify-exact.mjs      # 351 个数值用例:338 全过 + 13 例在已
 | `Normalize(map,a,b,outA,outB)` | oracle 实测 | `a→outA, b→outB` 线性,**不外扩截断**(ramp 0..1 + (0.2,0.8,10,20) → 6.67..23.33) |
 | `map.Autolevel()` | oracle 实测 | min→0, max→1 |
 | `\ueb77\uf21d\ue95e(map,a=0,b=1)` | oracle 实测 | `clamp(v,a,b)-a`(Bias 式下移+封顶) |
+| `float.\ue05d\uedfb\ue0c7(a,b)` | 源码 | **`a + v*(b-a)`(把 0..1 滑杆线性重映射到 [a,b])**,不是 clamp;`Slot.\ue05d\uedfb\ue0c7(-1,1)`、`Plates` 的 `Range/Falloff/Warp` 都靠它,漏掉会让符号/区间整段错 |
+| FNSIMD 噪声类型 | 源码 | `NoiseType 7 = Cellular(非分形)`:`SetFractalOctaves/Gain/FractalType` 对**它无效**,别叠 12 阶;`NoiseType 3 = PerlinFractal`(才吃 octaves);`FractalType 0 = FBM` |
 | `Others.SmoothedMedianBlur` | oracle 实测(512) | `half=size/2*(width/512)` **整数除法**;整行复用同一个窗口缓冲区、整块排序、取 `sorted[len/2-1]` 与 `sorted[len/2+1]` 的平均;**越界未写入的残留值参与排序**——照抄这点边界才对 |
 | `Masking.Mask(a,b,m)` | 源码 | `a*(1-m)+b*m` |
 | `Combiner.Mix` | `MathV.Mix` | `a*(1-t)+b*t`;枚举值由包装函数钉死:Blend0 Add1 Screen2 Subtract3 Difference4 Multiply5 Divide6 Divide2 7 Max8 Min9 |
@@ -126,11 +128,11 @@ node tools/verify-exact.mjs      # 351 个数值用例:338 全过 + 13 例在已
 | `FilterCore.FilterProcess` | 源码+oracle | 模糊差分滤波器组:半径 `(1-f*0.9999)*N*0.25`;LowPass/HighPass/LowShelf/HighShelf 已对拍通过,BandPass/Notch 受 blur 边缘模型影响(2e-2 内) |
 | `AspectMaps.GetThreshold` | 源码 | `v > threshold ? 1 : 0`(另有 < / 区间两个变体) |
 | Map 运算符 | Fx.Map.cs | `+`/`-`/`*` 都是逐元素(Add/Subtract/Multiply),不是混合模式 |
-| `Map.Flip()`(`\ueb77\uf21d\ue95d()` 无参) | oracle | **水平镜像**,不是取反!(ramp 上两者恰好等价,曾据此误判) |
-| `Map.Autolevel()` / `.Drop()` / `.Invert()` | oracle | 分别是 min/max→0..1、减基线截断、1-v |
+| `Map.Invert()`(`\ueb77\uf21d\ue95d()` 无参) | 源码 + oracle | **`Vector<float>.One - v`(取反)**,不是水平镜像;`Combiner.Embed` 用非对称噪声图逐值对拍 3e-8 |
+| `Map.Autolevel()` / `.Drop()` / `.Invert()` | oracle | 分别是 min/max→0..1、减基线(`min(1,min)`)后夹到 **[0,1]**、1-v |
 | `Combiner.Transpose` | oracle | 参考图先 `FilterProcess(0.75, gain0, LowShelf)` 再 drop,按 Amount 加进地面,最后把新范围映回原 min/max — **已逐值通过** |
 
-| `Map.Flip()` 无参 = 水平镜像;无参 `uE95E` = "min<0 则上移" | oracle | 两者在 ramp 上都酷似取反/Drop,必须用非对称或有符号范围的图才能区分 |
+| `\ueb77\uf21d\ue95d()` 无参 = 取反;无参 `\ueb77\uf21d\ue95e` = "min<0 则上移" | 源码+oracle | 取反与"水平镜像"在水平 ramp 上完全等价,旧测试因此把 Embed 的取反误判成镜像;必须用非对称图才能区分 |
 | `AspectMaps.GetCurvature` | 源码+oracle | 有限差分 + 三种曲率(H/V/Average),注意 `max=Max/2` 而 `min=Min` 不除以 2;精确(2e-6) |
 | `Sharpen` | 源码 | Edge = `map + GetCurvature(0,1,0.2,Vertical)*0.008*Amount`;Frequency = GraphicEQ 顶带 +Amount |
 
@@ -401,7 +403,7 @@ node tools/web-import-check.mjs
 
 ## 10. 建议的第一步
 
-1. `node tools/verify-exact.mjs` —— 331 全过 + 10 例已知近似(blur 边缘 6、Repeat 4)
+1. `node tools/verify-exact.mjs` —— 339 全过 + 12 例已知近似(Repeat 3、blur 边缘 6、Contours 3)
 2. `node tools/smoke-new-nodes.mjs` —— 17/17
 3. `node tools/analyze-pending.mjs` —— 剩余 90 条的分组(见 7.4d)
 4. 下一批建议(按性价比):
@@ -410,3 +412,41 @@ node tools/web-import-check.mjs
      反推 hash/gradient LUT,再逐字段拟合 fractal/perturb 参数;这是最大一块(约 30 节点)
    * **`Profiles.ComplexTerraces`** → Stratify(单一缺口)
    * `Cartographer.Contours/Grid` 的 builder 本来就不难,只等 resize/Terrace
+
+---
+
+## 11. 地形/节点审计(2.3.1)
+
+**已结构化对齐**(oracle 或逐行索引核对):Canyon、Combiner.Embed、Combiner.Transpose、
+Invert、Flip(X/Y/XY)、Slump/Ridge/M2 基元、Texturizer A–L、Stones(`1-Craterfield(1-map)`)。
+
+**仍为手工近似**(registry `note: model|approx`),按 Gaea `Build()` 的真实结构列出缺口:
+
+| 节点 | Gaea Build 结构 | 本仓库现状 / 缺口 |
+|---|---|---|
+| Mountain | 3×Ridge(xorshift 随机尺度)+RadialGradient 包络+`Min(FractalWarp)`+按 Style 跑 PE+Strata=`ComplexTerraces`+`Mask(GetHeightNormalized(0.65,1,0.33))`+Bulk `ue95e(0.2/-0.25)` | 自造 ridged Voronoi 叠加,无径向包络/PE/Strata |
+| MountainRange | 3×Ridge+`ThermalShaper(-0.05)`+`Min(FractalWarp)`+按 Style 跑 PE+Stratified 三次 `FractalTerrace`+Mask+Bulk `ue95e(-0.25/-0.15/-0.05)*Height` | 带状 ridge 噪声+thermalPass |
+| Plates | Perlin(`Scale`,10,warp Complex)+MultiFractal(type1)*0.4 → `DistanceRT(Range=lerp(0.7,1), Falloff)` → `FractalWarp(Warp=lerp(0.02,0.1), size=0.9-lerp(0.02,0.2))` | worley2 板块+自造 warp;Range/Falloff/Warp 被当 `clamp01` |
+| Sand | `Gabor(Scale*0.009, Chaos*0.45, 0.958)` → `ThermalShaper(1,-0.03125)*Height*0.1` → `ue95c(0.0025*Softness)`;可选 `aniso=In.ue95c(0.025)` | 自造沙纹 |
+| DuneSea | `Gabor(lerp(0.1,0.5,Scale)*0.25, chaos, undulation, Direction/360*2π)` ×`Height*0.4` → `FractalWarp(size 查表)` → `ue95c(Softness*0.25)` → `ThermalShaper(1,-0.2-0.8*Sharpness)` | Chaos/Undulation/DuneType 三张查表未移植 |
+| Slump(节点) | octaves 由 NoiseStyle(A/B/C→2/4/6)、WarpNoiseType 由 Style(A/B/C→1/3/5) | 固定 octaves=2,两个 ABC 列表未映射 |
+| Rugged | Complexity 轮:`Max(Slump,Slump)` 与 Ridge 按 Style 用 `Mix(Blend 2/0/4, 0.5)` | 自造 |
+| Uplift | `ComplexTerraces(Ridge(0.11-Scale, Height+1.2, 0.3).ue95c(0.1,1), 0.5,0.75,Height,0.3,Direction+178,Octaves,Seed+10)[0].ue95e()` | **已结构化移植**:Ridge(含 ScaleX=0.0001/ScaleY=1 各向异性)→ 0.1..1 → ComplexTerraces(3×FractalTerrace, XorShift 顺序一致)→ Min → `ue95e`;多 Pass Max。Ridge 内部噪声场仍为项目噪声近似 |
+| Crater(非 New / Classic) | `RadialGradient(N*X,N*Y,N*Scale*2)` → Sine/Triangle(`Formation=lerp(0,0.75)`,symmetric=**false**) → `ThermalShaper(1,Shape)` → `ue95f` → `ue95c(0,Height)`(即 ×Height) | **已结构化移植**:径向/折叠/Drop/×Height 精确;`ThermalShaper` 原生核未移植,用 talus 松弛近似 |
+| Crater(New) / CraterField | `CraterfieldGenerator(10000,Depth)` / `Render(...)` | CraterfieldGenerator 未移植,New 仍走经典冲击坑剖面 |
+| Volcano | `RadialGradient(x*X,x*Y,x*Scale*0.5,Height)` → `Triangle(Mouth=lerp(0.2,0.6),symmetric=false)` → `ue95e(Bulk)` → `ue95f` → Eroded:`Min(FractalWarp 0.1/0.5 ridged)`+PE | **已结构化移植**;FractalWarp 用项目噪声近似,PE 用 droplet 解算器按原固定实参调用 |
+| MountainSide | DetailField: Perlin(`6+96*Detail`,`Scale`,10)+Resize+`Blend(Linear,0.35)`+Invert+2×FractalWarp+Min;Slope: Perlin(`lerp(0.3,0.7,Scale)`,5,0.38)+Style(PE/ComplexTerraces) | 自造 |
+| Glacier | `Gaea.Nodes.resolved.cs:36297` | 待审计 |
+
+**新增语义陷阱(同名重载,极易踩)**:
+
+- `ue95e` 有 4 个重载,语义互不相同:
+  - `ue95e(map)`:`min < 0` 时 Drop,否则原样;
+  - `ue95e(map, float amount)`:`exp(t*(-10*amount))` 指数对比度曲线,`amount == 0.1` 时 no-op;
+  - `ue95e(map, a, b)`:`clamp(v,a,b) - a`;
+  - `ue95e(float[], a, b)`:线性重映射 `a + v*(b-a)`。
+- `ue95c(map, a, b)` = 线性重映射 `a + v*(b-a)`(不是 clamp);Crater 的 `ue95c(0, Height)` 就是 ×Height。
+- `Ridge(...)` 结尾是 `min(...).ue95c(0, Scale).ue95f() * Height`,输出范围 `[0, Scale*Height]`,**不要先归一化再乘 Height**(会放大约 `1/Scale` 倍)。Uplift 走 `rawScale` 分支。
+- `Profiles.Sine/Triangle(..., bool symmetric)` 在 Crater/Volcano 里传的是 `(byte)0 != 0` 即 **false**;写成 `true` 会得到环数完全不同的同心图案。
+- `FractalTerraces.Process2` 的 `shape_structural()` 读取两个从未赋值的字段(`hs_coeff`/`vs_coeff`),按恒等映射移植;其输出会 remap 回输入高度图的 `[min,max]`。
+- `Commit(map, allowMasking, clamp)` 只做 clamp,**不做** autolevel/归一化。

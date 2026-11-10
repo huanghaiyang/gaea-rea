@@ -49,11 +49,14 @@ export function getNode(graph, id) {
 }
 
 /**
- * Connect from -> to at an input port. Refuses self-loops and duplicates; replaces the
- * existing edge on that input port (Gaea behaves the same way: an input takes one link).
+ * Connect from -> to at an input port. Refuses self-loops, duplicates and cycle-forming links;
+ * replaces the existing edge on that input port (Gaea behaves the same way: an input takes one
+ * link). UI code should call `validateConnection` first so it can tell the user WHY a drop was
+ * refused — this guard only protects the invariant.
  */
 export function connect(graph, from, to, toPort, fromPort = 0) {
   if (from === to) return null;
+  if (wouldCreateCycle(graph, from, to)) return null;
   graph.edges = graph.edges.filter((e) => !(e.to === to && e.toPort === toPort));
   const edge = { id: newId('e'), from, fromPort, to, toPort };
   graph.edges.push(edge);
@@ -74,7 +77,14 @@ export function outgoingEdges(graph, id) {
   return graph.edges.filter((e) => e.from === id);
 }
 
-/** Depth-first search for a cycle that would be created by from -> to. */
+/**
+ * Would an edge from -> to close a cycle?
+ *
+ * A new edge points downstream, so it closes a loop exactly when `to` can already reach `from`
+ * through existing edges. (An earlier version walked the opposite direction, from `from` to
+ * `to`, which never found a loop for the usual case of dragging a downstream output back into
+ * an upstream input — it reported "safe" right before creating the cycle.)
+ */
 export function wouldCreateCycle(graph, from, to) {
   if (from === to) return true;
   const adj = new Map();
@@ -82,11 +92,11 @@ export function wouldCreateCycle(graph, from, to) {
     if (!adj.has(e.from)) adj.set(e.from, []);
     adj.get(e.from).push(e.to);
   }
-  const stack = [from];
+  const stack = [to];
   const seen = new Set();
   while (stack.length) {
     const cur = stack.pop();
-    if (cur === to) return true;
+    if (cur === from) return true;
     if (seen.has(cur)) continue;
     seen.add(cur);
     for (const n of (adj.get(cur) || [])) stack.push(n);

@@ -20,12 +20,15 @@ import {
   state, bus, snapshot, selectNode, schemaFor, isImplemented, registryEntry,
 } from './state.js';
 import { addNode, removeNode, connect, disconnect, getNode, wouldCreateCycle, incomingEdges } from './graph.js';
+import { validateConnection } from './connect-rules.js';
 import { defaultParams, KIND_COLOR } from './registry.js';
 import { rafThrottle, clamp } from './util.js';
 
 const NODE_W = 108;
 const NODE_H = 30;
 const PORT_R = 4.5;
+const PORT_GAP = 10;
+const PORT_PAD = 9;
 const GRID = 24;
 
 export class GraphEditor {
@@ -59,12 +62,18 @@ export class GraphEditor {
     const entry = registryEntry(node.name);
     const inputs = entry && entry.inputs ? entry.inputs.length : 1;
     const outputs = entry && entry.outputs ? entry.outputs.length : 1;
-    return { w: NODE_W, h: NODE_H, inputs: Math.max(0, inputs), outputs: Math.max(0, outputs) };
+    // Grow the body for nodes with many ports. At a fixed height the outer ports of a
+    // six-input node sat below the box, so edges ended in mid-air under the node.
+    const ports = Math.max(Math.max(0, inputs), Math.max(0, outputs));
+    const h = ports <= 2 ? NODE_H : (ports - 1) * PORT_GAP + PORT_PAD * 2;
+    return { w: NODE_W, h, inputs: Math.max(0, inputs), outputs: Math.max(0, outputs) };
   }
 
   portPos(node, side, index, count) {
     const { h } = this.nodeSize(node);
-    const y = node.y + h / 2 + (count > 1 ? (index - (count - 1) / 2) * 12 : 0);
+    // Centre the port stack on the node's midpoint; the same offsets are used for drawing,
+    // hit-testing and edge endpoints.
+    const y = node.y + h / 2 + (count > 1 ? (index - (count - 1) / 2) * PORT_GAP : 0);
     const x = side === 'in' ? node.x : node.x + NODE_W;
     return { x, y };
   }
@@ -174,8 +183,8 @@ export class GraphEditor {
       }      if (this.linkFrom) {
         const [wx, wy] = this.toWorld(e.offsetX, e.offsetY);
         const hit = this.hitTest(wx, wy);
-        if (hit && hit.kind === 'port' && hit.side === 'in') this.tryConnect(this.linkFrom.nodeId, hit.nodeId, hit.index);
-        else if (hit && hit.kind === 'node') this.tryConnect(this.linkFrom.nodeId, hit.nodeId, 0);
+        if (hit && hit.kind === 'port' && hit.side === 'in') this.tryConnect(this.linkFrom.nodeId, hit.nodeId, hit.index, this.linkFrom.port);
+        else if (hit && hit.kind === 'node') this.tryConnect(this.linkFrom.nodeId, hit.nodeId, 0, this.linkFrom.port);
         this.linkFrom = null;
         this._schedule();
       }
@@ -219,17 +228,16 @@ export class GraphEditor {
     }
   }
 
-  tryConnect(fromId, toId, toPort) {
-    if (fromId === toId) { this.onStatus('Cannot connect a node to itself'); return; }
-    if (wouldCreateCycle(state.graph, fromId, toId)) {
-      this.onStatus('That connection would create a cycle');
-      return;
-    }
+  tryConnect(fromId, toId, toPort, fromPort = 0) {
+    // One shared rule set for both canvases: self, port range, kind compatibility, cycles.
+    const verdict = validateConnection(state.graph, fromId, toId, toPort, fromPort);
+    if (!verdict.ok) { this.onStatus(verdict.reason); return false; }
     snapshot();
-    connect(state.graph, fromId, toId, toPort);
+    connect(state.graph, fromId, toId, toPort, fromPort);
     this.onStatus(`connected ${getNode(state.graph, fromId).name} \u2192 ${getNode(state.graph, toId).name}`);
     bus.emit('graph:changed', { reason: 'connect' });
     this._schedule();
+    return true;
   }
 
   /* ------------------------------------------------------------ hit-test */
@@ -292,8 +300,9 @@ export class GraphEditor {
     if (!nodes.length) { this.view = { x: 40, y: 30, k: 1 }; this._schedule(); return; }
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const n of nodes) {
+      const size = this.nodeSize(n);
       minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
-      maxX = Math.max(maxX, n.x + NODE_W); maxY = Math.max(maxY, n.y + NODE_H);
+      maxX = Math.max(maxX, n.x + size.w); maxY = Math.max(maxY, n.y + size.h);
     }
     const pad = 40;
     const rect = this.canvas.getBoundingClientRect();
@@ -561,7 +570,7 @@ export class GraphEditor {
       const b = document.createElement('button');
       b.textContent = `${c.node.name}${c.port > 0 ? ` [${c.port + 1}]` : ''}`;
       b.addEventListener('click', () => {
-        this.tryConnect(c.node.id, nodeId, portIndex);
+        this.tryConnect(c.node.id, nodeId, portIndex, c.port);
         this.hidePortPicker();
       });
       picker.appendChild(b);
@@ -589,7 +598,8 @@ export class GraphEditor {
   addNodeCenter(name) {
     const c = this.viewCenter();
     const jitter = (state.graph.nodes.length % 5) * 14;
-    return this.addNodeAt(name, c[0] - NODE_W / 2 + jitter, c[1] - NODE_H / 2 + jitter);
+    const size = this.nodeSize({ name });
+    return this.addNodeAt(name, c[0] - size.w / 2 + jitter, c[1] - size.h / 2 + jitter);
   }
 
   deleteSelected() {
