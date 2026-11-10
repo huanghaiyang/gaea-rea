@@ -1558,8 +1558,8 @@ export const NODES = [
     algorithm: REMAINING.groundTexture,
     category: CAT.FX,
     summary: 'GroundTexture adds superficial detail to the terrain to increase realism.',
-    inputs: [], outputs: [OUT_H()],
-    note: 'model',
+    inputs: [{ name: 'Input', kind: 'height' }], outputs: [OUT_H()],
+    note: 'exact (Rough 的 Complex 扭曲仍为结构移植)',
   },
 
   {
@@ -1765,7 +1765,7 @@ export const NODES = [
     category: CAT.FX,
     summary: 'Generates terrain texture masks using preset styles and controllable secondary effects.',
     inputs: [{ name: 'Input', kind: 'height' }], outputs: [MASK('Output')],
-    note: 'model',
+    note: 'exact 结构（Flow2 / 复合图案为模型近似）',
   },
 
   {
@@ -1999,7 +1999,7 @@ export const NODES = [
     category: CAT.PRIM,
     summary: 'Texture uses multiple factors (such as chaos, slopes, flow zones, and other geological features) to create a texture mask for any color node to create a texture map. Can be used by itself, or combined with other data maps and selectors.',
     inputs: [{ name: 'Input', kind: 'height' }, { name: 'Input 2', kind: 'height' }], outputs: [MASK('Output')],
-    note: 'model',
+    note: 'exact 结构（Flow2 汇流与 New 强调为模型近似）',
   },
 
   {

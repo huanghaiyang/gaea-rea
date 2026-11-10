@@ -312,6 +312,33 @@ tools/probe-range.mjs           探 Normalize/Autolevel/clamp 语义
 | `SyclFunctions.Cellular3D` | IceFloe |
 | 其它单点 | Distress(GetCanyon+Recurve)、Weathering(ColorTransport)、Mesher(3D) |
 
+### 7.4e 材质节点还原(本轮)
+
+- **GroundTexture**:已从占位换成反编译逐值实现。
+  - Harsh/Rocky:`Surfacer.Rocky`(3 阶有限差分 → 最小主曲率 → 0.025 平台/falloff 线性映射,
+    边界为 0)+ `Combiner.Screen(map, b, Strength*0.003)`。
+  - Rough:`map + Noises.Perlin(res,0.5,10,0.9,FBM,Id,Complex,0.05,0.5,10) * (Strength*0.03)`。
+  - 关键坑:引擎 `Noises.Perlin` 会把双极性噪声重映射成 `0.5 + raw*0.5`;本项目
+    `fnPerlinGrid` 是原始双极性,必须经过 `perlinMap01()`。
+  - `Density != 0` 时对遮罩做指数曲线,系数 `density * -10`(float 池 [32] = -10)。
+- **TextureBase**:按 `Texturize.TextureBase` 管线重写(双层 GetSlope、Flow2、斑块 Perlin、
+  FractalWarp Virtual、GraphicEQ Soil、Peaks/Accentuate/Enhance/Reverse)。Flow2 是原生水流
+  仿真,D8 汇流是对应模型;Accentuate=New 的内嵌 Byte3[117] 色带未提取,用曲率强调代替。
+- **Texturizer**:`TextureBase(In.Normalize(), …, Chaos=0.5, Patches=1)` + `Profiles.Sine`。
+  A–C 用 `Landscapes.Slump`(已按结构移植,含 ridged Perlin 扭曲与 `clamp(0.25,1)-0.25`),
+  D–F 用 `Landscapes.Ridge` 结构移植,Voronoi+阶梯化 Perlin+方向扭曲;G–L 原版是 M2–M6,
+  这里用同尺度 Slump 复合代替(M3–M6 的 FractalTerrace/RockCore.Large 未移植)。
+- **TextureBaker**:反编译 Build 就是原图 Copy,现有 passthrough 已正确。
+- **顺带修复**:`DotNoise` 默认 `Iterations` 来自参数表是 50(引擎上限 500),旧实现的
+  格子数 `2*1.6^it` 会平方爆炸,导致 smoke 卡死;现在格子数封顶 64。
+
+**3D 视口材质(B 项)结论**:`Gaea/Tessellation` 的 28 个 ps_4_0 变体已反汇编,主结构可读
+(`t0` 颜色图 + `t1` 3D LUT + `cb3` 位置/尺度、背面色 `cb0[7]`、Blinn-Phong 式高光),
+但 `data.unity3d` 里 **没有 Texture3D,也没有可解析的 Material→Shader 绑定**
+(`materials.json` 里 shader 名仍是 `Y` / `DebugUIIntField` 这类错解析),无法确定视口实际走
+哪一个变体、更拿不到 LUT 数据。因此本轮未改 render3d.js,避免把当前可用的近似着色换成
+猜出来的常量。若后续能从运行中的 Gaea 抓到实际 RT/材质绑定与 LUT,再按该变体替换。
+
 ### 7.5 结构性/UI 节点(建议明确跳过)
 
 `LoopBegin/LoopEnd/MacroPort/Reseed/Switch/Match/Mixer/Object/PointCloud/Meshify/Draw/Synth/Layers/Meshify/Sunlight/LightX/AO/ColorThreshold/Heal/HydroFix`

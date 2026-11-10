@@ -26,6 +26,9 @@ import {
 import { profileTerrace } from '../kernel/gaea-terrace.js';
 import { cartographerContours } from '../kernel/gaea-cartographer.js';
 import { mapBlur } from '../kernel/gaea-blur.js';
+import { blendPair, BLEND } from '../kernel/gaea-combine.js';
+import { exponentialCurveInPlace, graphicEQ } from '../kernel/gaea-exact.js';
+import { fnPerlinGrid, fnFractalPerlin, fnVoronoiGrid } from '../kernel/fastnoise.js';
 import { flowAccumulation } from '../kernels/erosion.js';
 import { occlusion } from '../kernels/features.js';
 import { fileStub } from '../kernels/generators.js';
@@ -876,27 +879,133 @@ export function driftNoise(ctx) {
   return f;
 }
 
-/** GroundTexture：岩石/粗糙地表纹理。 */
+/* ------------------------------------------------------- Surfacer（GroundTexture 基础） */
+
+/**
+ * `\uf55c\uf0ba\ue6d3.Terrain.Height`：地形的世界高度（米）。引擎里只用于把归一化高度换算成
+ * 世界尺度再做曲率，因此这里沿用侵蚀内核的 800 m，保证同一张图的曲率量级一致。
+ */
+const TERRAIN_HEIGHT_M = 800;
+/** `Surfacer.m_cellLength`：有限差分步长（像素）。 */
+const SURFACER_CELL = 5;
+
+const safeSqrt = (v) => (v <= 0 ? 0 : Math.sqrt(v));
+
+/** `Surfacer.MeanCurvature`。 */
+function meanCurvature(zx, zy, zxx, zyy, zxy) {
+  const n = (1 + zy * zy) * zxx - 2 * zxy * zx * zy + (1 + zx * zx) * zyy;
+  const d = 2 * Math.pow(zx * zx + zy * zy + 1, 1.5);
+  return safeDiv(n, d);
+}
+
+/** `Surfacer.GaussianCurvature`。 */
+function gaussianCurvature(zx, zy, zxx, zyy, zxy) {
+  const n = zxx * zyy - zxy * zxy;
+  const d = Math.pow(zx * zx + zy * zy + 1, 2);
+  return safeDiv(n, d);
+}
+
+/** `Surfacer.MinimalCurvature = Mean - sqrt(Mean² - Gaussian)`。 */
+function minimalCurvature(zx, zy, zxx, zyy, zxy) {
+  const m = meanCurvature(zx, zy, zxx, zyy, zxy);
+  const g = gaussianCurvature(zx, zy, zxx, zyy, zxy);
+  return m - safeSqrt(m * m - g);
+}
+
+/**
+ * `Surfacer.Rocky(map, falloff, density)` 的逐值移植。
+ *
+ * 反编译要点（Gaea.Nodes.resolved.cs:5072）：
+ *   - 高度先乘 Terrain.Height 变成世界单位，再用 5 像素步长做三次有限差分；
+ *   - 取最小主曲率，按 [0, 0.025] 的平台、[0.025, 0.025+falloff] 的线性下落、
+ *     [-falloff, 0] 的线性上升映射成 0..1 的岩石遮罩；
+ *   - 边界一圈保持 0（循环只跑 1..N-2）；
+ *   - Density 非 0 时对整张遮罩做一次指数曲线（曲线系数 = -10 * Density，
+ *     `\ueb77\uf21d\ue95e` 的单参重载，float 常量池 [32] = -10）。
+ */
+function surfacerRocky(src, size, falloff, density) {
+  const curveMap = new Float32Array(size * size);
+  const falloffMax = 0.025 + falloff;
+  const falloffMin = -falloff;
+  const minFactor = falloff;
+  const maxFactor = falloff;
+  const h = (x, y) => src[y * size + x] * TERRAIN_HEIGHT_M;
+  const c1 = 6 * SURFACER_CELL;
+  const c2 = 3 * SURFACER_CELL * SURFACER_CELL;
+  const c3 = 4 * SURFACER_CELL * SURFACER_CELL;
+
+  for (let y = 1; y < size - 1; y++) {
+    for (let x = 1; x < size - 1; x++) {
+      const h00 = h(x - 1, y - 1), h10 = h(x, y - 1), h20 = h(x + 1, y - 1);
+      const h01 = h(x - 1, y), h11 = h(x, y), h21 = h(x + 1, y);
+      const h02 = h(x - 1, y + 1), h12 = h(x, y + 1), h22 = h(x + 1, y + 1);
+
+      const num3 = (h20 + h21 + h22 - h00 - h01 - h02) / c1;
+      const num4 = (h02 + h12 + h22 - h00 - h10 - h20) / c1;
+      const num5 = (h02 + h22 + h01 + h21 + h00 + h20 - 2 * (h12 + h11 + h10)) / c2;
+      const num6 = (h02 + h12 + h22 + h00 + h10 + h20 - 2 * (h01 + h11 + h21)) / c2;
+      const num7 = (h22 + h00 - h02 - h20) / c3;
+
+      const v = minimalCurvature(-num3, -num4, -num5, -num6, -num7);
+      let value = 0;
+      if (v >= 0) {
+        if (v <= 0.025) value = 1;
+        else if (v < falloffMax) value = 1 - (v - 0.025) / maxFactor;
+      } else if (v > falloffMin) {
+        value = (v - falloffMin) / minFactor;
+      }
+      curveMap[y * size + x] = value;
+    }
+  }
+
+  if (density !== 0) exponentialCurveInPlace(curveMap, density * -10);
+  return curveMap;
+}
+
+/**
+ * GroundTexture：反编译 `Build()` 两条分支的精确实现。
+ *
+ *   Harsh/Rocky → `Combiner.Screen(map, Surfacer.Rocky(map, falloff, Density), Strength*0.003)`
+ *                 Harsh 的 falloff = (0.05 + Coverage*0.95) * 0.1，Rocky 固定 0.0001。
+ *   Rough       → `map + Noises.Perlin(res, 0.5, 10, 0.9, FBM, Id, Complex, 0.05, 0.5, 10, 1, 1) * (Strength*0.03)`
+ *                 Perlin 由 FastNoiseSIMD 内核生成；Complex 扭曲仍是结构移植，故整体标注
+ *                 “exact (warp approximate)”。
+ */
 export function groundTexture(ctx) {
   const { size, params, seed } = ctx;
-  const method = ENUM(params, 'Method', 'Harsh');
+  const rawMethod = P(params, 'Method', 'Harsh');
+  const method = typeof rawMethod === 'number'
+    ? (['Harsh', 'Rocky', 'Rough'][rawMethod] || 'Harsh')
+    : String(rawMethod);
   const strength = clamp01(NUM(params, 'Strength', 0.25));
   const coverage = clamp01(NUM(params, 'Coverage', 0.33));
   const density = clamp(NUM(params, 'Density', 0), -1, 1);
+  const src = inOr(ctx, 0, 0.5);
   const f = createField(size, 'height');
   const d = f.data;
-  const inv = 1 / size;
-  const oct = method === 'Harsh' ? 5 : method === 'Rocky' ? 4 : 3;
-  const freq = method === 'Rough' ? 18 : method === 'Rocky' ? 24 : 40;
-  for (let y = 0; y < size; y++) {
-    const v = (y + 0.5) * inv;
-    for (let x = 0; x < size; x++) {
-      const u = (x + 0.5) * inv;
-      let n = noisesPerlin(u, v, freq, oct, 0.55, seed);
-      n = Math.pow(clamp01(n + density * 0.15), method === 'Harsh' ? 0.6 : 1);
-      const mask = smoothstep(1 - coverage, 1, n);
-      d[y * size + x] = clamp01(mask * strength + n * (1 - strength) * 0.35);
-    }
+
+  if (method === 'Rough') {
+    const noise = perlinMap01({
+      size,
+      scale: 0.5,
+      octaves: 10,
+      gain: 0.9,
+      seed: seed | 0,
+      warp: 'Complex',
+      frequency: 0.05,
+      amplitude: 0.5,
+      warpOctaves: 10,
+    });
+    const amp = strength * 0.03;
+    for (let i = 0; i < d.length; i++) d[i] = clamp01(src.data[i] + noise[i] * amp);
+    return f;
+  }
+
+  const falloff = method === 'Harsh' ? (0.05 + coverage * 0.95) * 0.1 : 0.0001;
+  const rock = surfacerRocky(src.data, size, falloff, density);
+  const ratio = strength * 0.003;
+  for (let i = 0; i < d.length; i++) {
+    d[i] = clamp01(blendPair(BLEND.Screen, ratio, src.data[i], rock[i]));
   }
   return f;
 }
@@ -1457,35 +1566,150 @@ export function volcano(ctx) {
 
 /* ================================================================== 侵蚀 / 生成 */
 
-/** Texturizer：程序化表面纹理遮罩。 */
+/**
+ * `Landscapes.Slump(res, Scale, seed)`：两层 Perlin 叠加后做一次支架式扭曲，
+ * 再与自身取暗部，最后 clamp(0.25, 1) - 0.25。Slump 是 QuickTexture A–C 与 M2–M6 的基元。
+ */
+function slumpMap(n, scale, seedS) {
+  const s = clamp(scale, 0, 1);
+  const p1 = perlinMap01({
+    size: n, scale: lerp(0.7, 0.99, s), octaves: 2, gain: 0.5, seed: seedS | 0,
+    warp: 'Complex', frequency: 0.05, amplitude: 0.5, warpOctaves: 12,
+  });
+  const p2 = perlinMap01({
+    size: n, scale: 0.5, octaves: 10, gain: 0.9, seed: (seedS + 2) | 0,
+    warp: 'Complex', frequency: 0.05, amplitude: 0.5, warpOctaves: 10,
+  });
+  const map3 = new Float32Array(n * n);
+  for (let i = 0; i < map3.length; i++) map3[i] = p1[i] + p2[i] * 0.005;
+  const b = fractalWarpVirtual(map3, n, {
+    scale: 0.5, strength: 1, octaves: 12, roughness: 0.5,
+    iterations: 1, direction: 45, noiseSeed: (seedS + 1) | 0, ridged: true, edge: 1,
+  });
+  const out = new Float32Array(n * n);
+  for (let i = 0; i < out.length; i++) out[i] = Math.min(map3[i], b[i]);
+  return clampShiftData(out, 0.25, 1);
+}
+
+/** `Surfaces.M2`：四个不同尺度的 Slump 叠加。 */
+function m2Map(n, scale, seedS) {
+  const a = slumpMap(n, scale, seedS);
+  const b = slumpMap(n, scale * 1.2, seedS + 1);
+  const c = slumpMap(n, scale * 0.8, seedS + 2);
+  const d = slumpMap(n, scale * 1.6, seedS + 3);
+  const out = new Float32Array(n * n);
+  for (let i = 0; i < out.length; i++) out[i] = a[i] - b[i] + (c[i] * 0.5 + d[i] * 0.5);
+  return normalizeData(out);
+}
+
+/**
+ * `Landscapes.Ridge(res, Scale, Height, Definition, seed)` 的结构移植：
+ * Voronoi F1 + 阶梯化 Perlin + 方向扭曲 + 第二次支架扭曲。
+ * DirectionWarpF 用按地形图调制的定向位移近似。
+ */
+function ridgeMap(n, scale, height, definition, seedS) {
+  const s = clamp(scale, 0, 1);
+  const vor = fnVoronoiGrid({
+    size: n, scale: 100 * (1 - s * 1.05), jitter: 0.45, returnType: 2, seed: seedS | 0,
+  });
+  const p = perlinMap01({ size: n, scale: 0.75, octaves: 12, gain: 0.5, seed: (seedS + 1) | 0 });
+  let terr = profileTerrace(p, 67, 0.6, 0.2, 0.8, (seedS + 2) | 0);
+  const w1 = fractalWarpVirtual(terr, n, {
+    scale: 1 - definition * 0.99, strength: 1, octaves: 12, roughness: 0.5,
+    iterations: 1, direction: 45, noiseSeed: (seedS + 3) | 0,
+  });
+  for (let i = 0; i < terr.length; i++) terr[i] = Math.max(terr[i], w1[i]);
+
+  const amt = definition * 1.25 * n;
+  const dx = Math.cos(Math.PI / 4) * amt;
+  const dy = Math.sin(Math.PI / 4) * amt;
+  const map4 = new Float32Array(n * n);
+  for (let y = 0; y < n; y++) {
+    for (let x = 0; x < n; x++) {
+      const i = y * n + x;
+      const guide = (terr[i] - 0.5) * 2;
+      map4[i] = sampleBilinear(vor, n, x + dx * guide, y + dy * guide);
+    }
+  }
+
+  const b = fractalWarpVirtual(map4, n, {
+    scale: s / 2, strength: 0.65, octaves: 12, roughness: 0.5,
+    iterations: 1, direction: 45, noiseSeed: (seedS + 4) | 0, edge: 1,
+  });
+  const out = new Float32Array(n * n);
+  for (let i = 0; i < out.length; i++) {
+    const v = Math.min(map4[i], b[i]);
+    out[i] = Math.min(Math.max(v, 0), s);
+  }
+  normalizeData(out);
+  for (let i = 0; i < out.length; i++) out[i] *= height;
+  return out;
+}
+
+/**
+ * Texturizer：`TextureBase(In.Normalize(), Slope, Flows, Soil, 0.5, 1, Seed)`
+ * 之后按 Style 用 Sine 折叠不同图案。
+ *
+ * A–C 用 Slump，D–F 用 Ridge，G–L 用 M2 及同族 Slump 复合（原版 M3–M6 还含
+ * FractalTerrace / RockCore.Large，这里用同尺度 Slump 复合代替）。
+ */
 export function texturizer(ctx) {
   const { size, params, seed } = ctx;
   const src = inOr(ctx, 0, 0.5);
-  const style = ENUM(params, 'Style', 'A');
+  const styleRaw = P(params, 'Style', 'A');
+  const style = typeof styleRaw === 'number'
+    ? ('ABCDEFGHIJKL'[styleRaw] || 'A')
+    : (String(styleRaw).match(/[A-La-l]/)?.[0] || 'A').toUpperCase();
   const factor = clamp01(NUM(params, 'Factor', 0.5));
   const secondary = clamp01(NUM(params, 'Secondary', 0));
   const flows = clamp01(NUM(params, 'Flows', 0.33));
   const slopeK = clamp01(NUM(params, 'Slope', 0.33));
   const soil = clamp01(NUM(params, 'Soil', 0.33));
-  const seedS = NUM(params, 'Seed', seed);
-  const f = createField(size, 'mask');
-  const slope = slopeMagnitude(src);
-  const inv = 1 / size;
-  const freq = 10 + factor * 50;
-  for (let y = 0; y < size; y++) {
-    const v = (y + 0.5) * inv;
-    for (let x = 0; x < size; x++) {
-      const u = (x + 0.5) * inv;
-      const i = y * size + x;
-      let n;
-      if (style === 'A' || style === 'E') n = Math.pow(clamp01(fractalSum(perlin2, u * freq, v * freq, seedS, 4, 2.2, 0.5, 'Standard') * 0.5 + 0.5), 0.7);
-      else if (style === 'B') n = value2(u * freq * 1.5, v * freq * 1.5, seedS);
-      else n = fractalSum(perlin2, u * freq, v * freq, seedS, 3, 2, 0.5, 'Ridged');
-      const slopeMask = slope.data[i] * slopeK * 2;
-      const soilMask = (1 - clamp01(src.data[i])) * soil * 2;
-      f.data[i] = clamp01(n * factor * (0.4 + slopeMask * 0.3 + soilMask * 0.3) + secondary * 0.2 + flows * 0.1);
-    }
+  const seedS = NUM(params, 'Seed', seed) | 0;
+  const fmap = (a, b) => a + (b - a) * factor;
+
+  const norm = Float32Array.from(src.data);
+  normalizeData(norm);
+  const hf = textureBaseCompute(norm, size, {
+    slope: slopeK, scale: flows, soil, patches: 1, chaos: 0.5,
+    peaks: 0, accentuate: 'Off', enhance: 'None', reverse: false,
+    seed: seedS, legacy: false,
+  });
+
+  let pattern;
+  let folds;
+  switch (style) {
+    case 'B':
+      pattern = slumpMap(size, fmap(0.4, 0.75), seedS + 25); folds = fmap(0.05, 1.8); break;
+    case 'C':
+      pattern = slumpMap(size, fmap(0.4, 0.75), seedS + 2); folds = fmap(0.5, 3); break;
+    case 'D':
+      pattern = ridgeMap(size, fmap(0.4, 0.75), 0.6, 0.4, seedS + 2); folds = fmap(0.02, 3); break;
+    case 'E':
+      pattern = ridgeMap(size, fmap(0.4, 0.75), 0.6, 0.4, seedS + 6); folds = fmap(0.02, 2); break;
+    case 'F':
+      pattern = ridgeMap(size, fmap(0.4, 0.75), 0.5, 0.5, seedS + 6); folds = fmap(0.02, 0.75); break;
+    case 'G':
+      pattern = m2Map(size, fmap(0.6, 0.75), seedS + 6); folds = fmap(0.02, 0.75); break;
+    case 'H':
+      pattern = m2Map(size, fmap(0.26, 0.45), seedS + 6); folds = fmap(0.02, 0.75); break;
+    case 'I':
+      pattern = m2Map(size, fmap(0.16, 0.45) * 1.3, seedS + 6); folds = fmap(0.02, 0.75); break;
+    case 'J':
+      pattern = m2Map(size, fmap(0.46, 0.95), seedS + 6); folds = fmap(0.02, 0.75); break;
+    case 'K':
+      pattern = m2Map(size, fmap(0.26, 0.95), seedS + 6); folds = fmap(0.02, 0.75); break;
+    case 'L':
+      pattern = m2Map(size, fmap(0.26, 0.85), seedS + 6); folds = fmap(0.02, 0.75); break;
+    default:
+      pattern = slumpMap(size, fmap(0.4, 0.75), seedS + 5); folds = fmap(0.02, 0.8); break;
   }
+
+  let out = sineFold(hf, pattern, folds, new Float32Array(size * size));
+  if (secondary > 0) out = sineFold(out, out, secondary, new Float32Array(size * size));
+
+  const f = createField(size, 'mask');
+  for (let i = 0; i < out.length; i++) f.data[i] = clamp01(out[i]);
   return f;
 }
 
@@ -2056,40 +2280,317 @@ export function mixer(ctx) {
   return out;
 }
 
-/** TextureBase：地表纹理基础遮罩。 */
+/* --------------------------------------------------------------- Texturize */
+
+/** 地形世界宽度（米）。与 TERRAIN_HEIGHT_M 同尺度，使坡度角与 Gaea 的
+ *  `slopeCoeff = 0.03125 * Terrain.Height / (Terrain.Width / res)` 量级一致。 */
+const TERRAIN_WIDTH_M = 800;
+
+/** `Map.Autolevel()`：最小值拉到 0、最大值拉到 1。 */
+function normalizeData(data) {
+  let mn = Infinity, mx = -Infinity;
+  for (let i = 0; i < data.length; i++) {
+    const v = data[i];
+    if (v < mn) mn = v;
+    if (v > mx) mx = v;
+  }
+  const range = mx - mn;
+  if (!(Math.abs(range) >= 1e-12)) return data;
+  const inv = 1 / range;
+  for (let i = 0; i < data.length; i++) data[i] = (data[i] - mn) * inv;
+  return data;
+}
+
+/** `\ueb77\uf21d\ue95e(map, a, b)`：clamp(v, a, b) - a。 */
+function clampShiftData(data, a, b) {
+  for (let i = 0; i < data.length; i++) {
+    const v = data[i];
+    data[i] = (v < a ? a : v > b ? b : v) - a;
+  }
+  return data;
+}
+
+/**
+ * `AspectMaps.GetSlope(map, min, max, falloff)` 的逐值移植。
+ *
+ * 3×3 Sobel（权重 3/10）得到水平/垂直导数，乘 `slopeCoeff` 后取 atan 得到角度；
+ * 角度落在 [min, max] 内为 1，两侧按 falloff 线性衰减。
+ */
+function getSlopeMap(src, size, min, max, falloff) {
+  const out = new Float32Array(size * size);
+  const coeff = 0.03125 * TERRAIN_HEIGHT_M / (TERRAIN_WIDTH_M / size);
+  for (let y = 0; y < size; y++) {
+    const ym = y > 0 ? y - 1 : 0;
+    const yp = y < size - 1 ? y + 1 : size - 1;
+    for (let x = 0; x < size; x++) {
+      const xm = x > 0 ? x - 1 : 0;
+      const xp = x < size - 1 ? x + 1 : size - 1;
+      const a = src[ym * size + xm], b = src[ym * size + x], c = src[ym * size + xp];
+      const d = src[y * size + xm], e = src[y * size + xp];
+      const f = src[yp * size + xm], g = src[yp * size + x], h = src[yp * size + xp];
+      const gx = 3 * (c + h - a - f) + 10 * (e - d);
+      const gy = 3 * (a + c - f - h) + 10 * (b - g);
+      const angle = Math.atan(Math.sqrt(gx * gx + gy * gy) * coeff) * 57.29578;
+      let v = 0;
+      if (angle >= min && angle <= max) v = 1;
+      else if (falloff > 0) {
+        if (angle > max) v = Math.max(0, 1 - (angle - max) / falloff);
+        else v = Math.max(0, 1 - (min - angle) / falloff);
+      }
+      out[y * size + x] = v;
+    }
+  }
+  return out;
+}
+
+/**
+ * `Simulations.Flow2` 的示意实现：引擎里是一套原生水流模拟，这里用与 FlowMap 相同的
+ * D8 汇流 + 对数压缩，保留 Flow Length / Flow Volume 对通道的强弱影响。
+ */
+function flow2Model(src, size, flowLength, flowVolume) {
+  const acc = new Float32Array(size * size).fill(1);
+  const heights = Float32Array.from(src);
+  const order = Array.from({ length: size * size }, (_, i) => i)
+    .sort((a, b) => heights[b] - heights[a]);
+  const dirs = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
+  for (let k = 0; k < order.length; k++) {
+    const i = order[k];
+    const x = i % size, y = (i / size) | 0;
+    const hc = heights[i];
+    let best = 0, bx = -1, by = -1;
+    for (let dd = 0; dd < 8; dd++) {
+      const nx = x + dirs[dd][0], ny = y + dirs[dd][1];
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
+      const dist = dirs[dd][0] && dirs[dd][1] ? Math.SQRT2 : 1;
+      const slope = (hc - heights[ny * size + nx]) / dist;
+      if (slope > best) { best = slope; bx = nx; by = ny; }
+    }
+    if (bx >= 0) acc[by * size + bx] += acc[i];
+  }
+  let maxAcc = 1;
+  for (let i = 0; i < acc.length; i++) if (acc[i] > maxAcc) maxAcc = acc[i];
+  const logMax = Math.log1p(maxAcc) || 1;
+  const out = new Float32Array(size * size);
+  const gamma = 1 + (1 - flowVolume) * 2;
+  const gain = 0.35 + flowLength * 0.65;
+  for (let i = 0; i < out.length; i++) {
+    out[i] = Math.pow(Math.log1p(acc[i]) / logMax, gamma) * gain;
+  }
+  return out;
+}
+
+/**
+ * `Warps.FractalWarp`（Virtual 模式）的移植：用 12 阶 FBM Perlin 生成位移场，
+ * 再按 `strength * resolution * size` 的幅度对高度场做双线性重采样。
+ */
+function fractalWarpVirtual(src, size, opts) {
+  const {
+    scale = 0.5, strength = 0.5, octaves = 12, roughness = 0.5,
+    iterations = 1, direction = 45, noiseSeed = 0, normalized = false,
+    edge = 0, ridged = false,
+  } = opts;
+  const s = Math.max(1e-4, scale);
+  const wrap = edge === 1;
+  const sample = (data, x, y) => {
+    if (wrap) {
+      x = ((x % size) + size) % size;
+      y = ((y % size) + size) % size;
+    }
+    return sampleBilinear(data, size, x, y);
+  };
+  const vx = new Float32Array(size * size);
+  const vy = new Float32Array(size * size);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const i = y * size + x;
+      vx[i] = x;
+      vy[i] = y;
+    }
+  }
+  const warp = strength * size * s;
+  const freq = 1 / (s * size);
+  const step = 360 / Math.max(1, iterations);
+  let dir = direction;
+  let noiseId = noiseSeed;
+
+  for (let it = 0; it < iterations; it++) {
+    const sign = (it & 1) ? -1 : 1;
+    const seedX = noiseId++;
+    const seedY = noiseId++;
+    dir += step;
+    const nvx = new Float32Array(size * size);
+    const nvy = new Float32Array(size * size);
+    const fractalType = ridged ? 2 : 0;
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const px = x * freq, py = y * freq;
+        let nx = fnFractalPerlin(seedX, px, py, 0, { octaves, gain: roughness, fractalType }) * sign;
+        let ny = fnFractalPerlin(seedY, px, py, 0, { octaves, gain: roughness, fractalType }) * sign;
+        if (normalized) {
+          const inv = 0.5 / Math.sqrt(nx * nx + ny * ny + 0.1);
+          nx *= inv;
+          ny *= inv;
+        }
+        const i = y * size + x;
+        nvx[i] = sample(vx, x + nx * warp, y + ny * warp);
+        nvy[i] = sample(vy, x + nx * warp, y + ny * warp);
+      }
+    }
+    vx.set(nvx);
+    vy.set(nvy);
+  }
+
+  const out = new Float32Array(size * size);
+  for (let i = 0; i < out.length; i++) out[i] = sample(src, vx[i], vy[i]);
+  return out;
+}
+
+/** `Noises.Perlin` 的场级包装：引擎内部把 FastNoise 的双极性输出映射成 `0.5 + raw*0.5`。 */
+function perlinMap01(opts) {
+  const g = fnPerlinGrid(opts);
+  for (let i = 0; i < g.length; i++) g[i] = 0.5 + g[i] * 0.5;
+  return g;
+}
+
+/** `Profiles.Sine(a, b, amount)`：以 b 为折叠频率对 a 做正弦折叠。 */
+function sineFold(a, b, amount, out) {
+  const twoPi = Math.PI * 2;
+  for (let i = 0; i < out.length; i++) {
+    out[i] = (Math.sin((a[i] - 0.5) * b[i] * amount * twoPi) * 0.5) + 0.5;
+  }
+  return out;
+}
+
+/** `AspectMaps.GetCurvature(map, min, max, falloff, Average)` 的简化版。 */
+function curvatureMap(src, size, min, max, falloff) {
+  const out = new Float32Array(size * size);
+  for (let y = 1; y < size - 1; y++) {
+    for (let x = 1; x < size - 1; x++) {
+      const i = y * size + x;
+      const c = src[i];
+      const lap = (src[i - 1] + src[i + 1] + src[i - size] + src[i + size]) * 0.25 - c;
+      const angle = Math.atan(Math.abs(lap) * 256) * 57.29578;
+      let v = 0;
+      if (angle >= min && angle <= max) v = 1;
+      else if (falloff > 0) {
+        if (angle > max) v = Math.max(0, 1 - (angle - max) / falloff);
+        else v = Math.max(0, 1 - (min - angle) / falloff);
+      }
+      out[i] = v;
+    }
+  }
+  return out;
+}
+
+/**
+ * TextureBase：`Texturize.TextureBase(map, Slope, Scale, Soil, Chaos, Patches, Seed)`。
+ *
+ * 结构完全按反编译（Gaea.Nodes.resolved.cs:23369 → Texturize）：坡度双层遮罩 +
+ * Flow2 汇流 + Perlin 斑块 + FractalWarp 扰动 + GraphicEQ 土壤层，最后叠加
+ * Peaks / Accentuation / Enhance / Reverse。
+ * 其中 Flow2 与 Virtual 扭曲里的复数噪声无法逐位复刻，标注为模型近似。
+ */
+function textureBaseCompute(mapIn, n, o) {
+  const slope = o.slope;
+  const scale = o.scale;
+  const soil = o.soil;
+  const patches = o.patches;
+  const chaos = o.chaos;
+  const peaks = o.peaks;
+  const accentuate = o.accentuate;
+  const enhance = o.enhance;
+  const reverse = o.reverse;
+  const seedS = o.seed | 0;
+  if (o.legacy && false) { /* 保留 legacy 分支位，当前版本无差异 */ }
+
+  const map = Float32Array.from(mapIn);
+  const map2 = getSlopeMap(map, n, 9, slope * 0.25 * 90, 27.000002);
+  const map3 = getSlopeMap(map, n, 54.000004, 90, 27.000002);
+
+  // 汇流层：Normalize → 指数曲线（Scale 映射到 -1..1）
+  const flow = normalizeData(flow2Model(map, n, scale, soil));
+  exponentialCurveInPlace(flow, (-1 + 2 * scale) * -10);
+
+  // 斑块层
+  const patch = normalizeData(perlinMap01({
+    size: n, scale: 0.5 * scale, octaves: 12, gain: 0.65, seed: seedS + 1,
+    warp: 'Complex', frequency: 0.05, amplitude: 0.5, warpOctaves: 10,
+  }));
+
+  const map4 = new Float32Array(n * n);
+  for (let i = 0; i < map4.length; i++) {
+    map4[i] = blendPair(BLEND.Add, 0.5, patch[i], map2[i] + map3[i]);
+  }
+  const map5 = new Float32Array(n * n);
+  for (let i = 0; i < map5.length; i++) map5[i] = lerp(map4[i], patch[i], 0.65);
+
+  // 细节扰动，再与 map5 取暗部
+  let b = fractalWarpVirtual(map5, n, {
+    scale: chaos * 0.09,
+    strength: patches * 3,
+    octaves: 12,
+    roughness: 0.5,
+    iterations: 1,
+    direction: 45,
+    noiseSeed: seedS + 2,
+  });
+  for (let i = 0; i < b.length; i++) b[i] = Math.min(map5[i], b[i]);
+
+  // 土壤层
+  const map6 = normalizeData(graphicEQ(map, n, [0, 0, 0, 0, soil * 0.5, soil, soil * 2]));
+  const m = new Float32Array(n * n);
+  for (let i = 0; i < m.length; i++) {
+    const blended = lerp(b[i], map6[i], soil);
+    m[i] = lerp(blended, blended + flow[i], 0.7) + map6[i] * 0.1;
+  }
+
+  if (peaks > 0) {
+    const p = normalizeData(graphicEQ(map, n, [0, 2, 2, 2, 2, 1, 1]));
+    for (let i = 0; i < m.length; i++) m[i] = clamp01(m[i] + p[i] * peaks);
+  }
+
+  if (accentuate === 'Old') {
+    const curv = curvatureMap(map, n, 0, 1, 0.1);
+    for (let i = 0; i < m.length; i++) m[i] = clamp01(m[i] + curv[i] * 0.5);
+  } else if (accentuate === 'New') {
+    // 反编译里 New 走的是内嵌色带（Byte3[117]），这里用同源的曲率强调代替。
+    const curv = curvatureMap(map, n, 0, 1, 0.1);
+    for (let i = 0; i < m.length; i++) m[i] = clamp01(m[i] + Math.pow(curv[i], 0.8) * 0.5);
+  }
+
+  if (enhance === 'Equalize') {
+    const tmp = createField(n, 'height');
+    tmp.data.set(m);
+    equalizeInPlace(tmp, 1, 0, 1, 16384);
+    m.set(tmp.data);
+  } else if (enhance === 'Autolevel') {
+    normalizeData(m);
+  }
+
+  if (reverse) for (let i = 0; i < m.length; i++) m[i] = 1 - m[i];
+  for (let i = 0; i < m.length; i++) m[i] = clamp01(m[i]);
+  return m;
+}
+
+/** TextureBase 节点入口。 */
 export function textureBase(ctx) {
   const { size, params, seed } = ctx;
   const src = inOr(ctx, 0, 0.5);
-  const slopeW = clamp01(NUM(params, 'Slope', 0.25));
-  const flowsW = clamp01(NUM(params, 'Flows', 0.15));
-  const soilW = clamp01(NUM(params, 'Soil', 0.6));
-  const patchesW = clamp01(NUM(params, 'Patches', 0.4));
-  const chaosW = clamp01(NUM(params, 'Chaos', 0.1));
-  const peaks = clamp(NUM(params, 'Peaks', 0), -1, 1);
-  const accentuate = ENUM(params, 'Accentuate', 'Off');
-  const enhance = ENUM(params, 'Enhance', 'None');
-  const reverse = B(params, 'Reverse');
-  const seedS = NUM(params, 'Seed', seed);
+  const m = textureBaseCompute(src.data, size, {
+    slope: clamp01(NUM(params, 'Slope', 0.25)),
+    scale: clamp01(NUM(params, 'Flows', 0.15)),
+    soil: clamp01(NUM(params, 'Soil', 0.6)),
+    patches: clamp01(NUM(params, 'Patches', 0.4)),
+    chaos: clamp01(NUM(params, 'Chaos', 0.1)),
+    peaks: clamp(NUM(params, 'Peaks', 0), -1, 1),
+    accentuate: ENUM(params, 'Accentuate', 'Off'),
+    enhance: ENUM(params, 'Enhance', 'Autolevel'),
+    reverse: B(params, 'Reverse'),
+    seed: NUM(params, 'Seed', seed),
+    legacy: false,
+  });
   const f = createField(size, 'mask');
-  const slope = slopeMagnitude(src);
-  const inv = 1 / size;
-  for (let y = 0; y < size; y++) {
-    const v = (y + 0.5) * inv;
-    for (let x = 0; x < size; x++) {
-      const i = y * size + x;
-      const u = x / size;
-      const patch = fractalSum(perlin2, u * 8, v * 8, seedS, 4, 2, 0.5, 'Standard') * 0.5 + 0.5;
-      let n = slope.data[i] * slopeW + (1 - src.data[i]) * soilW + patch * patchesW;
-      n += Math.abs(perlin2(u * 20, v * 20, seedS)) * flowsW;
-      n += (value2(u * 30, v * 30, seedS) - 0.5) * chaosW;
-      n += (src.data[i] - 0.5) * peaks * 0.6;
-      if (accentuate === 'New') n = Math.pow(clamp01(n), 0.8);
-      else if (accentuate === 'Old') n = Math.pow(clamp01(n), 1.3);
-      if (enhance === 'Autolevel') n = clamp01((n - 0.35) / 0.3);
-      if (reverse) n = 1 - n;
-      f.data[i] = clamp01(n);
-    }
-  }
+  f.data.set(m);
   return f;
 }
 

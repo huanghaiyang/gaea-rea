@@ -79,8 +79,11 @@ const libItems = shim.document.querySelectorAll('#lib-list .lib-item');
 ok(libItems.length === 182, 'library rendered 182 entries', libItems.length);
 const implCount = app.IMPLEMENTED.size;
 ok(implCount >= 50, 'registry implements a substantial node set', `${implCount} nodes`);
-const catOnly = 182 - CATALOG.nodes.filter((n) => app.IMPLEMENTED.has(n.name)).length;
-ok(catOnly > 0, 'catalog-only nodes exist and are labelled', `${catOnly} catalog-only`);
+// 目录里的 182 个名字现在全部有算法实现，曾经存在的"仅目录"节点已经清零。
+// 断言方向随之翻转: 覆盖必须保持完整，一旦某个节点回退成"仅目录"，这里立刻失败。
+const catOnly = CATALOG.nodes.map((n) => n.name).filter((n) => !app.IMPLEMENTED.has(n));
+ok(catOnly.length === 0, 'every catalogue name is implemented (nothing catalog-only left)',
+  catOnly.length ? `${catOnly.length} catalog-only: ${catOnly.slice(0, 5).join(', ')}` : `${implCount} implemented`);
 
 // search
 const search = shim.registry.byId.get('lib-search');
@@ -234,14 +237,17 @@ ok(badge && /implemented|model|approx|stub|not implemented/i.test(badge.textCont
 
 /* ------------------------------------------------------------------ unknown catalog node */
 
-section('catalog-only node is usable and honest');
-const unknownName = CATALOG.nodes.map((n) => n.name).find((n) => !app.IMPLEMENTED.has(n)) || null;
-ok(!!unknownName, 'a catalog-only node exists', unknownName);
+section('unknown node is usable and honest');
+// 目录已全覆盖，没有"仅目录"节点可用了；但"未知节点仍可用且诚实"这条承诺必须继续受测，
+// 所以合成一个任何别名都解析不到的名字来当未知节点
+// （不能用 'Erosion3' 这类带数字后缀的名字，resolveEntry 会把它解析回 Erosion2）。
+const unknownName = CATALOG.nodes.map((n) => n.name).find((n) => !app.IMPLEMENTED.has(n)) || 'NoSuchNodeZz';
+ok(!app.IMPLEMENTED.has(unknownName), 'an unknown node name is available', unknownName);
 if (unknownName) {
   const n0 = state.graph.nodes.length;
   editor.addNodeCenter(unknownName);
   await sleep(20);
-  ok(state.graph.nodes.length === n0 + 1, 'catalog-only node can be added to the graph');
+  ok(state.graph.nodes.length === n0 + 1, 'unknown node can be added to the graph');
   const un = state.graph.nodes[state.graph.nodes.length - 1];
   mod.selectNode(un.id);
   await sleep(20);
@@ -249,7 +255,7 @@ if (unknownName) {
   ok(badge && /not implemented|stub/i.test(badge.textContent), 'shown as not implemented', badge ? badge.textContent : '-');
   // it must still evaluate (passthrough) without error
   const r = await mod.getEvaluator().requestNow('test-unknown');
-  ok(r && r.errors.length === 0, 'catalog-only node evaluates as a passthrough',
+  ok(r && r.errors.length === 0, 'unknown node evaluates as a passthrough',
     r ? JSON.stringify(r.errors) : 'no result');
   editor.deleteSelected();
   await sleep(20);

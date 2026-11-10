@@ -189,7 +189,9 @@ async function main() {
   undo();
 
   /* ---------------------------------------------------------- 6. unimplemented node is honest */
-  const catalogOnly = (state.catalog.nodes.map((n) => n.name).find((n) => !app.IMPLEMENTED.has(n))) || 'Erosion3';
+  // 目录已全覆盖时，用一个任何别名都解析不到的名字来合成未知节点
+  // （'Erosion3' 之类带数字后缀的名字会被 resolveEntry 解析回 Erosion2）。
+  const catalogOnly = (state.catalog.nodes.map((n) => n.name).find((n) => !app.IMPLEMENTED.has(n))) || 'NoSuchNodeZz';
   app.editor.addNodeCenter(catalogOnly);
   await sleep(20);
   const unknown = state.graph.nodes[state.graph.nodes.length - 1];

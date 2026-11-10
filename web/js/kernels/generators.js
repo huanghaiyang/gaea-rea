@@ -481,8 +481,10 @@ export function dotNoise(ctx) {
   const inv = 1 / size;
 
   for (let it = 0; it < iterations; it++) {
-    // feature count grows with iteration; each layer keeps its own lattice
-    const cells = Math.max(1, Math.round(2 * Math.pow(1.6, it)));
+    // feature count grows with iteration; each layer keeps its own lattice.
+    // Cap the lattice so a large Iterations value (Gaea allows up to 500) cannot make the
+    // per-layer loop quadratic-explode into billions of cells.
+    const cells = Math.max(1, Math.min(64, Math.round(2 * Math.pow(1.6, it))));
     const amp = Math.pow(multiplier, it) / iterations;
     for (let cy = 0; cy < cells; cy++) {
       for (let cx = 0; cx < cells; cx++) {
