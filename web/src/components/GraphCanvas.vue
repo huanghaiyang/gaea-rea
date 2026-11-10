@@ -240,6 +240,29 @@ const linkPath = computed(() => {
   return `M ${l.x} ${l.y} C ${l.x + dx} ${l.y}, ${b.x - dx} ${b.y}, ${b.x} ${b.y}`;
 });
 
+/**
+ * While a link is dragged: which input ports would accept it, keyed by node id.
+ * Uses the same `validateConnection` the drop itself runs, so the blink can never advertise a
+ * connection that would then be refused (wrong kind, cycle, missing port).
+ */
+const linkTargets = computed(() => {
+  const l = linking.value;
+  const targets = new Map();
+  if (!l) return targets;
+  for (const n of viewNodes.value) {
+    const ports = new Set();
+    for (let p = 0; p < n.inputs; p++) {
+      if (validateConnection(state.graph, l.nodeId, n.id, p, l.port).ok) ports.add(p);
+    }
+    if (ports.size) targets.set(n.id, ports);
+  }
+  return targets;
+});
+
+function isTargetPort(nodeId, port) {
+  return linkTargets.value.get(nodeId)?.has(port) === true;
+}
+
 /** Frame every node, with a margin. */
 function frameAll() {
   const ns = state.graph.nodes || [];
@@ -366,7 +389,7 @@ defineExpose({ frameAll, view });
         v-for="n in viewNodes"
         :key="n.id"
         class="node"
-        :class="{ selected: n.selected, missing: !n.implemented }"
+        :class="{ selected: n.selected, missing: !n.implemented, connectable: linkTargets.has(n.id) }"
       >
         <rect
           :x="n.x" :y="n.y" :width="n.w" :height="n.h" rx="5"
@@ -397,6 +420,7 @@ defineExpose({ frameAll, view });
         <circle
           v-for="i in n.inputs" :key="`i${i}`"
           class="port in"
+          :class="{ valid: isTargetPort(n.id, i - 1) }"
           :cx="n.x"
           :cy="n.y + n.h / 2 + portOffset(i - 1, n.inputs)"
           r="4"
@@ -435,6 +459,21 @@ defineExpose({ frameAll, view });
 
 .port { fill: #45454f; stroke: #6a6a76; stroke-width: 1; cursor: crosshair; }
 .port.out:hover, .port.in:hover { fill: #7cb7ff; }
+
+/* Legal drop targets blink while a link is dragged; both the node outline and the exact
+ * input ports that accept it. The colour matches the pending-link blue. */
+@keyframes link-target-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.node.connectable rect {
+  stroke: #7cb7ff; stroke-width: 2;
+  animation: link-target-blink 0.9s ease-in-out infinite;
+}
+.node.connectable .port.in.valid {
+  fill: #7cb7ff; stroke: #cfe4ff;
+  animation: link-target-blink 0.9s ease-in-out infinite;
+}
 
 .hint {
   position: absolute; inset: 50% 0 auto 0; text-align: center; margin: 0;

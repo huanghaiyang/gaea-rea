@@ -120,6 +120,7 @@ export class GraphEditor {
         this.linkFrom = { nodeId: hit.nodeId, port: hit.index };
         this.mouse = { x: wx, y: wy };
         this._schedule();
+        this._startLinkPulse();
         return;
       }
       if (hit && hit.kind === 'port' && hit.side === 'in') {
@@ -331,6 +332,10 @@ export class GraphEditor {
    * they are released with the element and are deliberately not tracked here.
    */
   dispose() {
+    if (this._pulseId) {
+      cancelAnimationFrame(this._pulseId);
+      this._pulseId = null;
+    }
     if (this._busOff) {
       for (const off of this._busOff) {
         try { off(); } catch { /* an already-detached handler is not an error */ }
@@ -365,6 +370,8 @@ export class GraphEditor {
     // edges under nodes
     for (const e of state.graph.edges) this._drawEdge(ctx, e);
     if (this.linkFrom) this._drawPendingLink(ctx);
+    // Legal drop targets for the link being dragged, resolved once per frame.
+    this._targets = this.linkFrom ? this._linkTargets() : null;
     for (const n of state.graph.nodes) this._drawNode(ctx, n);
 
     ctx.restore();
@@ -422,6 +429,33 @@ export class GraphEditor {
     ctx.restore();
   }
 
+  /** Input ports that would accept the link being dragged, keyed by node id. */
+  _linkTargets() {
+    const targets = new Map();
+    if (!this.linkFrom) return targets;
+    for (const node of state.graph.nodes) {
+      const size = this.nodeSize(node);
+      const ports = [];
+      for (let p = 0; p < size.inputs; p++) {
+        if (validateConnection(state.graph, this.linkFrom.nodeId, node.id, p, this.linkFrom.port).ok) ports.push(p);
+      }
+      if (ports.length) targets.set(node.id, ports);
+    }
+    return targets;
+  }
+
+  /** Keep redrawing while a link is dragged so the target highlight can blink. */
+  _startLinkPulse() {
+    if (this._pulseId) return;
+    const tick = () => {
+      this._pulseId = null;
+      if (!this.linkFrom) return;
+      this.draw();
+      this._pulseId = requestAnimationFrame(tick);
+    };
+    this._pulseId = requestAnimationFrame(tick);
+  }
+
   _drawPendingLink(ctx) {
     const from = getNode(state.graph, this.linkFrom.nodeId);
     if (!from) return;
@@ -470,6 +504,25 @@ export class GraphEditor {
     ctx.globalAlpha = impl ? 0.85 : 0.35;
     ctx.fillRect(node.x, node.y, 3.5, size.h);
     ctx.restore();
+
+    // Blinking highlight while a link is dragged: this node accepts it, at the listed ports.
+    const targets = this._targets && this._targets.get(node.id);
+    if (targets && targets.length) {
+      const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 160);
+      ctx.save();
+      ctx.globalAlpha = 0.3 + 0.6 * pulse;
+      ctx.strokeStyle = '#4c9aff';
+      ctx.lineWidth = 2;
+      roundRect(ctx, node.x, node.y, size.w, size.h, r);
+      ctx.stroke();
+      for (const p of targets) {
+        const pt = this.portPos(node, 'in', p, size.inputs);
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, PORT_R + 2 + 2 * pulse, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
 
     // title
     ctx.fillStyle = impl ? '#e6edf3' : '#a9a4b0';
